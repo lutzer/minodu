@@ -1,0 +1,6 @@
+.venv
+__pycache__
+database
+documents
+models/stt_models/*.*
+!models/stt_models/*.zip

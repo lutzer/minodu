@@ -1,0 +1,6 @@
+.venv
+__pycache__
+.DS_Store
+minodu_ai_services/models/stt_models/*.*
+minodu_ai_services/models/stt_models/*.zip
+minodu_ai_services/database
