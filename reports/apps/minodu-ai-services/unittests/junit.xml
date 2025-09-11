@@ -1,1 +1,45 @@
-<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="15" time="21.964" timestamp="2025-09-11T21:27:07.377198+02:00" hostname="Lutzs-MacBook-Pro.local"><testcase classname="tests.test_rag.TestRagAPI" name="test_ask" time="3.728" /><testcase classname="tests.test_stt.TestSttAPI" name="test_transcribe_mono" time="1.148" /><testcase classname="tests.test_stt.TestSttAPI" name="test_transcribe_stereo" time="1.096" /><testcase classname="tests.test_stt.TestSttAPI" name="test_transcribe_mp3" time="2.057" /><testcase classname="tests.test_stt.TestStt" name="test_transcribe_english_mono" time="1.117" /><testcase classname="tests.test_stt.TestStt" name="test_transcribe_english_stereo" time="1.120" /><testcase classname="tests.test_stt.TestStt" name="test_transcribe_french_mp3" time="1.974" /><testcase classname="tests.test_stt.TestStt" name="test_transcribe_kabye_should_be_empty" time="6.094" /><testcase classname="tests.test_tts.TestTtsAPI" name="test_synthesize" time="0.428" /><testcase classname="tests.test_tts.TestTts" name="test_synthesize_some_data_en" time="0.411" /><testcase classname="tests.test_tts.TestTts" name="test_synthesize_some_data_fr" time="0.348" /><testcase classname="tests.test_tts.TestTts" name="test_create_wav" time="0.413" /><testcase classname="tests.test_tts.TestTts" name="test_create_wave_header" time="0.000" /><testcase classname="tests.test_tts.TestTts" name="test_generate_streaming_wave" time="0.423" /><testcase classname="tests.test_weather.TestWeatherAPI" name="test_weather_text" time="0.740" /></testsuite></testsuites>
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="4" failures="0" skipped="0" tests="4" time="2.309" timestamp="2025-09-11T22:08:22.828923+02:00" hostname="Lutzs-MacBook-Pro.local"><testcase classname="" name="tests.test_rag" time="0.000"><error message="collection failure">#x1B[31mImportError while importing test module '/Users/lutz/Documents/Minodou/code/minodu/apps/minodu-ai-services/tests/test_rag.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+#x1B[1m#x1B[31m/Users/lutz/.pyenv/versions/3.11.13/lib/python3.11/importlib/__init__.py#x1B[0m:126: in import_module
+    #x1B[0m#x1B[94mreturn#x1B[39;49;00m _bootstrap._gcd_import(name[level:], package, level)#x1B[90m#x1B[39;49;00m
+#x1B[1m#x1B[31mtests/test_rag.py#x1B[0m:5: in &lt;module&gt;
+    #x1B[0m#x1B[94mfrom#x1B[39;49;00m#x1B[90m #x1B[39;49;00m#x1B[04m#x1B[96mminodu_ai_services#x1B[39;49;00m#x1B[04m#x1B[96m.#x1B[39;49;00m#x1B[04m#x1B[96msrc#x1B[39;49;00m#x1B[04m#x1B[96m.#x1B[39;49;00m#x1B[04m#x1B[96mapp#x1B[39;49;00m#x1B[90m #x1B[39;49;00m#x1B[94mimport#x1B[39;49;00m app#x1B[90m#x1B[39;49;00m
+#x1B[1m#x1B[31mminodu_ai_services/src/app.py#x1B[0m:12: in &lt;module&gt;
+    #x1B[0m#x1B[94mfrom#x1B[39;49;00m#x1B[90m #x1B[39;49;00m#x1B[04m#x1B[96m.#x1B[39;49;00m#x1B[04m#x1B[96mstt#x1B[39;49;00m#x1B[04m#x1B[96m.#x1B[39;49;00m#x1B[04m#x1B[96mstt_transcriber#x1B[39;49;00m#x1B[90m #x1B[39;49;00m#x1B[94mimport#x1B[39;49;00m SttTranscriber#x1B[90m#x1B[39;49;00m
+#x1B[1m#x1B[31mminodu_ai_services/src/stt/stt_transcriber.py#x1B[0m:5: in &lt;module&gt;
+    #x1B[0m#x1B[94mimport#x1B[39;49;00m#x1B[90m #x1B[39;49;00m#x1B[04m#x1B[96mvosk#x1B[39;49;00m#x1B[90m#x1B[39;49;00m
+#x1B[1m#x1B[31mE   ModuleNotFoundError: No module named 'vosk'#x1B[0m#x1B[0m</error></testcase><testcase classname="" name="tests.test_stt" time="0.000"><error message="collection failure">#x1B[31mImportError while importing test module '/Users/lutz/Documents/Minodou/code/minodu/apps/minodu-ai-services/tests/test_stt.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+#x1B[1m#x1B[31m/Users/lutz/.pyenv/versions/3.11.13/lib/python3.11/importlib/__init__.py#x1B[0m:126: in import_module
+    #x1B[0m#x1B[94mreturn#x1B[39;49;00m _bootstrap._gcd_import(name[level:], package, level)#x1B[90m#x1B[39;49;00m
+#x1B[1m#x1B[31mtests/test_stt.py#x1B[0m:6: in &lt;module&gt;
+    #x1B[0m#x1B[94mfrom#x1B[39;49;00m#x1B[90m #x1B[39;49;00m#x1B[04m#x1B[96mminodu_ai_services#x1B[39;49;00m#x1B[04m#x1B[96m.#x1B[39;49;00m#x1B[04m#x1B[96msrc#x1B[39;49;00m#x1B[04m#x1B[96m.#x1B[39;49;00m#x1B[04m#x1B[96mapp#x1B[39;49;00m#x1B[90m #x1B[39;49;00m#x1B[94mimport#x1B[39;49;00m app#x1B[90m#x1B[39;49;00m
+#x1B[1m#x1B[31mminodu_ai_services/src/app.py#x1B[0m:12: in &lt;module&gt;
+    #x1B[0m#x1B[94mfrom#x1B[39;49;00m#x1B[90m #x1B[39;49;00m#x1B[04m#x1B[96m.#x1B[39;49;00m#x1B[04m#x1B[96mstt#x1B[39;49;00m#x1B[04m#x1B[96m.#x1B[39;49;00m#x1B[04m#x1B[96mstt_transcriber#x1B[39;49;00m#x1B[90m #x1B[39;49;00m#x1B[94mimport#x1B[39;49;00m SttTranscriber#x1B[90m#x1B[39;49;00m
+#x1B[1m#x1B[31mminodu_ai_services/src/stt/stt_transcriber.py#x1B[0m:5: in &lt;module&gt;
+    #x1B[0m#x1B[94mimport#x1B[39;49;00m#x1B[90m #x1B[39;49;00m#x1B[04m#x1B[96mvosk#x1B[39;49;00m#x1B[90m#x1B[39;49;00m
+#x1B[1m#x1B[31mE   ModuleNotFoundError: No module named 'vosk'#x1B[0m#x1B[0m</error></testcase><testcase classname="" name="tests.test_tts" time="0.000"><error message="collection failure">#x1B[31mImportError while importing test module '/Users/lutz/Documents/Minodou/code/minodu/apps/minodu-ai-services/tests/test_tts.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+#x1B[1m#x1B[31m/Users/lutz/.pyenv/versions/3.11.13/lib/python3.11/importlib/__init__.py#x1B[0m:126: in import_module
+    #x1B[0m#x1B[94mreturn#x1B[39;49;00m _bootstrap._gcd_import(name[level:], package, level)#x1B[90m#x1B[39;49;00m
+#x1B[1m#x1B[31mtests/test_tts.py#x1B[0m:6: in &lt;module&gt;
+    #x1B[0m#x1B[94mfrom#x1B[39;49;00m#x1B[90m #x1B[39;49;00m#x1B[04m#x1B[96mminodu_ai_services#x1B[39;49;00m#x1B[04m#x1B[96m.#x1B[39;49;00m#x1B[04m#x1B[96msrc#x1B[39;49;00m#x1B[04m#x1B[96m.#x1B[39;49;00m#x1B[04m#x1B[96mapp#x1B[39;49;00m#x1B[90m #x1B[39;49;00m#x1B[94mimport#x1B[39;49;00m app#x1B[90m#x1B[39;49;00m
+#x1B[1m#x1B[31mminodu_ai_services/src/app.py#x1B[0m:12: in &lt;module&gt;
+    #x1B[0m#x1B[94mfrom#x1B[39;49;00m#x1B[90m #x1B[39;49;00m#x1B[04m#x1B[96m.#x1B[39;49;00m#x1B[04m#x1B[96mstt#x1B[39;49;00m#x1B[04m#x1B[96m.#x1B[39;49;00m#x1B[04m#x1B[96mstt_transcriber#x1B[39;49;00m#x1B[90m #x1B[39;49;00m#x1B[94mimport#x1B[39;49;00m SttTranscriber#x1B[90m#x1B[39;49;00m
+#x1B[1m#x1B[31mminodu_ai_services/src/stt/stt_transcriber.py#x1B[0m:5: in &lt;module&gt;
+    #x1B[0m#x1B[94mimport#x1B[39;49;00m#x1B[90m #x1B[39;49;00m#x1B[04m#x1B[96mvosk#x1B[39;49;00m#x1B[90m#x1B[39;49;00m
+#x1B[1m#x1B[31mE   ModuleNotFoundError: No module named 'vosk'#x1B[0m#x1B[0m</error></testcase><testcase classname="" name="tests.test_weather" time="0.000"><error message="collection failure">#x1B[31mImportError while importing test module '/Users/lutz/Documents/Minodou/code/minodu/apps/minodu-ai-services/tests/test_weather.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+#x1B[1m#x1B[31m/Users/lutz/.pyenv/versions/3.11.13/lib/python3.11/importlib/__init__.py#x1B[0m:126: in import_module
+    #x1B[0m#x1B[94mreturn#x1B[39;49;00m _bootstrap._gcd_import(name[level:], package, level)#x1B[90m#x1B[39;49;00m
+#x1B[1m#x1B[31mtests/test_weather.py#x1B[0m:5: in &lt;module&gt;
+    #x1B[0m#x1B[94mfrom#x1B[39;49;00m#x1B[90m #x1B[39;49;00m#x1B[04m#x1B[96mminodu_ai_services#x1B[39;49;00m#x1B[04m#x1B[96m.#x1B[39;49;00m#x1B[04m#x1B[96msrc#x1B[39;49;00m#x1B[04m#x1B[96m.#x1B[39;49;00m#x1B[04m#x1B[96mapp#x1B[39;49;00m#x1B[90m #x1B[39;49;00m#x1B[94mimport#x1B[39;49;00m app#x1B[90m#x1B[39;49;00m
+#x1B[1m#x1B[31mminodu_ai_services/src/app.py#x1B[0m:12: in &lt;module&gt;
+    #x1B[0m#x1B[94mfrom#x1B[39;49;00m#x1B[90m #x1B[39;49;00m#x1B[04m#x1B[96m.#x1B[39;49;00m#x1B[04m#x1B[96mstt#x1B[39;49;00m#x1B[04m#x1B[96m.#x1B[39;49;00m#x1B[04m#x1B[96mstt_transcriber#x1B[39;49;00m#x1B[90m #x1B[39;49;00m#x1B[94mimport#x1B[39;49;00m SttTranscriber#x1B[90m#x1B[39;49;00m
+#x1B[1m#x1B[31mminodu_ai_services/src/stt/stt_transcriber.py#x1B[0m:5: in &lt;module&gt;
+    #x1B[0m#x1B[94mimport#x1B[39;49;00m#x1B[90m #x1B[39;49;00m#x1B[04m#x1B[96mvosk#x1B[39;49;00m#x1B[90m#x1B[39;49;00m
+#x1B[1m#x1B[31mE   ModuleNotFoundError: No module named 'vosk'#x1B[0m#x1B[0m</error></testcase></testsuite></testsuites>
