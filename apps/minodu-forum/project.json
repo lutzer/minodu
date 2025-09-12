@@ -57,7 +57,10 @@
       ],
       "options": {
         "command": "poetry run pytest tests/",
-        "cwd": "{projectRoot}"
+        "cwd": "{projectRoot}",
+        "env" : {
+          "AI_SERVICE_URL" : "http://0.0.0.0:3002/services"
+        } 
       },
       "cache": true
     },

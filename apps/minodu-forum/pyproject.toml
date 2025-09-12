@@ -37,6 +37,8 @@ readme = 'README.md'
   python-multipart = "^0.0.20"
   pyjwt = "^2.10.1"
   uvicorn = "^0.35.0"
+  pytest-timeout = "^2.4.0"
+  pytest-asyncio = "^1.2.0"
 
   [tool.poetry.group.dev.dependencies]
   autopep8 = "2.3.1"
