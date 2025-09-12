@@ -1,0 +1,154 @@
+import pytest
+import os
+from fastapi.testclient import TestClient
+
+from minodu_forum.src.app import app
+from minodu_forum.src.database import get_db_connection, get_db
+from minodu_forum.src.routers.helpers import get_upload_file_path
+
+from .test_authors import create_author
+from .test_posts import create_post
+
+import mimetypes
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Create test client
+client = TestClient(app)
+
+def upload_file(post_id: int, file_path: str, auth_token: str):
+    with open(file_path, "rb") as f:
+        response = client.post(
+            "/files/upload",
+            files={"file": (os.path.basename(file_path), f, mimetypes.guess_type(file_path)[0])},
+            data={"post_id": post_id},
+            headers={"Authorization": f"Bearer {auth_token}"}
+        )
+    return response.json()
+
+class TestFilesApi:
+
+    def test_upload_image_file(self):
+        auth_token = create_author()
+        post = create_post(auth_token, "fetch_test")
+
+        file_path = os.path.join(script_dir, "files/laura.jpeg")
+        with open(file_path, "rb") as f:
+            response = client.post(
+                "/files/upload",
+                files={"file": (os.path.basename(file_path), f, mimetypes.guess_type(file_path)[0])},
+                data={"post_id": post["id"]},
+                headers={"Authorization": f"Bearer {auth_token}"}
+            )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["content_type"].startswith("image")
+        assert os.path.isfile(get_upload_file_path(data["filename"]))
+    
+    def test_upload_audio_file(self):
+        auth_token = create_author()
+        post = create_post(auth_token, "fetch_test")
+
+        file_path = os.path.join(script_dir, "files/french_sample.mp3")
+        with open(file_path, "rb") as f:
+            response = client.post(
+                "/files/upload",
+                files={"file": (os.path.basename(file_path), f, mimetypes.guess_type(file_path)[0])},
+                data={"post_id": post["id"]},
+                headers={"Authorization": f"Bearer {auth_token}"}
+            )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["content_type"].startswith("audio")
+        assert os.path.isfile(get_upload_file_path(data["filename"]))
+
+    def test_upload_wrong_file(self):
+        auth_token = create_author()
+        post = create_post(auth_token, "fetch_test")
+
+        file_path = os.path.join(script_dir, "files/laura.jpeg.zip")
+        with open(file_path, "rb") as f:
+            response = client.post(
+                "/files/upload",
+                files={"file": (os.path.basename(file_path), f, mimetypes.guess_type(file_path)[0])},
+                data={"post_id": post["id"]},
+                headers={"Authorization": f"Bearer {auth_token}"}
+            )
+        assert response.status_code == 500
+
+
+    def test_attach_file(self):
+        auth_token = create_author()
+        post = create_post(auth_token, "fetch_test")
+
+        file_path = os.path.join(script_dir, "files/laura.jpeg")
+        file = upload_file(post['id'],file_path, auth_token)
+
+        response = client.get(app.root_path + "/posts/")        
+        assert response.status_code == 200
+        response_data = response.json()
+        assert response_data[0]["files"][0]['filename'] == file["filename"]
+
+    def test_attach_file_restricted(self):
+        auth_token1 = create_author()
+        auth_token2 = create_author()
+        post = create_post(auth_token1, "fetch_test")
+
+        file_path = os.path.join(script_dir, "files/laura.jpeg")
+        with open(file_path, "rb") as f:
+            response = client.post(
+                "/files/upload",
+                files={"file": (os.path.basename(file_path), f, mimetypes.guess_type(file_path)[0])},
+                data={"post_id": post["id"]},
+                headers={"Authorization": f"Bearer {auth_token2}"}
+            )
+        assert response.status_code == 401
+
+    def test_delete_file(self):
+        auth_token = create_author()
+        post = create_post(auth_token, "fetch_test")
+
+        file_path = os.path.join(script_dir, "files/laura.jpeg")
+        file = upload_file(post['id'],file_path, auth_token)
+
+        assert os.path.isfile(get_upload_file_path(file['filename']))
+    
+        response = client.delete(
+            f"/files/{file['id']}",
+            headers={"Authorization": f"Bearer {auth_token}"}
+        )
+
+        assert response.status_code == 200
+        assert not os.path.isfile(get_upload_file_path(file['filename']))
+
+    def test_delete_file_restricted(self):
+        auth_token = create_author()
+        auth_token2 = create_author()
+        post = create_post(auth_token, "fetch_test")
+
+        file_path = os.path.join(script_dir, "files/laura.jpeg")
+        file = upload_file(post['id'],file_path, auth_token)
+    
+        response = client.delete(
+            f"/files/{file['id']}",
+            headers={"Authorization": f"Bearer {auth_token2}"}
+        )
+
+        assert response.status_code == 401
+
+    def test_delete_post_deletes_files(self):
+        auth_token = create_author()
+        post = create_post(auth_token, "fetch_test")
+
+        file_path = os.path.join(script_dir, "files/laura.jpeg")
+        file = upload_file(post['id'], file_path, auth_token)
+        
+        assert os.path.isfile(get_upload_file_path(file['filename']))
+
+        response = client.delete(
+            f"/posts/{post['id']}",
+            headers={"Authorization": f"Bearer {auth_token}"}
+        )
+        assert response.status_code == 200
+        assert not os.path.isfile(get_upload_file_path(file['filename']))
+    

@@ -1,0 +1,9 @@
+.venv
+*.db
+__pycache__
+.env
+.python-version
+
+tests/tmp
+minodu_forum/uploads/*
+minodu_forum/avatars/*
