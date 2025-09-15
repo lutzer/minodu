@@ -49,4 +49,7 @@ nx graph
 
 # add python project
 nx g @nxlv/python:poetry-project <name> --directory=apps/<name> --projectType=application
+
+# add node project
+nx g @nx/node:application <name> --directory=apps/<name>
 ```

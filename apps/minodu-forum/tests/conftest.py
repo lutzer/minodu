@@ -10,11 +10,16 @@ from minodu_forum.src.routers.helpers import get_avatar_file_path, get_upload_fi
 def set_test_database_url(monkeypatch):
     # Set a test-specific database URL and create tables
     monkeypatch.setenv("DATABASE_URL", "sqlite:///./test_database.db")
+    #database = f"mysql+pymysql://user:password@localhost:3306/minodu"
+    #monkeypatch.setenv("DATABASE_URL", database)
     monkeypatch.setenv("UPLOAD_DIR", "tests/tmp")
     monkeypatch.setenv("AVATAR_UPLOAD_DIR", "tests/tmp")
+
+    get_db_connection().drop_tables()
     get_db_connection().create_tables()
     
     yield
+
 
     # Delete all files before dropping database table
     db = get_db_connection().get_session_direct()
@@ -28,6 +33,7 @@ def set_test_database_url(monkeypatch):
     for avatar in avatars:
         os.remove(get_avatar_file_path(avatar.filename))
 
-    get_db_connection().drop_tables()
+
+
 
     
