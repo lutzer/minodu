@@ -46,6 +46,13 @@
         "command": "docker-compose exec minodu-database mysql -u appuser -papppassword myapp",
         "cwd": "apps/minodu-database"
       }
+    },
+    "clear": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "rm -rf ./data",
+        "cwd": "apps/minodu-database"
+      }
     }
   }
 }
