@@ -1,5 +1,7 @@
 # Minodu Database
 
+Runs mysql database instance on localhost:3306/minodu
+
 ## Commands
 
 ```

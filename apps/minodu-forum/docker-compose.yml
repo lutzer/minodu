@@ -1,0 +1,13 @@
+services:
+  minodu-forum:
+    build: .
+    ports:
+      - 3001:3001
+    environment:
+      - JWT_SECRET_KEY=1234
+      - DATABASE_URL=mysql+pymysql://user:password@host.docker.internal:3306/minodu
+    volumes:
+      - ./data/uploads:/app/uploads
+      - ./data/avatars:/app/avatars
+    restart: always
+
