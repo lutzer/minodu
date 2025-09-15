@@ -61,7 +61,7 @@ class Config:
     @property
     def database_url(self):
         if self._database_url is None:
-            self._database_url = os.getenv("DATABASE_URL", "sqlite:///./database.db")
+            self._database_url = os.getenv("DATABASE_URL", "mysql+pymysql://user:password@localhost:3306/minodu")
         return self._database_url
 
     @property

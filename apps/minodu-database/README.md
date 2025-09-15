@@ -17,4 +17,7 @@ nx shell minodu-database
 
 # Build the Docker image
 nx build minodu-database
+
+# Clear database by removing data folder
+nx clear 
 ```
