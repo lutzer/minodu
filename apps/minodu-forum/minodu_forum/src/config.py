@@ -27,7 +27,7 @@ class Config:
     @property
     def port(self):
         if self._port is None:
-            self._port = int(os.getenv("PORT", 3002))
+            self._port = int(os.getenv("PORT", 3001))
         return self._port
 
     @property
