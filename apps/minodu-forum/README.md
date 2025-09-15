@@ -11,8 +11,10 @@ Backend for the minodu forum
 
 ### Setup
 
-* create virtual env `python -m venv .venv` and activate with `source .venv/bin/activate`
-* install requirements: `pip install -r requirements`
+* install pyenv `brew install pyenv`
+* run `pyenv install 3.12.11` 
+* install poetry with `brew install poetry`
+* run `poetry install`
 
 ### Tests
 
