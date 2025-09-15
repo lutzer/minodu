@@ -50,3 +50,6 @@ Thumbs.db
 /.cache
 reports
 
+
+vite.config.*.timestamp*
+vitest.config.*.timestamp*
