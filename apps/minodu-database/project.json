@@ -1,0 +1,51 @@
+{
+  "name": "minodu-database",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/minodu-database/src",
+  "projectType": "application",
+  "targets": {
+    "install": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm install",
+        "cwd": "apps/minodu-database"
+      }
+    },
+    "build": {
+      "executor": "@nx/docker:build",
+      "options": {
+        "context": "apps/minodu-database",
+        "dockerfile": "apps/minodu-database/Dockerfile",
+        "tags": ["minodu-database:latest"]
+      }
+    },
+    "up": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker-compose up -d",
+        "cwd": "apps/minodu-database"
+      }
+    },
+    "down": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker-compose down",
+        "cwd": "apps/minodu-database"
+      }
+    },
+    "logs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker-compose logs -f minodu-database",
+        "cwd": "apps/minodu-database"
+      }
+    },
+    "shell": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker-compose exec minodu-database mysql -u appuser -papppassword myapp",
+        "cwd": "apps/minodu-database"
+      }
+    }
+  }
+}
