@@ -12,7 +12,6 @@
     ],
     "sharedGlobals": ["{workspaceRoot}/.github/workflows/ci.yml"]
   },
-  "nxCloudId": "68c2bcf7e20c3e08544590e5",
   "targetDefaults": {
     "@nx/eslint:lint": {
       "cache": true,

@@ -1,5 +1,5 @@
 services:
-  app:
+  minodu-ai-services:
     build: .
     ports:
       - 3001:3001
