@@ -1,7 +1,6 @@
 services:
   minodu-database:
     build: .
-    container_name: minodu-database
     restart: always
     ports:
       - "3306:3306"
