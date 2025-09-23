@@ -2,8 +2,8 @@ from typing import Dict, List
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.document_loaders.text import TextLoader
-from pathlib import Path
 import glob
+import os
 
 class DocumentStore:
     def __init__(self, vectorstore, chroma_client):
@@ -38,7 +38,7 @@ class DocumentStore:
         self.vectorstore.add_texts(texts=chunks, metadatas=chunk_metadatas)
         print(f"Added {len(chunks)} chunks from {len(texts)} documents")
     
-    def add_file(self, file_path):
+    def add_file(self, file_path, source_id : int = -1):
         """Add a single file"""
         if file_path.endswith('.pdf'):
             loader = PyPDFLoader(file_path)
@@ -49,7 +49,7 @@ class DocumentStore:
         
         documents = loader.load()
         texts = [doc.page_content for doc in documents]
-        metadatas = [{"source": file_path, "page": i} for i in range(len(texts))]
+        metadatas = [{"source": os.path.basename(file_path), "page": i, "source_id" : source_id} for i in range(len(texts))]
         
         self.add_text_documents(texts, metadatas)
     
@@ -75,7 +75,7 @@ class DocumentStore:
             doc_info = {
                 'id': doc_id,
                 'metadata': metadata,
-                'content_preview': content[:200] + "..." if len(content) > 200 else content,
+                'content_preview': content[:100] + "..." if len(content) > 100 else content,
                 'content_length': len(content)
             }
             documents.append(doc_info)

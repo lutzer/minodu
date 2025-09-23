@@ -37,6 +37,8 @@ readme = 'README.md'
   python-multipart = "^0.0.20"
   uvicorn = "^0.35.0"
   vosk = "0.3.44"
+  langchain-community = "^0.3.29"
+  pypdf = "^6.1.0"
 
   [tool.poetry.group.dev.dependencies]
   autopep8 = "2.3.1"
