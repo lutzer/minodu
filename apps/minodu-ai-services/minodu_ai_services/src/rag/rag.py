@@ -29,7 +29,7 @@ class RAG:
         history: str
         source_id : Optional[int] = None
 
-    def __init__(self, language="en", database_path : str = None):
+    def __init__(self, language="en"):
 
         self.language = 0 if language == "en" else 1
 
@@ -39,11 +39,11 @@ class RAG:
         self.llm = OllamaLLM(base_url=ollama_host, model=ollama_model, temperature=0.1, keep_alive=600 )
         
         embedding_model = os.environ.get("EMBEDDING_MODEL", "all-minilm:l6-v2")
+        database_path = os.environ.get("EMBEDDING_DATABASE_PATH", os.path.join(os.path.dirname(__file__), "../../data"))
 
         # Vector store setup (same as above)
         self.embeddings = OllamaEmbeddings(base_url=ollama_host, model=embedding_model)
 
-        database_path = database_path or os.path.join(os.path.dirname(__file__), "../../data")
         self.chroma_client = chromadb.PersistentClient(
             path=database_path,
             settings=Settings(anonymized_telemetry=False)
@@ -148,11 +148,13 @@ class RAG:
             "k" : 1
         }
 
-        docs, scores = zip(
-            *self.vectorstore.similarity_search_with_score(query, **search_kwargs)
-        )
+        results = self.vectorstore.similarity_search_with_score(query, **search_kwargs)
+
+        if not results:
+            return (None, 0)
         
-        return (docs[0], scores[0]) if len(docs) > 0 else None
+        docs, scores = zip(*results)
+        return (docs[0], scores[0])
 
     def get_retriever(self, source_id: int = None):
         kwargs = {

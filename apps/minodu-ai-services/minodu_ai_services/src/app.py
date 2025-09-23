@@ -1,3 +1,4 @@
+from typing import Any, Optional
 from fastapi import FastAPI, UploadFile, HTTPException
 from pydantic import BaseModel
 from fastapi.responses import StreamingResponse
@@ -40,6 +41,25 @@ async def rag_ask(request: RagRequest):
     return StreamingResponse(
         generate_stream(),
         media_type="text/plain"
+    )
+
+class RagSourceRequest(BaseModel):
+    query: str
+    language: str
+
+class RagSourceResponse(BaseModel):
+    document: Optional[Any]
+    score: float
+
+@app.post("/rag/sources", response_model=RagSourceResponse)
+async def extract_sources(request: RagSourceRequest):
+    rag = RAG(language=request.language)
+
+    document, score = rag.find_sources_for_text(request.query)
+
+    return RagSourceResponse(
+        document=document,
+        score=score
     )
 
 ### WEATHER LLM ###
