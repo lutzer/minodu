@@ -41,7 +41,7 @@ class RAG:
         embedding_model = os.environ.get("EMBEDDING_MODEL", "all-minilm:l6-v2")
 
         # Vector store setup (same as above)
-        self.embeddings = OllamaEmbeddings(base_url=ollama_host, model="all-minilm:l6-v2")
+        self.embeddings = OllamaEmbeddings(base_url=ollama_host, model=embedding_model)
 
         database_path = database_path or os.path.join(os.path.dirname(__file__), "../../data")
         self.chroma_client = chromadb.PersistentClient(
@@ -58,7 +58,7 @@ class RAG:
         # Simple chain
         if language == "en":
             self.template = textwrap.dedent("""
-                You are a helpful AI assistant. Answer questions based on the provided context and conversation history.
+                You are a helpful AI assistant. Answer questions based on the provided context and conversation history. 
 
                 IMPORTANT INSTRUCTIONS:
                 - Only use information from the CONTEXT section below
@@ -75,7 +75,7 @@ class RAG:
                 ===== END CONTEXT =====
 
                 ===== CONVERSATION HISTORY =====
-                Previous conversation between you and the user, if any:
+                Previous conversation between you and the user:
                                             
                 {history}
                                             
@@ -134,6 +134,7 @@ class RAG:
             | self.llm
             | StrOutputParser()
         )
+
     
     def ask(self, request: RagRequestData) -> str:
         return self.chain.invoke(asdict(request))
@@ -141,6 +142,17 @@ class RAG:
     def ask_streaming(self, request: RagRequestData) -> Iterator[str]:
         for chunk in self.chain.stream(asdict(request)):
             yield chunk
+
+    def find_sources_for_text(self, query) -> str:
+        search_kwargs = {
+            "k" : 1
+        }
+
+        docs, scores = zip(
+            *self.vectorstore.similarity_search_with_score(query, **search_kwargs)
+        )
+        
+        return (docs[0], scores[0]) if len(docs) > 0 else None
 
     def get_retriever(self, source_id: int = None):
         kwargs = {

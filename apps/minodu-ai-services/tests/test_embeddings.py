@@ -52,9 +52,26 @@ class TestDocumentStore:
         for doc in results:
             assert doc.metadata["source_id"] == 2
 
-    def test_rag_ask(self):
+    def test_rag_ask_without_source(self):
         rag = RAG(language="en", database_path=database_path)
 
-        result = rag.ask(RAG.RagRequestData(question="Tell me something abour your providec context", history="", source_id=2))
+        result = rag.ask(RAG.RagRequestData(question="Tell me something abour your providec context", history=""))
         assert len(result) > 0
+
+    def test_rag_ask_with_source(self):
+        rag = RAG(language="en", database_path=database_path)
+
+        result = rag.ask(RAG.RagRequestData(question="test", history="", source_id=2))
+        assert len(result) > 0
+
+    def test_rag_extract_sources(self):
+        rag = RAG(language="en", database_path=database_path)
+
+        result = rag.ask(RAG.RagRequestData(question="Tell me what you know about insect pests", history=""))
+        assert len(result) > 0
+
+        source, score = rag.find_sources_for_text(result)
+
+        assert score < 1.0
+        assert source.metadata["source_id"] == 1
 
