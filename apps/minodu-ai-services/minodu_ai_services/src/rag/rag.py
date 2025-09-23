@@ -38,8 +38,10 @@ class RAG:
 
         self.llm = OllamaLLM(base_url=ollama_host, model=ollama_model, temperature=0.1, keep_alive=600 )
         
+        embedding_model = os.environ.get("EMBEDDING_MODEL", "all-minilm:l6-v2")
+
         # Vector store setup (same as above)
-        self.embeddings = OllamaEmbeddings(base_url=ollama_host, model="nomic-embed-text")
+        self.embeddings = OllamaEmbeddings(base_url=ollama_host, model="all-minilm:l6-v2")
 
         database_path = database_path or os.path.join(os.path.dirname(__file__), "../../data")
         self.chroma_client = chromadb.PersistentClient(

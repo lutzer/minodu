@@ -4,7 +4,7 @@
 
 * install olama `curl -fsSL https://ollama.com/install.sh | sh` or on mac: `brew install ollama`
 * add olama to autostart: `sudo systemctl enable ollama` (or manually start ollama with `ollama serve`)
-* install models: `ollama pull llama3.2:1b && ollama pull nomic-embed-text`
+* install models: `ollama pull llama3.2:1b && ollama pull nomic-embed-text && ollama pull all-minilm:l6-v2`
 
 ## Docker Setup
 

@@ -58,5 +58,3 @@ class TestDocumentStore:
         result = rag.ask(RAG.RagRequestData(question="Tell me something abour your providec context", history="", source_id=2))
         assert len(result) > 0
 
-        print(result)
-
