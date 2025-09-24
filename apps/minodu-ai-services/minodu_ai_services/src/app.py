@@ -3,13 +3,17 @@ from fastapi import FastAPI, UploadFile, HTTPException
 from pydantic import BaseModel
 from fastapi.responses import StreamingResponse
 from fastapi import Form
+import tempfile
 
 import os
 import tempfile
 import io
 
 from .rag.rag import RAG
+from .rag.document_store import DocumentStore
+
 from .weather.llm import WeatherLLM
+
 from .stt.stt_transcriber import SttTranscriber
 from .tts.speech_generator import SpeechGenerator
 
@@ -61,6 +65,58 @@ async def extract_sources(request: RagSourceRequest):
         document=document,
         score=score
     )
+
+class RagDocumentRequest(BaseModel):
+    document: Optional[Any]
+    score: float
+
+@app.post("/rag/documents/")
+async def add_document(file: UploadFile, language: str = Form(...), source_id: int = Form(...)):
+    rag = RAG(language=language)
+    store = DocumentStore(rag.vectorstore, rag.chroma_client)
+
+    try:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
+            content = await file.read()
+            temp_file.write(content)
+            temp_file_path = temp_file.name
+            store.add_file(temp_file_path, source_id)
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Could not add document: {str(e)}")
+    
+    finally:
+        # Clean up the temporary file
+        os.unlink(temp_file_path)
+        
+    return "Document added"
+
+    # document, score = rag.find_sources_for_text(request.query)
+
+    # return RagSourceResponse(
+    #     document=document,
+    #     score=score
+    # )
+
+@app.delete("/rag/documents/{language}/{source_id}")
+async def delete_documents(source_id: int, language: str):
+    rag = RAG(language=language)
+
+    store = DocumentStore(rag.vectorstore, rag.chroma_client)
+
+    try:
+        store.delete_document_by_id(source_id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Could not add document: {str(e)}")
+
+    return "Document deleted"
+
+    # document, score = rag.find_sources_for_text(request.query)
+
+    # return RagSourceResponse(
+    #     document=document,
+    #     score=score
+    # )
 
 ### WEATHER LLM ###
 

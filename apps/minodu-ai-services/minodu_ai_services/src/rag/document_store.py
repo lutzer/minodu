@@ -90,6 +90,10 @@ class DocumentStore:
             print(f"Deleted document with ID: {doc_id}")
         except Exception as e:
             print(f"Error deleting document {doc_id}: {e}")
+
+    def delete_document_by_id(self, id: int):
+        collection = self.chroma_client.get_collection(self.collection_name)
+        collection.delete(where={"source_id": id})
     
     def delete_document(self, document_name: str):
         """Delete all documents from a specific source"""
@@ -116,3 +120,6 @@ class DocumentStore:
         except Exception as e:
             print(f"Error deleting documents from source {document_name}: {e}")
             return 0
+
+    def delete_all_documents(self):
+        self.chroma_client.delete_collection(name=self.collection_name)
