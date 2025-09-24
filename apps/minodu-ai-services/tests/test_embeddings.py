@@ -1,6 +1,7 @@
 import pytest
 import os
 import shutil
+import time
 
 from minodu_ai_services.src.rag.document_store import DocumentStore
 from minodu_ai_services.src.rag.rag import RAG
@@ -12,10 +13,12 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 @pytest.fixture(scope="module", autouse=True)
 def setup_and_teardown():
     
-    shutil.rmtree(database_path, ignore_errors=True)
+    rag = RAG(language="en")
+    store = DocumentStore(rag.vectorstore, rag.chroma_client)
+    store.delete_all_documents()
+    time.sleep(1)
 
     yield  # This is where the test runs
-    
 
 class TestDocumentStore:
 
@@ -29,8 +32,10 @@ class TestDocumentStore:
         documents = store.list_documents()
 
         assert len(documents) > 0
+
         
         for doc in documents:
+            print(doc["metadata"])
             assert doc["metadata"]["source_id"] == 1
 
     def test_retrive_filtered_document(self):
