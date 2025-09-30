@@ -8,4 +8,8 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-{@render children?.()}
+<h1>Mindou</h1>
+
+<div class="content">
+	{@render children?.()}
+</div>
