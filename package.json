@@ -2,7 +2,13 @@
   "name": "@minodu/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "dev:start": "docker-compose -f docker-compose.dev.yml up -d --build",
+    "dev:stop": "docker-compose -f docker-compose.dev.yml down",
+    "dev:logs": "docker-compose -f docker-compose.dev.yml logs -f",
+    "dev:clean": "docker-compose -f docker-compose.dev.yml down -v --remove-orphans --rmi all && docker volume prune -f && docker network prune -f",
+    "dev:status": "docker-compose -f docker-compose.dev.yml ps"
+  },
   "private": true,
   "devDependencies": {
     "@nx/js": "21.5.1",

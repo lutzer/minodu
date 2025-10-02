@@ -7,6 +7,7 @@ Monorepo containing all the minodu apps and services
 * install node and npm with `brew install node`
 * install poetry with `brew install poetry`
 * install nx with `npm install -g nx`
+* install docker
 
 ### Project specific requirements
 
@@ -19,6 +20,10 @@ Monorepo containing all the minodu apps and services
 ## Setup
 
 * run `npm install`
+
+## Development
+
+* run development docker container with `npm run dev:start` and stop with `npm run dev:stop`
 
 ## Run apps with
 

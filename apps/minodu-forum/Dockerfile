@@ -2,6 +2,7 @@ FROM python:3.12-slim AS base
 
 # prepare container
 RUN apt-get update -y && apt upgrade -y && apt-get clean -y
+RUN apt-get install curl -y
 
 # Install Poetry
 RUN pip install poetry
