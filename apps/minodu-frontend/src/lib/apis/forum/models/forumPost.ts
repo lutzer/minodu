@@ -1,5 +1,5 @@
-import type { ForumAuthor } from "./forum_author"
-import type { ForumFile } from "./forum_file"
+import type { ForumAuthor } from "./forumAuthor"
+import type { ForumFile } from "./forumFile"
 
 export interface ForumPost {
     id: number

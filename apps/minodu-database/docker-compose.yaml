@@ -14,9 +14,6 @@ services:
     networks:
       - mysql-network
 
-volumes:
-  mysql_data:
-
 networks:
   mysql-network:
     driver: bridge

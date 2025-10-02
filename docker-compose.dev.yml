@@ -1,0 +1,66 @@
+services:
+  # Database service
+  minodu-database:
+    build:
+      context: ./apps/minodu-database
+      dockerfile: Dockerfile
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=minodu
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=rootpassword
+    volumes:
+      - ./data/database:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # AI Services
+  minodu-ai-services:
+    build:
+      context: ./apps/minodu-ai-services
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3002"
+    environment:
+      - OLLAMA_HOST=host.docker.internal:11434
+      - PORT=3002
+    volumes:
+      - ./data/ai-services/documents:/app/documents
+      - ./data/ai-services/database:/app/database
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3002/services/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Forum Service
+  minodu-forum:
+    build:
+      context: ./apps/minodu-forum
+      dockerfile: Dockerfile
+    ports:
+      - "3003:3003"
+    environment:
+      - JWT_SECRET_KEY=dev_secret_key_1234
+      - DATABASE_URL=mysql+pymysql://user:password@minodu-database:3306/minodu
+      - PORT=3003
+      - AI_SERVICE_URL=http://minodu-ai-services:3002/services
+    volumes:
+      - ./data/minodu-forum/uploads:/app/uploads
+      - ./data/minodu-forum/avatars:/app/avatars
+    depends_on:
+      minodu-database:
+        condition: service_healthy
+      minodu-ai-services:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3003/forum/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
