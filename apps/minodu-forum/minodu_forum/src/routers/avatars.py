@@ -27,7 +27,7 @@ async def get_avatars(db: Session = Depends(get_db)):
     return query.all()
 
 @router.post("/create", response_model=AvatarResponse)
-async def create_avatar(file: UploadFile, db: Session = Depends(get_db)): 
+async def create_avatar(file: UploadFile, db: Session = Depends(get_db)):
     
     try:
         # Validate and save file

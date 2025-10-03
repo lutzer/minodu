@@ -31,11 +31,11 @@ async def save_file(
         file_extension = mimetypes.guess_extension(file.content_type, strict=True) or ""
 
     unique_filename = f"{uuid.uuid4()}{file_extension}"
-    
     file_path = os.path.join(upload_directory, unique_filename)
 
     if not os.path.isdir(upload_directory):
         os.makedirs(upload_directory)
+
     
     # Save file to disk
     async with aiofiles.open(file_path, 'wb') as f:

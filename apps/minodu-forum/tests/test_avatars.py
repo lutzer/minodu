@@ -33,6 +33,8 @@ class TestAvatarsApi:
                 "/avatars/create",
                 files={"file": (os.path.basename(file_path), f, mimetypes.guess_type(file_path)[0])}
             )
+
+        print(response.text)
         assert response.status_code == 200
         data = response.json()
         assert data["content_type"].startswith("image")
@@ -70,5 +72,15 @@ class TestAvatarsApi:
 
         assert response.status_code == 200
         assert not os.path.isfile(get_avatar_file_path(avatar['filename']))
+
+    def test_get_static_uploaded_avatar(self):
+        file_path = os.path.join(script_dir, "files/laura.jpeg")
+        avatar = create_avatar(file_path)
+        
+        response = client.get(app.root_path + "/static/avatars/" + avatar["filename"])
+
+        assert response.status_code == 200
+        assert "image/jpeg" in response.headers["content-type"]
+        assert len(response.content) > 0
 
     

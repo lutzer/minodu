@@ -46,15 +46,15 @@ class Config:
     def upload_dir(self):
         if self._upload_dir is None:
             script_dir = os.path.dirname(os.path.abspath(__file__))
-            upload_dir = os.getenv("UPLOAD_DIR", "uploads")
+            upload_dir = os.getenv("UPLOAD_DIR", "static/uploads")
             self._upload_dir = os.path.join(script_dir, "..", upload_dir)
         return self._upload_dir
     
     @property
     def avatar_dir(self):
-        if self._upload_dir is None:
+        if self._avatar_dir is None:
             script_dir = os.path.dirname(os.path.abspath(__file__))
-            upload_dir = os.getenv("AVATAR_UPLOAD_DIR", "avatars")
+            upload_dir = os.getenv("AVATAR_UPLOAD_DIR", "static/avatars")
             self._avatar_dir = os.path.join(script_dir, "..", upload_dir)
         return self._avatar_dir
 
