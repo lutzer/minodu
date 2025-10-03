@@ -5,5 +5,4 @@ __pycache__
 .python-version
 
 tests/tmp
-minodu_forum/uploads/*
-minodu_forum/avatars/*
+minodu_forum/static

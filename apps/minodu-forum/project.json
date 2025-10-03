@@ -83,6 +83,17 @@
           "PORT": "3003"
         }
       }
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "poetry run python minodu_forum/main.py",
+        "cwd": "{projectRoot}",
+        "env": {
+          "PORT": "3003",
+          "DATABASE_URL": "sqlite:///./dev_database.db"
+        }
+      }
     }
   },
   "tags": [],
