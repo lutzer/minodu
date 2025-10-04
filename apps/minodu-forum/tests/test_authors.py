@@ -134,3 +134,24 @@ class TestAuthorsApi:
             headers={"Authorization": f"Bearer {token}"})
 
         assert response.status_code != 200
+
+    def test_check_login(self):
+        authorName = "somerandomusernamel30984"
+        token = create_author(authorName)
+
+        response = client.get(
+            app.root_path + f"/login", 
+            headers={"Authorization": f"Bearer {token}"})
+
+        assert response.status_code == 200
+        assert response.json()['name'] == authorName
+
+    def test_check_login_fail(self):
+        authorName = "somerandomusernamel30984"
+        token = create_author(authorName)
+
+        response = client.get(
+            app.root_path + f"/login", 
+            headers={"Authorization": f"Bearer {token}dsfdsfsdf"})
+        
+        assert response.status_code == 401

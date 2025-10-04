@@ -95,3 +95,11 @@ async def edit_author(author_id: int, new_data: AuthorEdit, db: Session = Depend
     db.commit()
     db.refresh(author)
     return author
+
+@router.get("/login", response_model=AuthorResponse)
+async def check_login(db: Session = Depends(get_db), token_author_id: int = Depends(get_author_from_token)):
+    author = db.get(Author, token_author_id)
+    if not author:
+        raise HTTPException(status_code=404, detail="Author not found, maybe it was deleted.")
+    
+    return author

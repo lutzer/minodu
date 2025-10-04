@@ -13,6 +13,7 @@ from .routers import posts
 from .routers import authors
 from .routers import files
 from .routers import avatars
+from .routers import login
 
 from .config import Config
 
@@ -29,6 +30,7 @@ app.include_router(posts.router, prefix="/posts", tags=["posts"])
 app.include_router(authors.router, prefix="/authors", tags=["authors"])
 app.include_router(files.router, prefix="/files", tags=["files"])
 app.include_router(avatars.router, prefix="/avatars", tags=["avatars"])
+app.include_router(login.router, prefix="/login", tags=["login"])
 
 # create static dirs
 os.makedirs(Config().upload_dir, exist_ok=True)
