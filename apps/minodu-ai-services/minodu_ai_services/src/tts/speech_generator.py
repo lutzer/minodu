@@ -44,12 +44,26 @@ class SpeechGenerator:
                 
                 # Export as MP3 to bytes buffer
                 mp3_buffer = io.BytesIO()
-                audio.export(mp3_buffer, format="mp3", bitrate="192k")
+                audio.export(mp3_buffer, format="mp3", bitrate="128k")
                 mp3_buffer.seek(0)
                 
                 # Yield MP3 bytes
                 yield mp3_buffer.read()
-            
+    def generate_mp3(audio_chunks, channels, samplerate, samplewidth=2) -> io.BytesIO:
+        combined_chunks = b''.join(audio_chunks)
+
+        audio = AudioSegment(
+            data=combined_chunks,
+            sample_width=samplewidth,
+            frame_rate=samplerate,
+            channels=channels
+        )
+
+        mp3_buffer = io.BytesIO()
+        audio.export(mp3_buffer, format="mp3", bitrate="128k")
+        mp3_buffer.seek(0)
+
+        return mp3_buffer
 
     def generate_wav(audio_chunks, channels, samplerate, samplewidth=2) -> io.BytesIO:
         """Generate WAV file as BytesIO object"""

@@ -7,6 +7,7 @@
 	import type { Optional } from '$lib/types';
 	import ForumPostElement from '$lib/components/forum/ForumPostElement.svelte';
 	import ForumInputElement from '$lib/components/forum/ForumInputElement.svelte';
+	import TtsButton from '$lib/components/TtsButton.svelte';
   
     let createAuthorDialog : AuthorCreateDialog;
 
@@ -46,6 +47,8 @@
 
 <div>
     <h2>Forum</h2>
+
+    <TtsButton text="Hello there"/>
 
     <h3>Posts</h3>
     {#if posts.length > 0 }

@@ -4,7 +4,8 @@ import type { Optional } from "$lib/types";
 type TtsRequest = {
     text: string,
     language: string
-    return_header: boolean
+    return_header: Optional<boolean>
+    format: "mp3" | "wav"
 }
 
 type CreatePostRequest = {

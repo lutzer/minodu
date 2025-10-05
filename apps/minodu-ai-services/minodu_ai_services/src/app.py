@@ -91,13 +91,6 @@ async def add_document(file: UploadFile, language: str = Form(...), source_id: i
         
     return "Document added"
 
-    # document, score = rag.find_sources_for_text(request.query)
-
-    # return RagSourceResponse(
-    #     document=document,
-    #     score=score
-    # )
-
 @app.delete("/rag/documents/{language}/{source_id}")
 async def delete_documents(source_id: int, language: str):
     rag = RAG(language=language)
@@ -110,13 +103,6 @@ async def delete_documents(source_id: int, language: str):
         raise HTTPException(status_code=500, detail=f"Could not add document: {str(e)}")
 
     return "Document deleted"
-
-    # document, score = rag.find_sources_for_text(request.query)
-
-    # return RagSourceResponse(
-    #     document=document,
-    #     score=score
-    # )
 
 ### WEATHER LLM ###
 

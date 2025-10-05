@@ -82,15 +82,14 @@ class TestTts:
 
         audio_chunks = []
         
-        for audio_chunk in generator.synthesize("Hello, how are you? This is an Example Text.", SpeechGenerator.AudioFormat.MP3):
+        for audio_chunk in generator.synthesize("Hello, how are you? This is an Example Text."):
             audio_chunks.append(audio_chunk)
 
-        buffer = SpeechGenerator.generate_wav(audio_chunks, generator.channels(), generator.samplerate())
+        buffer = SpeechGenerator.generate_mp3(audio_chunks, generator.channels(), generator.samplerate())
 
         buffer.seek(0)  # Reset position to beginning
         with open(output_path, "wb") as f:
-            for chunk in audio_chunks:
-                f.write(chunk)
+            f.write(buffer.read())
 
         assert(os.path.exists(output_path))
 
@@ -131,16 +130,13 @@ class TestTts:
         for audio_chunk in generator.synthesize("Hello, how are you? This is an Example Text.", SpeechGenerator.AudioFormat.MP3):
             audio_chunks.append(audio_chunk)
 
-        buffer = SpeechGenerator.generate_wav(audio_chunks, generator.channels(), generator.samplerate())
-
-        buffer.seek(0)  # Reset position to beginning
         with open(output_path, "wb") as f:
             for chunk in audio_chunks:
                 f.write(chunk)
 
         assert(os.path.exists(output_path))
 
-        os.remove(output_path)
+        # os.remove(output_path)
 
 
 
