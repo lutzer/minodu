@@ -169,29 +169,45 @@ class TtsRequest(BaseModel):
     language: str
     text: str
     return_header: bool = True
+    format: str = "wav"
 
 @app.post("/tts/synthesize")
 async def synthesize_speech(request: TtsRequest):
     try:
         generator = SpeechGenerator(request.language)
         
-        def generate_audio():
-            if request.return_header:
-                header = SpeechGenerator.create_wav_header(generator.samplerate(), generator.channels())
-                yield header
+        if request.format == "wav":
+            def generate_audio():
+                if request.return_header:
+                    header = SpeechGenerator.create_wav_header(generator.samplerate(), generator.channels())
+                    yield header
 
-            for audio_chunk in generator.synthesize(request.text):
-                yield audio_chunk
-        
-        return StreamingResponse(
-            generate_audio(),
-            media_type="audio/wav",
-            headers={
-                "Content-Disposition": "attachment; filename=speech.wav",
-                "X-Sample-Rate": str(generator.samplerate()),
-                "X-Channels": str(generator.channels())
-            }
-        )
+                for audio_chunk in generator.synthesize(request.text):
+                    yield audio_chunk
+            
+            return StreamingResponse(
+                generate_audio(),
+                media_type="audio/wav",
+                headers={
+                    "Content-Disposition": "attachment; filename=speech.wav",
+                    "X-Sample-Rate": str(generator.samplerate()),
+                    "X-Channels": str(generator.channels())
+                }
+            )
+        elif request.format == "mp3":
+            def generate_audio():
+                for audio_chunk in generator.synthesize(request.text, SpeechGenerator.AudioFormat.MP3):
+                    yield audio_chunk
+            
+            return StreamingResponse(
+                generate_audio(),
+                media_type="audio/mpeg",
+                headers={
+                    "Content-Disposition": "attachment; filename=speech.mp3"
+                }
+            )
+        else:
+            raise Exception("Unsupported format, only supports: wav and mp3")
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Speech synthesis failed: {str(e)}")

@@ -1,10 +1,17 @@
+from enum import Enum
 import wave
 from piper import PiperVoice
 import os
 import io
 import struct
+from pydub import AudioSegment
 
 class SpeechGenerator:
+
+    class AudioFormat(Enum):
+        WAV = 1
+        MP3 = 2
+
     def __init__(self, language="en"):
 
         script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -20,9 +27,29 @@ class SpeechGenerator:
     def channels(self) -> int:
         return 1
         
-    def synthesize(self, text: str):
-        for chunk in self.voice.synthesize(text):
-            yield chunk.audio_int16_bytes
+    def synthesize(self, text: str, format : AudioFormat = AudioFormat.WAV):
+        if format == SpeechGenerator.AudioFormat.WAV:
+            for chunk in self.voice.synthesize(text):
+                yield chunk.audio_int16_bytes
+        elif format == SpeechGenerator.AudioFormat.MP3:
+            mp3_buffer = io.BytesIO()
+            for chunk in self.voice.synthesize(text):
+
+                audio = AudioSegment(
+                    data=chunk.audio_int16_bytes,
+                    sample_width=2,
+                    frame_rate=self.samplerate(),
+                    channels=self.channels()
+                )
+                
+                # Export as MP3 to bytes buffer
+                mp3_buffer = io.BytesIO()
+                audio.export(mp3_buffer, format="mp3", bitrate="192k")
+                mp3_buffer.seek(0)
+                
+                # Yield MP3 bytes
+                yield mp3_buffer.read()
+            
 
     def generate_wav(audio_chunks, channels, samplerate, samplewidth=2) -> io.BytesIO:
         """Generate WAV file as BytesIO object"""
