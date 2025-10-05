@@ -13,10 +13,21 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 
 class TestTtsAPI:
 
-    def test_synthesize(self):
+    def test_synthesize_wav(self):
         test_data = {
             "text": "Hello Api, synthesize this",
-            "language": "en"
+            "language": "en",
+            "format": "wav"
+        }
+        response = client.post(app.root_path + "/tts/synthesize", json=test_data)        
+        assert response.status_code == 200
+        assert(len(response.content) > 0)
+    
+    def test_synthesize_mp3(self):
+        test_data = {
+            "text": "Hello Api, synthesize this",
+            "language": "en",
+            "format": "mp3"
         }
         response = client.post(app.root_path + "/tts/synthesize", json=test_data)        
         assert response.status_code == 200
@@ -64,6 +75,27 @@ class TestTts:
 
         os.remove(output_path)
 
+    def test_create_mp3(self):
+        output_path = os.path.join(script_dir, "output.mp3")
+
+        generator = SpeechGenerator("en")
+
+        audio_chunks = []
+        
+        for audio_chunk in generator.synthesize("Hello, how are you? This is an Example Text.", SpeechGenerator.AudioFormat.MP3):
+            audio_chunks.append(audio_chunk)
+
+        buffer = SpeechGenerator.generate_wav(audio_chunks, generator.channels(), generator.samplerate())
+
+        buffer.seek(0)  # Reset position to beginning
+        with open(output_path, "wb") as f:
+            for chunk in audio_chunks:
+                f.write(chunk)
+
+        assert(os.path.exists(output_path))
+
+        os.remove(output_path)
+
     def test_create_wave_header(self):
         header = SpeechGenerator.create_wav_header()
         assert(len(header) > 0)
@@ -82,6 +114,27 @@ class TestTts:
 
         with open(output_path, "wb") as f:
             f.write(header)
+            for chunk in audio_chunks:
+                f.write(chunk)
+
+        assert(os.path.exists(output_path))
+
+        os.remove(output_path)
+
+    def test_create_streaming_mp3(self):
+        output_path = os.path.join(script_dir, "output.mp3")
+
+        generator = SpeechGenerator("en")
+
+        audio_chunks = []
+        
+        for audio_chunk in generator.synthesize("Hello, how are you? This is an Example Text.", SpeechGenerator.AudioFormat.MP3):
+            audio_chunks.append(audio_chunk)
+
+        buffer = SpeechGenerator.generate_wav(audio_chunks, generator.channels(), generator.samplerate())
+
+        buffer.seek(0)  # Reset position to beginning
+        with open(output_path, "wb") as f:
             for chunk in audio_chunks:
                 f.write(chunk)
 
