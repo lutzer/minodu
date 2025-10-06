@@ -1,15 +1,17 @@
+from datetime import datetime
 import os
 import sys
 import logging
 from langchain_ollama.llms import OllamaLLM
-from langchain_ollama import OllamaEmbeddings
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableParallel, RunnablePassthrough
 from langchain.schema.output_parser import StrOutputParser
-from langchain_chroma import Chroma
 from typing import Iterator
 import textwrap
 from dataclasses import dataclass, asdict
+import langchain
+
+# At the top of your file or in __init__
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -20,26 +22,29 @@ class WeatherLLM:
         temperature: float
         humidity: float
         pressure: float
-        lux = float
-        ambient = float
-        co = float
-        no2 = float
+        lux: float
+        ambient: float
+        co: float
+        no2: float
 
     def __init__(self, language="en"):
+
+        # langchain.debug = True
 
         self.language = 0 if language == "en" else 1
 
         ollama_host = os.environ.get("OLLAMA_HOST", "http://localhost:11434/")
 
         self.llm = OllamaLLM(base_url=ollama_host, model="llama3.2:1b", temperature=0.1, keep_alive=600 )
-
-        # Détermination the saison
-        current_month = datetime.now().month
-        if 4 <= current_month <= 10:
-            saison = "saison des pluies"
-        else:
-            saison = "saison sèche"
         
+         # Détermination the saison
+        def get_season() -> str:
+            current_month = datetime.now().month
+            if 4 <= current_month <= 10:
+                return "saison des pluies" if language == "fr" else "rainy season"
+            else:
+                return "saison sèche" if language == "fr" else "dry season"
+
         # Simple chaine
         if language == "en":
             self.template = textwrap.dedent("""
@@ -49,7 +54,7 @@ class WeatherLLM:
                 The raw data is as follows:
                 Current Temperature: {temperature}°C
                 Relative Humidity: {humidity}%
-                Atmospheric Pressure: {press} hPa
+                Atmospheric Pressure: {pressure} hPa
                 Luminosity: {lux} lux
                 Ambient Luminosity: {ambient}
                 Carbon Monoxide (CO): {co}
@@ -64,7 +69,7 @@ class WeatherLLM:
                 Les données brutes sont les suivantes :
                 Température actuelle : {temperature}°C
                 Humidité relative : {humidity}%
-                Pression atmosphérique: {press} hPa
+                Pression atmosphérique: {pressure} hPa
                 Luminosité: {lux} lux
                 Luminosité ambiante: {ambient}
                 Monoxyde de carbone (CO): {co}
@@ -79,8 +84,14 @@ class WeatherLLM:
         # Create the chain
         self.chain = (
             RunnableParallel({
-                "temperature": lambda x: x["temperature"], 
-                "humidity": lambda x: x["humidity"]
+                "temperature": lambda x: x["temperature"],
+                "humidity": lambda x: x["humidity"],
+                "pressure": lambda x: x["pressure"],
+                "lux": lambda x: x["lux"],
+                "ambient": lambda x: x["ambient"],
+                "co": lambda x: x["co"],
+                "no2": lambda x: x["no2"],
+                "saison": lambda x: get_season()
             })
             | self.prompt
             | self.llm
