@@ -9,6 +9,10 @@
     let mediaSource : Optional<MediaSource>;
     let mediaSourceBuffer : Optional<SourceBuffer>;
     let audioQueue: ArrayBuffer[] = [];
+
+    export async function stop() {
+        cleanup()
+    }
     
     export async function speak(text: string) {
 
@@ -76,15 +80,22 @@
             audioElement.src = "";
         }
         
-        if (mediaSource && mediaSource.readyState !== 'closed') {
+        if (mediaSource && mediaSource.readyState == "open") {
             try {
                 mediaSource.endOfStream();
             } catch (e) {
                 console.warn('Error ending MediaSource stream:', e);
             }
-            mediaSource = undefined;
         }
 
+        if (mediaSource) {
+            // remove all source buffers
+            for(let i=mediaSource.sourceBuffers.length-1; i >= 0; i--) {
+                mediaSource.removeSourceBuffer(mediaSource.sourceBuffers[i])
+            }
+        }
+
+        audioQueue = []
         mediaSourceBuffer = undefined;
 
         playbackReset.set({ timestamp: Date.now() });
