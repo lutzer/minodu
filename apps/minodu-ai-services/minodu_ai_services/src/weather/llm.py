@@ -51,7 +51,6 @@ class WeatherLLM:
         if language == "en":
             season_en = season['en'];
             self.template = textwrap.dedent("""
-                As a meteorological expert, here is the content for your prompt, rewritten in English:
                 Act as a meteorological expert. Analyze and interpret the raw data from a weather station located in Kara, Northern Togo, for local farmers.
 
                 The raw data is as follows:
