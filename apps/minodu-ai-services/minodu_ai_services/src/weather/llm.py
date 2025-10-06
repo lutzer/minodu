@@ -69,6 +69,7 @@ class WeatherLLM:
             season_fr = season['fr']
             self.template = textwrap.dedent("""
                 Agis en tant qu'expert en météorologie. Analyse et interprète les données brutes d'une station météo de Kara, au nord du Togo, pour des agriculteurs.
+                                            
                 Les données brutes sont les suivantes :
                 Température actuelle : {temperature}°C
                 Humidité relative : {humidity}%
@@ -88,7 +89,12 @@ class WeatherLLM:
         self.chain = (
             RunnableParallel({
                 "temperature": lambda x: x["temperature"], 
-                "humidity": lambda x: x["humidity"]
+                "humidity": lambda x: x["humidity"],
+                "pressure": lambda x: x["pressure"],
+                "luminosity": lambda x: x["luminosity"],
+                "ambient_luminosity": lambda x: x["ambient_luminosity"],
+                "carbon_monoxide": lambda x: x["carbon_monoxide"],
+                "nitrogen_dioxide": lambda x: x["nitrogen_dioxide"]
             })
             | self.prompt
             | self.llm
