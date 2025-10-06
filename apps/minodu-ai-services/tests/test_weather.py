@@ -18,10 +18,10 @@ class TestWeatherAPI:
             temperature= 20.0,
             humidity = 0.8,
             pressure = 10,
-            lux = 10,
-            ambient = 10,
-            co = 0.5,
-            no2 = 0.2
+            luminosity = 10,
+            ambient_luminosity = 10,
+            carbon_monoxide = 0.5,
+            nitrogen_dioxide = 0.2
         )
 
         result = llm.ask(data)
@@ -35,10 +35,10 @@ class TestWeatherAPI:
                 "temperature": 20,
                 "humidity": 0.5,
                 "pressure" : 1.2,
-                "lux" : 500,
-                "ambient" : 0.5,
-                "co" : 0.5,
-                "no2" : 0.8
+                "luminosity" : 500,
+                "ambient_luminosity" : 0.5,
+                "carbon_monoxide" : 0.5,
+                "nitrogen_dioxide" : 0.8
             }
         }
         response = client.post(app.root_path + "/weather/text", json=test_data)        
