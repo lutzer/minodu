@@ -14,13 +14,16 @@
     })
     
     function handleClick() {
-        ttsPlayer.speak(text)
-        playing = true
+        if (!playing) {
+            ttsPlayer.speak(text)
+            playing = true
+        } else {
+            ttsPlayer.stop()
+        }
     }
 </script>
 
 <div>
     <button 
-        onclick={handleClick}
-        disabled={playing}>Listen</button>
+        onclick={handleClick}>{playing ? "Stop" : "Listen"}</button>
 </div>
