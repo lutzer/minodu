@@ -7,9 +7,10 @@
 	import type { Optional } from '$lib/types';
 	import ForumPostElement from '$lib/components/forum/ForumPostElement.svelte';
 	import ForumInputElement from '$lib/components/forum/ForumInputElement.svelte';
-	import TtsButton from '$lib/components/TtsButton.svelte';
+	import TextToSpeechPlayer from '$lib/components/common/TextToSpeechPlayer.svelte';
   
     let createAuthorDialog : AuthorCreateDialog;
+    let ttsPlayer : TextToSpeechPlayer;
 
     let posts : ForumPost[] = []
     let author : Optional<ForumAuthor> = undefined
@@ -48,8 +49,6 @@
 <div>
     <h2>Forum</h2>
 
-    <TtsButton text="Hello there"/>
-
     <h3>Posts</h3>
     {#if posts.length > 0 }
     <ul>
@@ -59,6 +58,7 @@
                 post={post} 
                 isOwn={author?.id == post.author.id}
                 onDeleteClicked={() => deletePost(post.id)}
+                ttsPlayer={ttsPlayer}
                 />
         </li>
         {/each}
@@ -77,6 +77,8 @@
     <AuthorCreateDialog bind:this={createAuthorDialog} 
         onSubmit={async (name, avatar) => createAuthor(name, avatar)} 
     />
+
+    <TextToSpeechPlayer bind:this={ttsPlayer}/>
 </div>
 
 
