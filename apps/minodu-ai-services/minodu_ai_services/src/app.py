@@ -1,3 +1,4 @@
+from dataclasses import asdict
 from typing import Any, Optional
 from fastapi import FastAPI, UploadFile, HTTPException
 from pydantic import BaseModel
@@ -107,17 +108,15 @@ async def delete_documents(source_id: int, language: str):
 ### WEATHER LLM ###
 
 class WeatherRequest(BaseModel):
-    temperature: float
-    humidity: float
     language: str
-
+    sensor_data: WeatherLLM.SensorData
 
 @app.post("/weather/text")
 async def weather_text(request: WeatherRequest):
     weather_llm = WeatherLLM(language=request.language)
 
     def generate_stream():
-        sensorData = WeatherLLM.SensorData(request.temperature, request.humidity)
+        sensorData = WeatherLLM.SensorData(**request.dict()['sensor_data'])
         for chunk in weather_llm.ask_streaming(sensorData):
             yield chunk
 
