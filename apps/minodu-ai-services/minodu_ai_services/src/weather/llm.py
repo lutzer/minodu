@@ -34,8 +34,9 @@ class WeatherLLM:
         self.language = 0 if language == "en" else 1
 
         ollama_host = os.environ.get("OLLAMA_HOST", "http://localhost:11434/")
+        ollama_model = os.environ.get("OLLAMA_MODEL", "llama3.2:1b")
 
-        self.llm = OllamaLLM(base_url=ollama_host, model="llama3.2:1b", temperature=0.1, keep_alive=600 )
+        self.llm = OllamaLLM(base_url=ollama_host, model=ollama_model, temperature=0.1, keep_alive=600 )
 
         # Determine the season based on the current month (Kara, Togo)
         current_month = datetime.now().month
