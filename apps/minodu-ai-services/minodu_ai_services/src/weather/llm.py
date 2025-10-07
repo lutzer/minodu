@@ -29,7 +29,7 @@ class WeatherLLM:
 
     def __init__(self, language="en"):
 
-        # langchain.debug = True
+        langchain.debug = True
 
         self.language = 0 if language == "en" else 1
 
@@ -89,16 +89,9 @@ class WeatherLLM:
         
         # Create the chain
         self.chain = (
-            RunnableParallel({
-                "temperature": lambda x: x["temperature"], 
-                "humidity": lambda x: x["humidity"],
-                "pressure": lambda x: x["pressure"],
-                "luminosity": lambda x: x["luminosity"],
-                "ambient_luminosity": lambda x: x["ambient_luminosity"],
-                "carbon_monoxide": lambda x: x["carbon_monoxide"],
-                "nitrogen_dioxide": lambda x: x["nitrogen_dioxide"],
-                "season": lambda x: get_season()
-            })
+            RunnablePassthrough().assign(
+                season = lambda x: get_season()
+            )
             | self.prompt
             | self.llm
             | StrOutputParser()
