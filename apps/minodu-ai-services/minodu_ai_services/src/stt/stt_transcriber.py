@@ -9,6 +9,7 @@ import tempfile
 import io
 from functools import reduce
 
+from ..vars import LanguageEnum
 
 @dataclass
 class SttResult():
@@ -18,10 +19,17 @@ class SttResult():
 class SttTranscriber:
 
 
-    def __init__(self, language="en"):
+    def __init__(self, language=LanguageEnum):
         script_dir = os.path.dirname(os.path.abspath(__file__))
 
-        model_path = "../../models/stt_models/vosk-model-small-en-us-0.15" if language == "en" else "../../models/stt_models/vosk-model-small-fr-0.22"
+        match language:
+            case LanguageEnum.en:
+                model_path = "../../models/stt_models/vosk-model-small-en-us-0.15"
+            case LanguageEnum.fr:
+                model_path = "../../models/stt_models/vosk-model-small-fr-0.22"
+            case _:
+                raise Exception("No Model for language:" + str(language))
+            
         model_path = os.path.join(script_dir, model_path)
         if not os.path.exists(model_path):
             print(f"Model '{model_path}' was not found. Please check the path.")

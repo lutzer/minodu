@@ -11,6 +11,8 @@ import textwrap
 from dataclasses import dataclass, asdict
 import langchain
 
+from ..vars import LanguageEnum
+
 # At the top of your file or in __init__
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -27,11 +29,9 @@ class WeatherLLM:
         carbon_monoxide: float
         nitrogen_dioxide: float
 
-    def __init__(self, language="en"):
+    def __init__(self, language : LanguageEnum):
 
         langchain.debug = True
-
-        self.language = 0 if language == "en" else 1
 
         ollama_host = os.environ.get("OLLAMA_HOST", "http://localhost:11434/")
         ollama_model = os.environ.get("OLLAMA_MODEL", "llama3.2:1b")
@@ -46,13 +46,21 @@ class WeatherLLM:
         # Logic to determine the season
             if 4 <= current_month <= 10:
                 # Rainy Season (April to October)
-                return "saison des pluies" if language == "fr" else "rainy season"
+                match language:
+                    case LanguageEnum.fr:
+                        return "saison des pluies"
+                    case LanguageEnum.en:
+                        return "rainy season"
             else:
                 # Dry Season (November to March)
-                return  "saison sèche" if language == "fr" else "dry season"
+                match language:
+                    case LanguageEnum.fr:
+                        return  "saison sèche" 
+                    case LanguageEnum.en:
+                        return "dry season"
         
         # Simple chaine
-        if language == "en":
+        if language == LanguageEnum.en:
             self.template = textwrap.dedent("""
                 Act as a meteorological expert. Analyze and interpret the raw data from a weather station located in Kara, Northern Togo, for local farmers.
 
@@ -68,7 +76,7 @@ class WeatherLLM:
 
                 Provide a single, simple English paragraph presenting the current weather conditions, the rainfall outlook (if relevant), air quality information (if available), and the implications for local plants and crops. Ensure your analysis considers the current season.
                 """)
-        else:
+        elif language == LanguageEnum.fr:
             self.template = textwrap.dedent("""
                 Agis en tant qu'expert en météorologie. Analyse et interprète les données brutes d'une station météo de Kara, au nord du Togo, pour des agriculteurs.
                                             
@@ -90,7 +98,7 @@ class WeatherLLM:
         # Create the chain
         self.chain = (
             RunnablePassthrough().assign(
-                season = lambda x: get_season()
+                season = lambda _: get_season()
             )
             | self.prompt
             | self.llm

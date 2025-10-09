@@ -1,4 +1,5 @@
 from dataclasses import asdict
+from enum import Enum
 from typing import Any, Optional
 from fastapi import FastAPI, UploadFile, HTTPException
 from pydantic import BaseModel
@@ -11,12 +12,14 @@ import tempfile
 import io
 
 from .rag.rag import RAG
-from .rag.document_store import DocumentStore
+from .rag.document_store import DocumentStore, DocumentStoreException
 
 from .weather.llm import WeatherLLM
 
 from .stt.stt_transcriber import SttTranscriber
 from .tts.speech_generator import SpeechGenerator
+
+from .vars import LanguageEnum
 
 api_prefix = os.getenv('API_PREFIX', "/services")
 
@@ -31,7 +34,7 @@ async def root():
 
 class RagRequest(BaseModel):
     conversation: str
-    language: str
+    language: LanguageEnum
     question: str
 
 @app.post("/rag/ask")
@@ -50,7 +53,7 @@ async def rag_ask(request: RagRequest):
 
 class RagSourceRequest(BaseModel):
     query: str
-    language: str
+    language: LanguageEnum
 
 class RagSourceResponse(BaseModel):
     document: Optional[Any]
@@ -72,7 +75,7 @@ class RagDocumentRequest(BaseModel):
     score: float
 
 @app.post("/rag/documents/")
-async def add_document(file: UploadFile, language: str = Form(...), source_id: int = Form(...)):
+async def add_document(file: UploadFile, language: LanguageEnum = Form(...), source_id: int = Form(...)):
     rag = RAG(language=language)
     store = DocumentStore(rag.vectorstore, rag.chroma_client)
 
@@ -93,22 +96,25 @@ async def add_document(file: UploadFile, language: str = Form(...), source_id: i
     return "Document added"
 
 @app.delete("/rag/documents/{language}/{source_id}")
-async def delete_documents(source_id: int, language: str):
+async def delete_documents(source_id: int, language: LanguageEnum):
+
     rag = RAG(language=language)
 
     store = DocumentStore(rag.vectorstore, rag.chroma_client)
 
     try:
         store.delete_document_by_id(source_id)
+    except DocumentStoreException as e:
+        raise HTTPException(status_code=404, detail=f"Could not delete document: {str(e)}")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Could not add document: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Could not delete document: {str(e)}")
 
     return "Document deleted"
 
 ### WEATHER LLM ###
 
 class WeatherRequest(BaseModel):
-    language: str
+    language: LanguageEnum
     sensor_data: WeatherLLM.SensorData
 
 @app.post("/weather/text")
@@ -151,7 +157,7 @@ async def stt_transcribe(file: UploadFile, language: str = Form(...)):
 ### TEXT TO SPEECH API ###
 
 class TtsRequest(BaseModel):
-    language: str
+    language: LanguageEnum
     text: str
     return_header: bool = True
     format: str = "wav"

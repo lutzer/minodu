@@ -8,6 +8,7 @@ from functools import reduce
 from minodu_ai_services.src.app import app
 from minodu_ai_services.src.rag.rag import RAG
 from minodu_ai_services.src.rag.document_store import DocumentStore
+from minodu_ai_services.src.vars import LanguageEnum
 
 from .conftest import database_path
 
@@ -19,7 +20,7 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 @pytest.fixture(scope="module", autouse=True)
 def setup_and_teardown():
     
-    rag = RAG(language="en")
+    rag = RAG(language=LanguageEnum.en)
     store = DocumentStore(rag.vectorstore, rag.chroma_client)
     store.delete_all_documents()
     time.sleep(1)
@@ -32,7 +33,7 @@ class TestRagAPI:
         test_data = {
             "question": "This is a generic question.",
             "conversation" : "",
-            "language": "en"
+            "language": LanguageEnum.en
         }
         response = client.post(app.root_path + "/rag/ask", json=test_data)        
         assert response.status_code == 200
@@ -41,7 +42,7 @@ class TestRagAPI:
     def test_find_sources(self):
         file_path = os.path.join(script_dir, "docs/2_EN_AMANA_SCRIPT AUDIO.pdf")
 
-        rag = RAG(language="en")
+        rag = RAG(language=LanguageEnum.en)
         store = DocumentStore(rag.vectorstore, rag.chroma_client)
         store.add_file(file_path, 2)
 
@@ -67,13 +68,11 @@ class TestRagAPI:
                     "source_id" : 3
                 }
             )
-
-        print(response.content)
     
         assert response.status_code == 200
 
         # check if document is present
-        rag = RAG(language="en")
+        rag = RAG(language=LanguageEnum.en)
         store = DocumentStore(rag.vectorstore, rag.chroma_client)
         documents = store.list_documents()
 
@@ -85,9 +84,14 @@ class TestRagAPI:
         assert response.status_code == 200
 
         # check if document is deleted
-        rag = RAG(language="en")
+        rag = RAG(language=LanguageEnum.en)
         store = DocumentStore(rag.vectorstore, rag.chroma_client)
         documents = store.list_documents()
 
         is_in_documents = reduce(lambda acc, val: acc or val["metadata"]["source_id"] == 3, documents, False)
         assert not is_in_documents
+
+
+    def test_delete_document_error(self):
+        response = client.delete(app.root_path + "/rag/documents/en/999")
+        assert response.status_code != 200
