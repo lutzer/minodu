@@ -5,18 +5,47 @@
 
     export const playbackReset = writable<{ timestamp: number } | null>(null);
 
-    let audioElement : HTMLAudioElement;
-    let mediaSource : Optional<MediaSource>;
-    let mediaSourceBuffer : Optional<SourceBuffer>;
-    let audioQueue: ArrayBuffer[] = [];
+    // let audioElement : HTMLAudioElement;
+    // let mediaSource : Optional<MediaSource>;
+    // let mediaSourceBuffer : Optional<SourceBuffer>;
+    // let audioQueue: ArrayBuffer[] = [];
+
+    type StreamingPlayer = {
+        audioElement: HTMLAudioElement
+        mediaSource: MediaSource
+        sourceBuffer: Optional<SourceBuffer>
+        streamReader: ReadableStreamDefaultReader<Uint8Array<ArrayBuffer>>
+    }
+
+    let streamingPlayers : StreamingPlayer[] = []
 
     export async function stop() {
-        cleanup()
+        playbackReset.set({timestamp: Date.now()})
+
+        streamingPlayers.forEach((p) => {
+            p.streamReader.cancel()
+
+            p.audioElement.removeEventListener("ended", onMediaEnded)
+            p.audioElement.pause();
+
+            if (p.mediaSource.readyState === 'open') {
+                 if (p.sourceBuffer && p.sourceBuffer) {
+                    p.sourceBuffer.abort()
+                    p.mediaSource.removeSourceBuffer(p.sourceBuffer)
+                }
+
+                p.mediaSource.endOfStream();
+            }   
+
+            p.audioElement.removeAttribute('src');
+            URL.revokeObjectURL(p.audioElement.src);
+        })
+        streamingPlayers = []
     }
     
     export async function speak(text: string) {
 
-        cleanup()
+        stop()
 
         let response = await AiServicesApi.generateTextToSpeechStream({
                 text: text,
@@ -30,9 +59,26 @@
         if (!reader)
             throw Error("Could not initialize audio response reader");
 
-        mediaSource = new MediaSource();
-        audioElement.src = URL.createObjectURL(mediaSource);
 
+        let player = new Audio();
+
+        player.addEventListener("ended", onMediaEnded)
+
+        let mediaSource = new MediaSource();
+        let mediaSourceBuffer : SourceBuffer 
+        let audioQueue : ArrayBuffer[] = [];
+
+        player.src = URL.createObjectURL(mediaSource);
+        player.play()
+
+        var streamingPlayer : StreamingPlayer = {
+            audioElement : player,
+            mediaSource: mediaSource,
+            sourceBuffer: undefined,
+            streamReader: reader
+        }
+
+        streamingPlayers.push(streamingPlayer)
 
         mediaSource.addEventListener('error', (e) => {
             console.error('MediaSource error:', e);
@@ -40,7 +86,7 @@
 
         mediaSource.addEventListener('sourceopen', function () {
             mediaSourceBuffer = this.addSourceBuffer('audio/mpeg');
-
+            streamingPlayer.sourceBuffer = mediaSourceBuffer
 
             mediaSourceBuffer.addEventListener('updateend', () => {
                 processQueue()
@@ -65,7 +111,8 @@
         while (true) {
             const { done, value } = await reader.read();
             if (done) {
-                mediaSource.endOfStream();
+                if (mediaSource.readyState === 'open')
+                    mediaSource.endOfStream();
                 break;
             }
             audioQueue.push(value.buffer);
@@ -73,47 +120,8 @@
         }
     }
 
-    function cleanup() {
-        if (audioElement) {
-            audioElement.pause();
-            URL.revokeObjectURL(audioElement.src)
-            audioElement.src = "";
-        }
-        
-        if (mediaSource && mediaSource.readyState == "open") {
-            try {
-                mediaSource.endOfStream();
-            } catch (e) {
-                console.warn('Error ending MediaSource stream:', e);
-            }
-        }
-
-        if (mediaSource) {
-            // remove all source buffers
-            for(let i=mediaSource.sourceBuffers.length-1; i >= 0; i--) {
-                mediaSource.removeSourceBuffer(mediaSource.sourceBuffers[i])
-            }
-        }
-
-        audioQueue = []
-        mediaSourceBuffer = undefined;
-
-        playbackReset.set({ timestamp: Date.now() });
+    function onMediaEnded() {
+        playbackReset.set({timestamp: Date.now()})
     }
+    
 </script>
-
-<style>
-    .tts-player {
-        display: none;
-    }
-</style>
-
-<div>
-    <audio 
-        class="tts-player" 
-        bind:this={audioElement} 
-        onended={cleanup} 
-        autoplay 
-        controls>
-    </audio>
-</div>
