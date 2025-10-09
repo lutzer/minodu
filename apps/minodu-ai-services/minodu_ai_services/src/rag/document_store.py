@@ -5,6 +5,9 @@ from langchain_community.document_loaders.text import TextLoader
 import glob
 import os
 
+class DocumentStoreException(Exception):
+    pass
+
 class DocumentStore:
     def __init__(self, vectorstore, chroma_client):
         self.vectorstore = vectorstore
@@ -93,33 +96,35 @@ class DocumentStore:
 
     def delete_document_by_id(self, id: int):
         collection = self.chroma_client.get_collection(self.collection_name)
+        results = collection.get(
+                where={"source_id": id},
+                include=["metadatas"]
+            )
+
+        if not results['ids']:
+            raise DocumentStoreException(f"No documents found with ud: {id}")
+        
         collection.delete(where={"source_id": id})
     
     def delete_document(self, document_name: str):
         """Delete all documents from a specific source"""
-        try:
-            collection = self.chroma_client.get_collection(self.collection_name)
+        collection = self.chroma_client.get_collection(self.collection_name)
+        
+        # First, get all documents with this source
+        results = collection.get(
+            where={"source": document_name},
+            include=["metadatas"]
+        )
+        
+        if not results['ids']:
+            raise DocumentStoreException(f"No documents found with source: {document_name}")
+        
+        # Delete all documents with this source
+        collection.delete(where={"source": document_name})
+        
+        deleted_count = len(results['ids'])
+        return deleted_count
             
-            # First, get all documents with this source
-            results = collection.get(
-                where={"source": document_name},
-                include=["metadatas"]
-            )
-            
-            if not results['ids']:
-                print(f"No documents found with source: {document_name}")
-                return 0
-            
-            # Delete all documents with this source
-            collection.delete(where={"source": document_name})
-            
-            deleted_count = len(results['ids'])
-            print(f"Deleted {deleted_count} documents from source: {document_name}")
-            return deleted_count
-            
-        except Exception as e:
-            print(f"Error deleting documents from source {document_name}: {e}")
-            return 0
 
     def delete_all_documents(self):
         self.chroma_client.delete_collection(name=self.collection_name)
