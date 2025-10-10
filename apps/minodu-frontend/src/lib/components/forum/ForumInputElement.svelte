@@ -6,10 +6,12 @@
     export let author: Optional<ForumAuthor>
     export let onCreateAuthorClicked: () => {}
     export let onLogoutAuthorClicked: () => {}
-    export let onSubmitPostClicked: (title: string, text: string) => {}
+    export let onSubmitPostClicked: (title: string, text: string, audioRecording : Optional<Blob>) => {}
 
     let title : string = ""
     let text : string = ""
+    let audioRecording : Optional<Blob>
+
 </script>
 
 <style>
@@ -56,11 +58,11 @@
             <label for="text">Text</label>
             <textarea id="text" bind:value={text} disabled={author == undefined}></textarea>
         </div>
-        <button onclick={() => onSubmitPostClicked(title, text)} 
+        <button onclick={() => onSubmitPostClicked(title, text, audioRecording)} 
             disabled={author == undefined || text.length < 1 || title.length < 1}>Submit</button>
     </div>
     <div class="audio-input input-block">
-        <AudioRecorder></AudioRecorder>
+        <AudioRecorder bind:blob={audioRecording}></AudioRecorder>
     </div>
 </div>
 

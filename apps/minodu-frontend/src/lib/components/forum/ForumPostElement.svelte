@@ -21,6 +21,9 @@
 
 <div class="post">
     <p>{post.id} - {post.title} : {post.text}</p>
+    {#each post.files as file }
+    <p>{file.id} - {file.filename}</p>
+    {/each}
     <TextToSpeechButton text={post.text} ttsPlayer={ttsPlayer}/>
     {#if isOwn}
         <button onclick={onDeleteClicked}>Delete</button>

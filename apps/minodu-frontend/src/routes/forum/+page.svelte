@@ -30,8 +30,11 @@
         update()
     }
 
-    async function createPost(title: string, text: string) {
-        await ForumApi.createPost({ title: title, text : text});
+    async function createPost(title: string, text: string, audioRecording: Optional<Blob>) {
+        let post = await ForumApi.createPost({ title: title, text : text});
+        if (audioRecording) {
+            await ForumApi.attachFile(post.id, audioRecording)
+        }
         update()
     }
 
@@ -70,7 +73,7 @@
     <ForumInputElement
         author={author}
         onCreateAuthorClicked={async () => createAuthorDialog.open()}
-        onSubmitPostClicked={async (title, text) => createPost(title, text)}
+        onSubmitPostClicked={async (title, text, audioRecording) => createPost(title, text, audioRecording)}
         onLogoutAuthorClicked={async () => logout()}
     />
 
