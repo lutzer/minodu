@@ -21,7 +21,7 @@ def upload_file(post_id: int, file_path: str, auth_token: str):
         response = client.post(
             "/files/upload",
             files={"file": (os.path.basename(file_path), f, mimetypes.guess_type(file_path)[0])},
-            data={"post_id": post_id},
+            data={"post_id": post_id, "language": "en"},
             headers={"Authorization": f"Bearer {auth_token}"}
         )
     return response.json()
@@ -37,7 +37,7 @@ class TestFilesApi:
             response = client.post(
                 "/files/upload",
                 files={"file": (os.path.basename(file_path), f, mimetypes.guess_type(file_path)[0])},
-                data={"post_id": post["id"]},
+                data={"post_id": post["id"], "language": "en"},
                 headers={"Authorization": f"Bearer {auth_token}"}
             )
         assert response.status_code == 200
@@ -54,7 +54,7 @@ class TestFilesApi:
             response = client.post(
                 "/files/upload",
                 files={"file": (os.path.basename(file_path), f, mimetypes.guess_type(file_path)[0])},
-                data={"post_id": post["id"]},
+                data={"post_id": post["id"], "language": "fr"},
                 headers={"Authorization": f"Bearer {auth_token}"}
             )
         assert response.status_code == 200
@@ -71,7 +71,7 @@ class TestFilesApi:
             response = client.post(
                 "/files/upload",
                 files={"file": (os.path.basename(file_path), f, mimetypes.guess_type(file_path)[0])},
-                data={"post_id": post["id"]},
+                data={"post_id": post["id"], "language": "en"},
                 headers={"Authorization": f"Bearer {auth_token}"}
             )
         assert response.status_code == 500
@@ -99,7 +99,7 @@ class TestFilesApi:
             response = client.post(
                 "/files/upload",
                 files={"file": (os.path.basename(file_path), f, mimetypes.guess_type(file_path)[0])},
-                data={"post_id": post["id"]},
+                data={"post_id": post["id"], "language": "en"},
                 headers={"Authorization": f"Bearer {auth_token2}"}
             )
         assert response.status_code == 401

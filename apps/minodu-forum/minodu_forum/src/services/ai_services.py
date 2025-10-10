@@ -6,7 +6,7 @@ import os
 
 logger = logging.getLogger(__name__)
 
-def transcribe_audio(file_path, language : str = "fr") -> Optional[str]:
+def transcribe_audio(file_path, language : str) -> Optional[str]:
     try:
         with open(file_path, "rb") as f:
             response = requests.post(
