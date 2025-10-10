@@ -1,5 +1,8 @@
 <script lang="ts">
+	import type { Optional } from '$lib/types';
     import { onMount } from 'svelte'
+
+    export let blob : Optional<Blob>
 
     let media : Blob[] = [];
     let mediaRecorder : MediaRecorder;
@@ -14,12 +17,12 @@
 
     async function prepareRecorder() {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
         mediaRecorder.ondataavailable = (e) => media.push(e.data)
 
         mediaRecorder.onstop = () => {
             recording = false;
-            const blob = new Blob(media, {'type' : 'audio/ogg; codecs=opus' });
+            blob = new Blob(media, {'type' : mediaRecorder.mimeType });
             audioElement.src = URL.createObjectURL(blob);
             media = []
         }
@@ -39,7 +42,7 @@
         
     }
 
-    export async function startRecording() {
+    async function startRecording() {
         if (!prepared) {
             await prepareRecorder()
         }
@@ -47,27 +50,28 @@
         mediaRecorder?.start()
     }
 
-    export function stopRecording() {
+    function stopRecording() {
         mediaRecorder?.stop()
     }
 
-    export function reset() {
+    function reset() {
         mediaRecorder?.stop()
+        blob = undefined
         media = []
         if (audioElement) {
             audioElement.src = ""
         }
     }
 
-    export function startPlayback() {
+    function startPlayback() {
         audioElement?.play()
     }
 
-    export function pausePlayback() {
+    function pausePlayback() {
         audioElement?.pause()
     }
 
-    export function stopPlayback() {
+    function stopPlayback() {
         if (audioElement) {
             audioElement.currentTime = 0;
             audioElement.pause()

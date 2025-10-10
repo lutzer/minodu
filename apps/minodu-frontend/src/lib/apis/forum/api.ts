@@ -3,6 +3,7 @@ import { HttpError } from "$lib/errors";
 import type { ForumAvatar } from "./models/fromAvatar";
 import type { ForumAuthor } from "./models/forumAuthor";
 import type { Optional } from "$lib/types";
+import type { ForumFile } from "./models/forumFile";
 
 type CreateAuthorRequest = {
     name: string,
@@ -40,7 +41,7 @@ export class ForumApi {
         return response.json();
     }
 
-    public static async createPost(request: CreatePostRequest) {
+    public static async createPost(request: CreatePostRequest) : Promise<ForumPost> {
         const response = await fetch(`${ForumApi.API_PREFIX}/posts/`, {
             method: "POST",
             headers: {
@@ -52,6 +53,7 @@ export class ForumApi {
         if (!response.ok) {
             throw new HttpError({ code: response.status, message: await response.text()});
         }
+        return await response.json();
     }
 
     public static async deletePost(id: number) {
@@ -65,6 +67,24 @@ export class ForumApi {
         if (!response.ok) {
             throw new HttpError({ code: response.status, message: await response.text()});
         }
+    }
+
+    public static async attachFile(post_id: number, file: Blob) : Promise<ForumFile>  {
+        const formData = new FormData();
+        formData.append('file', file, 'recording.webm');
+        formData.append('post_id', post_id.toString());
+
+        const response = await fetch(`${ForumApi.API_PREFIX}/files/upload`, {
+            method: "POST",
+            headers: {
+                'Authorization': `Bearer ${ForumApi.getToken()}`
+            },
+            body: formData
+        })
+        if (!response.ok) {
+            throw new HttpError({ code: response.status, message: await response.text()});
+        }
+        return await response.json()
     }
 
     public static async getAvatars() : Promise<ForumAvatar[]> {
