@@ -11,6 +11,7 @@
   
     let createAuthorDialog : AuthorCreateDialog;
     let ttsPlayer : TextToSpeechPlayer;
+    let forumInputElement : ForumInputElement;
 
     let posts : ForumPost[] = []
     let author : Optional<ForumAuthor> = undefined
@@ -35,6 +36,7 @@
         if (audioRecording) {
             await ForumApi.attachFile(post.id, audioRecording)
         }
+        forumInputElement?.reset()
         update()
     }
 
@@ -71,6 +73,7 @@
     {/if}
 
     <ForumInputElement
+        bind:this={forumInputElement}
         author={author}
         onCreateAuthorClicked={async () => createAuthorDialog.open()}
         onSubmitPostClicked={async (title, text, audioRecording) => createPost(title, text, audioRecording)}

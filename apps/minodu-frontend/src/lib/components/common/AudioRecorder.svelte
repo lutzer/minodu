@@ -4,6 +4,12 @@
 
     export let blob : Optional<Blob>
 
+    $: {
+        if (!blob) {
+            reset()
+        }
+    }
+
     let media : Blob[] = [];
     let mediaRecorder : MediaRecorder;
     let audioElement : HTMLAudioElement;
@@ -43,10 +49,10 @@
     }
 
     async function startRecording() {
+        reset()
         if (!prepared) {
             await prepareRecorder()
         }
-        reset()
         mediaRecorder?.start()
     }
 
@@ -93,10 +99,10 @@
 <div class="audio-recorder">
     <audio bind:this={audioElement} controls></audio>
     {#if !recording}
-        <button on:click={startRecording}>Record</button>
+        <button on:click={startRecording} disabled={blob !== undefined}>Record</button>
     {:else}
         <button on:click={stopRecording}>Stop</button>
     {/if}
-    <button on:click={reset}>Reset</button>
-    <button on:click={startPlayback}>Play</button>
+    <button on:click={reset} disabled={blob === undefined}>Reset</button>
+    <button on:click={startPlayback} disabled={blob === undefined}>Play</button>
 </div>

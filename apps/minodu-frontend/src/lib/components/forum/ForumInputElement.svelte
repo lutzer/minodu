@@ -12,6 +12,18 @@
     let text : string = ""
     let audioRecording : Optional<Blob>
 
+    let submitEnabled: boolean = false
+
+    $ : {
+        submitEnabled = (title.length > 3 && text.length > 3) || audioRecording != undefined
+    }
+
+    export function reset() {
+        title = ""
+        text = ""
+        audioRecording = undefined
+    }
+
 </script>
 
 <style>
@@ -58,11 +70,13 @@
             <label for="text">Text</label>
             <textarea id="text" bind:value={text} disabled={author == undefined}></textarea>
         </div>
-        <button onclick={() => onSubmitPostClicked(title, text, audioRecording)} 
-            disabled={author == undefined || text.length < 1 || title.length < 1}>Submit</button>
     </div>
     <div class="audio-input input-block">
         <AudioRecorder bind:blob={audioRecording}></AudioRecorder>
+    </div>
+    <div class="submit input-block">
+        <button onclick={() => onSubmitPostClicked(title, text, audioRecording)} 
+            disabled={!submitEnabled}>Submit</button>
     </div>
 </div>
 
