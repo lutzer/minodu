@@ -1,6 +1,7 @@
 <script lang="ts">
     import type { ForumAuthor } from '$lib/apis/forum/models/forumAuthor.ts';
 	import type { Optional } from '$lib/types';
+	import AudioRecorder from '../common/AudioRecorder.svelte';
     
     export let author: Optional<ForumAuthor>
     export let onCreateAuthorClicked: () => {}
@@ -13,26 +14,31 @@
 
 <style>
     .forum-input-container {
-        display: flex;
+        float: left;
     }
 
-    .author {
+    .input-block {
         background-color: lightgray;
         margin: 10px;
         padding: 10px;
+        float: left;
+    }
+
+    .author {
         width: 100px;
         text-align: center;
     }
 
-    .post-input {
-        background-color: lightgray;
-        margin: 10px;
-        padding: 10px;
+    .text-input {
     }
+
+    .audio-input {
+    }
+
 </style>
 
 <div class="forum-input-container">
-    <div class="author">
+    <div class="author input-block">
     {#if (author != undefined)}
         <h4>{author.name}</h4>
         <p>{author.avatar}</p>
@@ -41,7 +47,7 @@
         <button onclick={onCreateAuthorClicked}>Create Author</button>
     {/if}
     </div>
-    <div class="post-input">
+    <div class="text-input input-block">
         <div class="input">
             <label for="title">Title</label>
             <input id="title" type="text" bind:value={title}/>
@@ -52,6 +58,9 @@
         </div>
         <button onclick={() => onSubmitPostClicked(title, text)} 
             disabled={author == undefined || text.length < 1 || title.length < 1}>Submit</button>
+    </div>
+    <div class="audio-input input-block">
+        <AudioRecorder></AudioRecorder>
     </div>
 </div>
 

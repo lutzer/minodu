@@ -5,42 +5,14 @@
 
     export const playbackReset = writable<{ timestamp: number } | null>(null);
 
-    // let audioElement : HTMLAudioElement;
-    // let mediaSource : Optional<MediaSource>;
-    // let mediaSourceBuffer : Optional<SourceBuffer>;
-    // let audioQueue: ArrayBuffer[] = [];
-
-    type StreamingPlayer = {
-        audioElement: HTMLAudioElement
-        mediaSource: MediaSource
-        sourceBuffer: Optional<SourceBuffer>
-        streamReader: ReadableStreamDefaultReader<Uint8Array<ArrayBuffer>>
-    }
-
-    let streamingPlayers : StreamingPlayer[] = []
+    let cleanupQueue : { cleanup : () => void }[] = []
 
     export async function stop() {
         playbackReset.set({timestamp: Date.now()})
 
-        streamingPlayers.forEach((p) => {
-            p.streamReader.cancel()
-
-            p.audioElement.removeEventListener("ended", onMediaEnded)
-            p.audioElement.pause();
-
-            if (p.mediaSource.readyState === 'open') {
-                 if (p.sourceBuffer && p.sourceBuffer) {
-                    p.sourceBuffer.abort()
-                    p.mediaSource.removeSourceBuffer(p.sourceBuffer)
-                }
-
-                p.mediaSource.endOfStream();
-            }   
-
-            p.audioElement.removeAttribute('src');
-            URL.revokeObjectURL(p.audioElement.src);
-        })
-        streamingPlayers = []
+        cleanupQueue.forEach(element => {
+            element.cleanup()
+        });
     }
     
     export async function speak(text: string) {
@@ -71,22 +43,16 @@
         player.src = URL.createObjectURL(mediaSource);
         player.play()
 
-        var streamingPlayer : StreamingPlayer = {
-            audioElement : player,
-            mediaSource: mediaSource,
-            sourceBuffer: undefined,
-            streamReader: reader
-        }
-
-        streamingPlayers.push(streamingPlayer)
-
         mediaSource.addEventListener('error', (e) => {
             console.error('MediaSource error:', e);
         });
 
-        mediaSource.addEventListener('sourceopen', function () {
-            mediaSourceBuffer = this.addSourceBuffer('audio/mpeg');
-            streamingPlayer.sourceBuffer = mediaSourceBuffer
+        mediaSource.addEventListener('sourceopen', handleSourceOpened)
+
+        function handleSourceOpened() {
+            if (player.paused)
+                return
+            mediaSourceBuffer = mediaSource.addSourceBuffer('audio/mpeg');
 
             mediaSourceBuffer.addEventListener('updateend', () => {
                 processQueue()
@@ -97,7 +63,7 @@
             });
 
             processQueue()
-        })
+        }
 
         function processQueue() {
             if (!mediaSourceBuffer || mediaSourceBuffer.updating)
@@ -107,6 +73,29 @@
                 mediaSourceBuffer.appendBuffer(audioQueue.shift()!);
             }
         }
+
+        function cleanup() {
+            reader?.cancel()
+
+            player.removeEventListener("ended", onMediaEnded)
+            player.pause();
+
+            mediaSource.removeEventListener('sourceopen', handleSourceOpened)
+
+            if (mediaSource.readyState === 'open') {
+
+                mediaSourceBuffer?.abort()
+                 if (mediaSourceBuffer) {
+                    mediaSource.removeSourceBuffer(mediaSourceBuffer)
+                }
+                mediaSource.endOfStream();
+            }   
+
+            player.removeAttribute('src');
+            URL.revokeObjectURL(player.src);
+        }
+
+        cleanupQueue.push({ cleanup: cleanup });
 
         while (true) {
             const { done, value } = await reader.read();
