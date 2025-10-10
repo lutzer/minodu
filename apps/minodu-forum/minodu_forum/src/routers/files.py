@@ -42,7 +42,7 @@ async def get_file(file_id: int, db: Session = Depends(get_db)):
     return file
 
 @router.post("/upload", response_model=FileResponse)
-async def upload_file(file: UploadFile, post_id: int = Form(...), db: Session = Depends(get_db), token_author_id: int = Depends(get_author_from_token)):
+async def upload_file(file: UploadFile, post_id: int = Form(...), language: str = Form(...), db: Session = Depends(get_db), token_author_id: int = Depends(get_author_from_token)):
     post = db.query(Post).filter(Post.id == post_id).first()
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
@@ -72,7 +72,7 @@ async def upload_file(file: UploadFile, post_id: int = Form(...), db: Session = 
         if db_file.content_type.startswith("audio/"):
             threading.Thread(
                 target=transcribe_file_and_update_record, 
-                args=(get_upload_file_path(db_file.filename), db_file.id)
+                args=(get_upload_file_path(db_file.filename), db_file.id, language)
             ).start()
         
         return db_file
@@ -101,8 +101,8 @@ async def delete_file(file_id: int, db: Session = Depends(get_db), token_author_
     
     return { "message" : "File deleted" }
 
-def transcribe_file_and_update_record(file_path: str, file_id: int):
-    result = transcribe_audio(file_path)
+def transcribe_file_and_update_record(file_path: str, file_id: int, language: str):
+    result = transcribe_audio(file_path, language)
     if result != None:
         with get_db_session() as db:
             file = db.get(File, file_id)
