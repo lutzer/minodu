@@ -115,7 +115,13 @@ class SttTranscriber:
             else:
                 # Already mono
                 return self.transcribe_raw(file_buffer)
+        elif filename.lower().endswith(".webm"):
+            audio = AudioSegment.from_file(file_buffer, format="webm")
+            audio = audio.set_channels(1).set_sample_width(2)
 
+            wav_io = io.BytesIO()
+            audio.export(wav_io, format="wav")
+            return self.transcribe_raw(wav_io)
         else:
             raise Exception("Audio file must be WAV or MP3 format.")
 
