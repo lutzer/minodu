@@ -13,6 +13,8 @@ from ..database import get_db
 from .authors import AuthorResponse
 from .files import FileResponse
 
+from ..events import broadcast
+
 from .auth import get_author_from_token
 
 router = APIRouter()
@@ -75,6 +77,7 @@ async def create_post(post: PostCreate, db: Session = Depends(get_db), token_aut
     db.add(db_post)
     db.commit()
     db.refresh(db_post)
+    broadcast("update")
     return db_post
 
 @router.put("/{post_id}", response_model=PostResponse)
@@ -93,6 +96,7 @@ async def edit_post(post_id: int, new_data: PostEdit, db: Session = Depends(get_
     # commit changes
     db.commit()
     db.refresh(post)
+    broadcast("update")
     return post
 
 @router.delete("/{post_id}")
@@ -109,5 +113,5 @@ async def delete_file(post_id: int, db: Session = Depends(get_db), token_author_
 
     db.delete(post)
     db.commit()
-
+    broadcast("update")
     return { "msg" : "Post deleted." }

@@ -9,6 +9,8 @@ from ..database import get_db, get_db_session
 
 from ..config import Config
 
+from ..events import broadcast
+
 from ..models.file import File
 from ..models.post import Post
 from ..models.author import Author
@@ -75,6 +77,7 @@ async def upload_file(file: UploadFile, post_id: int = Form(...), language: str 
                 args=(get_upload_file_path(db_file.filename), db_file.id, language)
             ).start()
         
+        broadcast("update")
         return db_file
         
     except HTTPException:
@@ -98,7 +101,7 @@ async def delete_file(file_id: int, db: Session = Depends(get_db), token_author_
 
     db.delete(file)
     db.commit()
-    
+    broadcast("update")
     return { "message" : "File deleted" }
 
 def transcribe_file_and_update_record(file_path: str, file_id: int, language: str):
@@ -109,3 +112,4 @@ def transcribe_file_and_update_record(file_path: str, file_id: int, language: st
             if file != None:
                 file.text = result
                 db.commit()
+                broadcast("update")
