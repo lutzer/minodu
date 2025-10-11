@@ -1,15 +1,16 @@
+from concurrent.futures import ThreadPoolExecutor
 from fastapi import APIRouter, HTTPException, Depends, UploadFile, Form
 from pydantic import BaseModel
 from typing import List, Optional
 from sqlalchemy.orm import Session
 import os
-import threading
+import asyncio
 
 from ..database import get_db, get_db_session
 
 from ..config import Config
 
-from ..events import broadcast
+from ..events import broadcast, broadcast_async
 
 from ..models.file import File
 from ..models.post import Post
@@ -69,13 +70,13 @@ async def upload_file(file: UploadFile, post_id: int = Form(...), language: str 
         db.add(db_file)
         db.commit()
         db.refresh(db_file)
-
-        # transcribe audio
+        
         if db_file.content_type.startswith("audio/"):
-            threading.Thread(
-                target=transcribe_file_and_update_record, 
-                args=(get_upload_file_path(db_file.filename), db_file.id, language)
-            ).start()
+            asyncio.create_task(transcribe_file_and_update_record(
+                get_upload_file_path(db_file.filename), 
+                db_file.id, 
+                language
+            ))
         
         broadcast("update")
         return db_file
@@ -104,7 +105,7 @@ async def delete_file(file_id: int, db: Session = Depends(get_db), token_author_
     broadcast("update")
     return { "message" : "File deleted" }
 
-def transcribe_file_and_update_record(file_path: str, file_id: int, language: str):
+async def transcribe_file_and_update_record(file_path: str, file_id: int, language: str):
     result = transcribe_audio(file_path, language)
     if result != None:
         with get_db_session() as db:
@@ -112,4 +113,4 @@ def transcribe_file_and_update_record(file_path: str, file_id: int, language: st
             if file != None:
                 file.text = result
                 db.commit()
-                broadcast("update")
+                await broadcast_async("update")
