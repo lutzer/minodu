@@ -8,6 +8,7 @@
 	import ForumPostElement from '$lib/components/forum/ForumPostElement.svelte';
 	import ForumInputElement from '$lib/components/forum/ForumInputElement.svelte';
 	import TextToSpeechPlayer from '$lib/components/common/TextToSpeechPlayer.svelte';
+	import { json } from '@sveltejs/kit';
   
     let createAuthorDialog : AuthorCreateDialog;
     let ttsPlayer : TextToSpeechPlayer;
@@ -16,8 +17,23 @@
     let posts : ForumPost[] = []
     let author : Optional<ForumAuthor> = undefined
 
+    let events : EventSource
+
     onMount(async () => {
         update()
+
+        events = ForumApi.getEventSource()
+        events.onmessage = (msg) => {
+            try {
+                let data = JSON.parse(msg.data)
+                console.log(data)
+                if (data["topic"] === "update")
+                    update()
+            } catch (e) {
+                console.error("Could not parse message", e)
+            }
+                
+        }
     });
 
     async function update() {
@@ -34,15 +50,13 @@
     async function createPost(title: string, text: string, audioRecording: Optional<Blob>) {
         let post = await ForumApi.createPost({ title: title, text : text});
         if (audioRecording) {
-            await ForumApi.attachFile(post.id, audioRecording)
+            await ForumApi.attachFile(post.id, audioRecording, "en")
         }
         forumInputElement?.reset()
-        update()
     }
 
     async function deletePost(id: number) {
         await ForumApi.deletePost(id)
-        update()
     }
 
     async function logout() {

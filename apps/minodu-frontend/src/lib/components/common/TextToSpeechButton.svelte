@@ -13,7 +13,7 @@
         });
     })
     
-    function handleClick() {
+    async function handleClick() {
         if (!playing) {
             ttsPlayer.speak(text)
             playing = true
