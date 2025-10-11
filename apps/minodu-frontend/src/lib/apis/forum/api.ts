@@ -2,7 +2,7 @@ import type { ForumPost } from "./models/forumPost";
 import { HttpError } from "$lib/errors";
 import type { ForumAvatar } from "./models/fromAvatar";
 import type { ForumAuthor } from "./models/forumAuthor";
-import type { Optional } from "$lib/types";
+import type { Language, Optional } from "$lib/types";
 import type { ForumFile } from "./models/forumFile";
 
 type CreateAuthorRequest = {
@@ -69,10 +69,11 @@ export class ForumApi {
         }
     }
 
-    public static async attachFile(post_id: number, file: Blob) : Promise<ForumFile>  {
+    public static async attachFile(post_id: number, file: Blob, language: Language) : Promise<ForumFile>  {
         const formData = new FormData();
-        formData.append('file', file, 'recording.webm');
-        formData.append('post_id', post_id.toString());
+        formData.append('file', file, 'recording.webm')
+        formData.append('post_id', post_id.toString())
+        formData.append('language', language)
 
         const response = await fetch(`${ForumApi.API_PREFIX}/files/upload`, {
             method: "POST",
@@ -94,6 +95,10 @@ export class ForumApi {
         }
         return response.json();
         
+    }
+
+    public static getEventSource() : EventSource {
+        return new EventSource(`${ForumApi.API_PREFIX}/events/`);
     }
 
     public static deleteToken() {

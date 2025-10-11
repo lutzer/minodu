@@ -20,14 +20,14 @@
         stop()
 
         let response = await AiServicesApi.generateTextToSpeechStream({
-                text: text,
-                language: "en",
-                format: "mp3",
-                return_header: false
+            text: text,
+            language: "en",
+            format: "mp3",
+            return_header: false
         })
 
         const reader = response.body?.getReader();
-
+        
         if (!reader)
             throw Error("Could not initialize audio response reader");
 

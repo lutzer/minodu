@@ -20,9 +20,12 @@
 
 
 <div class="post">
-    <p>{post.id} - {post.title} : {post.text}</p>
+    <h2>{post.author.name}</h2>
+    <h3>{post.id} - {post.title}</h3>
+    <p>{post.text}</p>
     {#each post.files as file }
-    <p>{file.id} - {file.filename}</p>
+        <h4>{file.id} - {file.filename}</h4>
+        <p><i>{file.text}</i></p>
     {/each}
     <TextToSpeechButton text={post.text} ttsPlayer={ttsPlayer}/>
     {#if isOwn}
