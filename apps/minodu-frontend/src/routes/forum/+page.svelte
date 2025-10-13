@@ -17,23 +17,22 @@
     let posts : ForumPost[] = []
     let author : Optional<ForumAuthor> = undefined
 
-    let events : EventSource
-
-    onMount(async () => {
+    onMount(() => {
         update()
 
-        events = ForumApi.getEventSource()
-        events.onmessage = (msg) => {
+        let eventSource = ForumApi.getEventSource()
+        eventSource.onmessage = (msg) => {
             try {
                 let data = JSON.parse(msg.data)
-                console.log(data)
                 if (data["topic"] === "update")
                     update()
             } catch (e) {
-                console.error("Could not parse message", e)
+                console.error("Could not parse event", e)
             }
-                
         }
+        return () => {
+            eventSource.close();
+        };
     });
 
     async function update() {
@@ -47,10 +46,14 @@
         update()
     }
 
-    async function createPost(title: string, text: string, audioRecording: Optional<Blob>) {
+    async function createPost(title: string, text: string, audio: Optional<Blob>, image: Optional<File>) {
         let post = await ForumApi.createPost({ title: title, text : text});
-        if (audioRecording) {
-            await ForumApi.attachFile(post.id, audioRecording, "en")
+        if (audio) {
+            await ForumApi.attachFile(post.id, audio, "en")
+        }
+        if (image) {
+            let imageBlob = new Blob([image], { type: image.type })
+            await ForumApi.attachFile(post.id, imageBlob, "en")
         }
         forumInputElement?.reset()
     }
@@ -90,7 +93,7 @@
         bind:this={forumInputElement}
         author={author}
         onCreateAuthorClicked={async () => createAuthorDialog.open()}
-        onSubmitPostClicked={async (title, text, audioRecording) => createPost(title, text, audioRecording)}
+        onSubmitPostClicked={async (title, text, audio, image) => createPost(title, text, audio, image)}
         onLogoutAuthorClicked={async () => logout()}
     />
 
