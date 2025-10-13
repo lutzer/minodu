@@ -30,7 +30,7 @@ class FileResponse(BaseModel):
     filename: str
     content_type: str
     file_hash: str
-
+    file_urlpath: str
 
 @router.get("/", response_model=List[FileResponse])
 async def get_files(db: Session = Depends(get_db)):

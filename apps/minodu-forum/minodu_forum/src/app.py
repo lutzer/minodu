@@ -39,8 +39,8 @@ os.makedirs(Config().upload_dir, exist_ok=True)
 os.makedirs(Config().avatar_dir, exist_ok=True)
 
 # mount static dirs
-app.mount("/static/files", StaticFiles(directory=Config().upload_dir), name="files")
-app.mount("/static/avatars", StaticFiles(directory=Config().avatar_dir), name="avatars")
+app.mount(Config().static_upload_path, StaticFiles(directory=Config().upload_dir), name="files")
+app.mount(Config().static_avatar_path, StaticFiles(directory=Config().avatar_dir), name="avatars")
 
 @app.get("/")
 async def root():

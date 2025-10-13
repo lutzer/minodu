@@ -80,4 +80,12 @@ class Config:
     def max_file_size(self):
         if self._max_file_size is None:
             self._max_file_size = os.getenv("MAX_FILE_SIZE", 1024 * 1024 * 5)
-        return self._max_file_size        
+        return self._max_file_size
+
+    @property
+    def static_upload_path(self):
+        return "/static/files"
+    
+    @property
+    def static_avatar_path(self):
+        return "/static/avatars"  
