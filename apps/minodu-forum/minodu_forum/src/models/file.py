@@ -1,5 +1,6 @@
 from sqlalchemy import event, Column, Integer, String, Text, DateTime, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
+from sqlalchemy.ext.hybrid import hybrid_property
 from datetime import datetime
 import os
 import logging
@@ -25,6 +26,10 @@ class File(Base):
     post_id = Column(Integer, ForeignKey('posts.id'), nullable=False)
 
     post = relationship("Post", back_populates="files")
+
+    @hybrid_property
+    def file_urlpath(self):
+        return Config().api_prefix + Config().static_upload_path + "/" + self.filename
 
 # Event listener for after delete
 @event.listens_for(File, 'after_delete')

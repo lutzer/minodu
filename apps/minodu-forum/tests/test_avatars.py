@@ -83,4 +83,14 @@ class TestAvatarsApi:
         assert "image/jpeg" in response.headers["content-type"]
         assert len(response.content) > 0
 
+    def test_get_static_uploaded_avatar_urlpath(self):
+        file_path = os.path.join(script_dir, "files/laura.jpeg")
+        create_avatar(file_path)
+
+        response = client.get("/avatars")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data[0]["file_urlpath"]) > 0
+
     
