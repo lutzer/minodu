@@ -1,7 +1,7 @@
-from typing import List
+from typing import Set
 import asyncio
 
-active_connections: List[asyncio.Queue] = set()
+active_connections: Set[asyncio.Queue] = set()
 
 def broadcast(topic: str, payload: str = ""):
     asyncio.create_task(broadcast_async(topic, payload))
