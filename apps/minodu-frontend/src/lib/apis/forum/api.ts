@@ -4,6 +4,7 @@ import type { ForumAvatar } from "./models/fromAvatar";
 import type { ForumAuthor } from "./models/forumAuthor";
 import type { Language, Optional } from "$lib/types";
 import type { ForumFile } from "./models/forumFile";
+import { mimeTypeToFileExtension } from "$lib/utils";
 
 type CreateAuthorRequest = {
     name: string,
@@ -70,8 +71,13 @@ export class ForumApi {
     }
 
     public static async attachFile(post_id: number, file: Blob, language: Language) : Promise<ForumFile>  {
+        
+        let extension = mimeTypeToFileExtension(file.type)
+        if (extension == "")
+            throw Error("File type not supported: " + file.type)
+
         const formData = new FormData();
-        formData.append('file', file, 'recording.webm')
+        formData.append('file', file, 'file' + extension)
         formData.append('post_id', post_id.toString())
         formData.append('language', language)
 
