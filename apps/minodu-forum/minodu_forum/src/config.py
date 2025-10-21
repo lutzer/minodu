@@ -33,13 +33,13 @@ class Config:
     @property
     def api_prefix(self):
         if self._api_prefix is None:
-            self._api_prefix = os.getenv("API_PREFIX", "/forum")
+            self._api_prefix = os.getenv("API_PREFIX", "/api/forum")
         return self._api_prefix
     
     @property
     def service_url(self):
         if self._service_url is None:
-            self._service_url = os.getenv("AI_SERVICE_URL", "http://localhost:3002/services")
+            self._service_url = os.getenv("AI_SERVICE_URL", "http://localhost:3002/api/services")
         return self._service_url
     
     @property

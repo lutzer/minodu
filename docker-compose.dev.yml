@@ -33,7 +33,7 @@ services:
       - ./data/ai-services/database:/app/database
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3002/services/"]
+      test: ["CMD", "curl", "-f", "http://localhost:3002/api/services/"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -49,7 +49,7 @@ services:
       - JWT_SECRET_KEY=dev_secret_key_1234
       - DATABASE_URL=mysql+pymysql://user:password@minodu-database:3306/minodu
       - PORT=3003
-      - AI_SERVICE_URL=http://minodu-ai-services:3002/services
+      - AI_SERVICE_URL=http://minodu-ai-services:3002/api/services
     volumes:
       - ./data/minodu-forum/uploads:/app/static/uploads
       - ./data/minodu-forum/avatars:/app/static/avatars
@@ -60,7 +60,7 @@ services:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3003/forum/"]
+      test: ["CMD", "curl", "-f", "http://localhost:3003/api/forum/"]
       interval: 30s
       timeout: 10s
       retries: 3

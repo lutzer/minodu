@@ -33,14 +33,13 @@
 
 <style>
     .forum-input-container {
-        float: left;
+        display: flex; 
     }
 
     .input-block {
         background-color: lightgray;
         margin: 10px;
         padding: 10px;
-        float: left;
     }
 
     .author {

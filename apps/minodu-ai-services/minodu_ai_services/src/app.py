@@ -21,7 +21,7 @@ from .tts.speech_generator import SpeechGenerator
 
 from .vars import LanguageEnum
 
-api_prefix = os.getenv('API_PREFIX', "/services")
+api_prefix = os.getenv('API_PREFIX', "/api/services")
 
 # Initialize FastAPI app with root_path prefix
 app = FastAPI(root_path=api_prefix)
