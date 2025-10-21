@@ -68,40 +68,56 @@
     }
 </script>
 
+<style>
+    .post-create {
+        background-color: lightblue;
+        padding: 10px;
+    }
+
+    .post-container {
+        background-color: lightcyan;
+        padding: 10px;
+    }
+</style>
+
 <div>
     <h2>Forum</h2>
 
-    <h3>Posts</h3>
-    {#if posts.length > 0 }
-    <ul>
-        {#each posts as post}
-        <li>
-            <ForumPostElement
-                post={post} 
-                isOwn={author?.id == post.author.id}
-                onDeleteClicked={() => deletePost(post.id)}
-                ttsPlayer={ttsPlayer}
-                />
-        </li>
-        {/each}
-    </ul>
-    {:else}
-    <p> No posts yet.</p>
-    {/if}
 
-    <ForumInputElement
-        bind:this={forumInputElement}
-        author={author}
-        onCreateAuthorClicked={async () => createAuthorDialog.open()}
-        onSubmitPostClicked={async (title, text, audio, image) => createPost(title, text, audio, image)}
-        onLogoutAuthorClicked={async () => logout()}
-    />
+    <div class="post-container">
+        <h3>Posts</h3>
+        {#if posts.length > 0 }
+        <ul>
+            {#each posts as post}
+            <li>
+                <ForumPostElement
+                    post={post} 
+                    isOwn={author?.id == post.author.id}
+                    onDeleteClicked={() => deletePost(post.id)}
+                    ttsPlayer={ttsPlayer}
+                    />
+            </li>
+            {/each}
+        </ul>
+        {:else}
+        <p> No posts yet.</p>
+        {/if}
+    </div>
 
-    <AuthorCreateDialog bind:this={createAuthorDialog} 
-        onSubmit={async (name, avatar) => createAuthor(name, avatar)} 
-    />
+    <div class="post-create">
+        <h3>New Post</h3>
+        <ForumInputElement
+            bind:this={forumInputElement}
+            author={author}
+            onCreateAuthorClicked={async () => createAuthorDialog.open()}
+            onSubmitPostClicked={async (title, text, audio, image) => createPost(title, text, audio, image)}
+            onLogoutAuthorClicked={async () => logout()}/>
 
-    <TextToSpeechPlayer bind:this={ttsPlayer}/>
+        <AuthorCreateDialog bind:this={createAuthorDialog} 
+            onSubmit={async (name, avatar) => createAuthor(name, avatar)}/>
+
+        <TextToSpeechPlayer bind:this={ttsPlayer}/>
+    </div>
 </div>
 
 

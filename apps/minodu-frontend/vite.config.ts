@@ -7,13 +7,11 @@ export default defineConfig({
     proxy: {
       '/api/services': {
         target: 'http://localhost:3002',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
+        changeOrigin: true
       },
       '/api/forum': {
         target: 'http://localhost:3003',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
+        changeOrigin: true
       }
     }
   }
