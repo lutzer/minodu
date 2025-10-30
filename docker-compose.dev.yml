@@ -64,3 +64,15 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+
+  minodu-frontend:
+    build:
+      context: ./apps/minodu-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - minodu-forum
+      - minodu-ai-services
+
+    

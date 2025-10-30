@@ -57,13 +57,13 @@
 
 <div class="forum-input-container">
     <div class="author input-block">
-    {#if (author != undefined)}
+        {#if (author != undefined)}
         <h4>{author.name}</h4>
         <p>{author.avatar}</p>
         <button onclick={onLogoutAuthorClicked}>logout</button>
-    {:else}
+        {:else}
         <button onclick={onCreateAuthorClicked}>Create Author</button>
-    {/if}
+        {/if}
     </div>
     <div class="text-input input-block">
         <div class="input">
