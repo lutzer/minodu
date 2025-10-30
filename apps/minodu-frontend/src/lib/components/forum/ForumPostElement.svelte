@@ -34,15 +34,15 @@
 
 <div class="post">
     <h3>{post.title} - from {post.author.name}</h3>
+
+    {#if (post.text.length > 0)}
     <p>
-        {post.text}
-        {#if (post.text.length > 0)}
-            <TextToSpeechButton text={post.text} ttsPlayer={ttsPlayer}/>
-        {/if}
+        {post.text} <TextToSpeechButton text={post.text} ttsPlayer={ttsPlayer}/> 
     </p>
+    {/if}
     
     <ul>
-    {#each post.files as file }
+        {#each post.files as file }
         <li class="file">
         {#if file.content_type.startsWith("audio")}
             <AudioPlayer audioSource={file.file_urlpath}></AudioPlayer>
@@ -55,9 +55,9 @@
         {/if}
             <p><i>{file.text}</i></p>
         </li>
-    {/each}
+        {/each}
     </ul>
     {#if isOwn}
-        <button onclick={onDeleteClicked}>Delete</button>
+    <button onclick={onDeleteClicked}>Delete</button>
     {/if}
 </div>
