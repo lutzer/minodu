@@ -114,3 +114,5 @@ async def transcribe_file_and_update_record(file_path: str, file_id: int, langua
                 file.text = result
                 db.commit()
                 await broadcast_async("update")
+
+        

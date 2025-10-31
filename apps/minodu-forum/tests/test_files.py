@@ -1,10 +1,14 @@
+import shutil
 import pytest
 import os
+from pathlib import Path
 from fastapi.testclient import TestClient
+from PIL import Image
 
 from minodu_forum.src.app import app
 from minodu_forum.src.database import get_db_connection, get_db
-from minodu_forum.src.routers.helpers import get_upload_file_path
+from minodu_forum.src.routers.helpers import get_upload_file_path, convert_image
+
 
 from .test_authors import create_author
 from .test_posts import create_post
@@ -42,6 +46,24 @@ class TestFilesApi:
             )
         assert response.status_code == 200
         data = response.json()
+        assert data["content_type"].startswith("image")
+        assert os.path.isfile(get_upload_file_path(data["filename"]))
+
+    def test_upload_image_png(self):
+        auth_token = create_author()
+        post = create_post(auth_token, "fetch_test")
+
+        file_path = os.path.join(script_dir, "files/sample.png")
+        data = upload_file(post["id"], file_path, auth_token)
+        assert data["content_type"].startswith("image")
+        assert os.path.isfile(get_upload_file_path(data["filename"]))
+
+    def test_upload_image_webp(self):
+        auth_token = create_author()
+        post = create_post(auth_token, "fetch_test")
+
+        file_path = os.path.join(script_dir, "files/sample.webp")
+        data = upload_file(post["id"], file_path, auth_token)
         assert data["content_type"].startswith("image")
         assert os.path.isfile(get_upload_file_path(data["filename"]))
     
@@ -173,4 +195,39 @@ class TestFilesApi:
         file = upload_file(post['id'],file_path, auth_token)
 
         assert len(file["file_urlpath"]) > 0
+
+    @pytest.mark.asyncio
+    async def test_convert_image_to_jpg_and_resize(self):
+        # Setup: Define paths
+        source_image = os.path.join(script_dir, "files/sample.png")
+        temp_image = os.path.join(script_dir, "files/tmp.png")
+
+        converted_image = ""
+        
+        try:
+            # Copy the original image to temp location
+            shutil.copy(source_image, temp_image)
+            assert Path(temp_image).exists(), "Failed to copy source image"
+            
+            # Run your conversion function
+            # Replace this with your actual conversion function
+            converted_image = await convert_image(temp_image, max_width=100, max_height=100)
+            
+            # Check if converted file exists
+            assert Path(converted_image).exists(), "Converted image was not created"
+            
+            # Verify file extension
+            assert Path(converted_image).suffix == ".jpg", f"Expected .jpg extension, got {converted_image.suffix}"
+            
+            # Verify dimensions
+            with Image.open(converted_image) as img:
+                width, height = img.size
+                assert width <= 100, f"Expected width lower than 100, got {width}"
+                assert height <= 100, f"Expected height lower than 100, got {height}"
+        finally:
+            # Cleanup: Delete temporary files
+            if Path(temp_image).exists():
+                Path(temp_image).unlink()
+            if len(converted_image) > 0 and Path(converted_image).exists():
+                Path(converted_image).unlink()
     
