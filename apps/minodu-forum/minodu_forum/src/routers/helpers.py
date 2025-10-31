@@ -5,6 +5,8 @@ import aiofiles
 import uuid
 import hashlib
 import mimetypes
+from pathlib import Path
+from PIL import Image
 
 from ..config import Config
 
@@ -35,19 +37,44 @@ async def save_file(
 
     if not os.path.isdir(upload_directory):
         os.makedirs(upload_directory)
-
     
     # Save file to disk
     async with aiofiles.open(file_path, 'wb') as f:
         await f.write(content)
+
+    # if file is image, resize and convert to jpg
+    if file.content_type.startswith("image/"):
+        new_path = await convert_image(file_path)
+        if (file_path != new_path):
+            os.remove(file_path)
+            file_path = new_path
     
     return {
-        "filename": unique_filename,
+        "filename": Path(file_path).name,
         "file_path": file_path,
         "file_size": file.size,
         "mime_type": file.content_type,
         "file_hash": calculate_file_hash(file_path)
     }
+
+async def convert_image(file_path: str, max_width: int = 1920, max_height: int = 1080) -> str:
+    img = Image.open(file_path)
+    outputpath = os.path.splitext(file_path)[0] + ".jpg"
+
+    # Resize if image is larger than max dimensions
+    if img.width > max_width or img.height > max_height:
+        img.thumbnail((max_width, max_height), Image.LANCZOS)
+
+    # Convert to RGB if necessary (JPEG doesn't support transparency)
+    if img.mode in ('RGBA', 'LA', 'P'):
+        rgb_img = Image.new('RGB', img.size, (255, 255, 255))
+        rgb_img.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
+        img = rgb_img
+
+    # Save as JPEG
+    img.save(outputpath, 'JPEG', quality=95)
+
+    return outputpath
 
 def calculate_file_hash(file_path: str) -> str:
     """Calculate SHA-256 hash of file for integrity checking"""
