@@ -1,11 +1,13 @@
 from dataclasses import asdict
 from enum import Enum
+import json
 from typing import Any, Optional
 from fastapi import FastAPI, UploadFile, HTTPException
 from pydantic import BaseModel
 from fastapi.responses import StreamingResponse
 from fastapi import Form
 import tempfile
+import logging
 
 import os
 import tempfile
@@ -43,8 +45,12 @@ async def rag_ask(request: RagRequest):
 
     def generate_stream():
         data = RAG.RagRequestData(request.question, request.conversation)
-        for chunk in rag.ask_streaming(data):
-            yield chunk
+        try:
+            for chunk in rag.ask_streaming(data):
+                yield chunk
+        except Exception as e:
+            logging.error(f"Error in RAG streaming: {e}", exc_info=True)
+            yield f"\n\n[ERROR: {str(e)}]"
 
     return StreamingResponse(
         generate_stream(),
@@ -123,8 +129,12 @@ async def weather_text(request: WeatherRequest):
 
     def generate_stream():
         sensorData = WeatherLLM.SensorData(**request.dict()['sensor_data'])
-        for chunk in weather_llm.ask_streaming(sensorData):
-            yield chunk
+        try:
+            for chunk in weather_llm.ask_streaming(sensorData):
+                yield chunk
+        except Exception as e:
+            logging.error(f"Error in RAG streaming: {e}", exc_info=True)
+            yield f"\n\n[ERROR: {str(e)}]"
 
     return StreamingResponse(
         generate_stream(),
@@ -169,12 +179,16 @@ async def synthesize_speech(request: TtsRequest):
         
         if request.format == "wav":
             def generate_audio():
-                if request.return_header:
-                    header = SpeechGenerator.create_wav_header(generator.samplerate(), generator.channels())
-                    yield header
+                try: 
+                    if request.return_header:
+                        header = SpeechGenerator.create_wav_header(generator.samplerate(), generator.channels())
+                        yield header
 
-                for audio_chunk in generator.synthesize(request.text):
-                    yield audio_chunk
+                    for audio_chunk in generator.synthesize(request.text):
+                        yield audio_chunk
+                except Exception as e:
+                    logging.error(f"Error in tts streaming: {e}", exc_info=True)
+                    yield f"\n\n[ERROR: {str(e)}]"
             
             return StreamingResponse(
                 generate_audio(),
