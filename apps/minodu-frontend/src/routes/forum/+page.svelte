@@ -8,7 +8,7 @@
 	import ForumPostElement from '$lib/components/forum/ForumPostElement.svelte';
 	import ForumInputElement from '$lib/components/forum/ForumInputElement.svelte';
 	import TextToSpeechPlayer from '$lib/components/common/TextToSpeechPlayer.svelte';
-	import { json } from '@sveltejs/kit';
+	import { Store } from '$lib/store';
   
     let createAuthorDialog : AuthorCreateDialog;
     let ttsPlayer : TextToSpeechPlayer;
@@ -42,7 +42,7 @@
 
     async function createAuthor(name: string, avatar: number | undefined) {
         let response = await ForumApi.createAuthor({name: name, avatar: avatar})
-        await ForumApi.saveToken(response.token)
+        await Store.saveForumToken(response.token)
         update()
     }
 
@@ -63,7 +63,7 @@
     }
 
     async function logout() {
-        ForumApi.deleteToken()
+        Store.deleteForumToken()
         author = undefined
     }
 </script>

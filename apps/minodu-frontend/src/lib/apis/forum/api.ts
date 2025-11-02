@@ -5,6 +5,7 @@ import type { ForumAuthor } from "./models/forumAuthor";
 import type { Language, Optional } from "$lib/types";
 import type { ForumFile } from "./models/forumFile";
 import { mimeTypeToFileExtension } from "$lib/utils";
+import { Store } from "$lib/store";
 
 type CreateAuthorRequest = {
     name: string,
@@ -18,7 +19,6 @@ type CreatePostRequest = {
 
 export class ForumApi {
     static readonly API_PREFIX = "/api/forum"  // No trailing slash
-    static readonly LOCAL_STORAGE_TOKEN_KEY = "FORUM_AUTH_TOKEN"
 
     public static async getPosts(): Promise<ForumPost[]> {
         const response = await fetch(`${ForumApi.API_PREFIX}/posts/`);
@@ -47,7 +47,7 @@ export class ForumApi {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${ForumApi.getToken()}`
+                'Authorization': `Bearer ${Store.getForumToken()}`
             },
             body: JSON.stringify(request)
         })
@@ -62,7 +62,7 @@ export class ForumApi {
             method: "DELETE",
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${ForumApi.getToken()}`
+                'Authorization': `Bearer ${Store.getForumToken()}`
             }
         })
         if (!response.ok) {
@@ -84,7 +84,7 @@ export class ForumApi {
         const response = await fetch(`${ForumApi.API_PREFIX}/files/upload`, {
             method: "POST",
             headers: {
-                'Authorization': `Bearer ${ForumApi.getToken()}`
+                'Authorization': `Bearer ${Store.getForumToken()}`
             },
             body: formData
         })
@@ -107,19 +107,7 @@ export class ForumApi {
         return new EventSource(`${ForumApi.API_PREFIX}/events/`);
     }
 
-    public static deleteToken() {
-        localStorage.removeItem(ForumApi.LOCAL_STORAGE_TOKEN_KEY)
-    }
-
-    public static saveToken(token: string) {
-        localStorage.setItem(ForumApi.LOCAL_STORAGE_TOKEN_KEY, token);
-    }
-
-    public static getToken() : string {
-        return localStorage.getItem(ForumApi.LOCAL_STORAGE_TOKEN_KEY) || "";
-    }
-
-    public static async checkToken(token: string = ForumApi.getToken()) : Promise<Optional<ForumAuthor>> {
+    public static async checkToken(token: string = Store.getForumToken()) : Promise<Optional<ForumAuthor>> {
         if (!token) {
             return undefined
         } else {
