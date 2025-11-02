@@ -1,3 +1,7 @@
 <h2>Home</h2>
 
-<a href="/forum">Forum</a>
+<ul>
+    <li><a href="/forum">Forum</a></li>
+    <li><a href="/bot">Chatbot</a></li>
+</ul>
+
