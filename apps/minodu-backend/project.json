@@ -1,0 +1,67 @@
+{
+  "name": "minodu-backend",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/minodu-backend/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "target": "node",
+        "compiler": "tsc",
+        "outputPath": "dist/apps/minodu-backend",
+        "main": "apps/minodu-backend/src/main.ts",
+        "tsConfig": "apps/minodu-backend/tsconfig.app.json",
+        "assets": ["apps/minodu-backend/src/assets"],
+        "isolatedConfig": true,
+        "webpackConfig": "apps/minodu-backend/webpack.config.js"
+      },
+      "configurations": {
+        "production": {
+          "optimization": true,
+          "extractLicenses": true,
+          "inspect": false
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "options": {
+        "buildTarget": "minodu-backend:build"
+      }
+    },
+    "docker-build": {
+      "executor": "@nx-tools/nx-docker:build",
+      "options": {
+        "push": false,
+        "tags": ["minodu-backend:latest"],
+        "build-args": ["NODE_ENV=production"]
+      },
+      "dependsOn": ["build"]
+    },
+    "docker-compose": {
+      "executor": "@nx-tools/nx-docker-compose:up",
+      "options": {
+        "composeFile": "apps/minodu-backend/docker-compose.yml",
+        "detach": true,
+        "build": true
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/minodu-backend/jest.config.ts"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/minodu-backend/**/*.ts"]
+      }
+    }
+  },
+  "tags": ["backend", "api"]
+}
