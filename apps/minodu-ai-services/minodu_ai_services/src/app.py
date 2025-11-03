@@ -1,23 +1,29 @@
+from dataclasses import asdict
+from enum import Enum
+import json
 from typing import Any, Optional
 from fastapi import FastAPI, UploadFile, HTTPException
 from pydantic import BaseModel
 from fastapi.responses import StreamingResponse
 from fastapi import Form
 import tempfile
+import logging
 
 import os
 import tempfile
 import io
 
 from .rag.rag import RAG
-from .rag.document_store import DocumentStore
+from .rag.document_store import DocumentStore, DocumentStoreException
 
 from .weather.llm import WeatherLLM
 
 from .stt.stt_transcriber import SttTranscriber
 from .tts.speech_generator import SpeechGenerator
 
-api_prefix = os.getenv('API_PREFIX', "/services")
+from .vars import LanguageEnum
+
+api_prefix = os.getenv('API_PREFIX', "/api/services")
 
 # Initialize FastAPI app with root_path prefix
 app = FastAPI(root_path=api_prefix)
@@ -30,7 +36,7 @@ async def root():
 
 class RagRequest(BaseModel):
     conversation: str
-    language: str
+    language: LanguageEnum
     question: str
 
 @app.post("/rag/ask")
@@ -39,8 +45,12 @@ async def rag_ask(request: RagRequest):
 
     def generate_stream():
         data = RAG.RagRequestData(request.question, request.conversation)
-        for chunk in rag.ask_streaming(data):
-            yield chunk
+        try:
+            for chunk in rag.ask_streaming(data):
+                yield chunk
+        except Exception as e:
+            logging.error(f"Error in RAG streaming: {e}", exc_info=True)
+            yield f"\n\n[ERROR: {str(e)}]"
 
     return StreamingResponse(
         generate_stream(),
@@ -49,7 +59,7 @@ async def rag_ask(request: RagRequest):
 
 class RagSourceRequest(BaseModel):
     query: str
-    language: str
+    language: LanguageEnum
 
 class RagSourceResponse(BaseModel):
     document: Optional[Any]
@@ -71,7 +81,7 @@ class RagDocumentRequest(BaseModel):
     score: float
 
 @app.post("/rag/documents/")
-async def add_document(file: UploadFile, language: str = Form(...), source_id: int = Form(...)):
+async def add_document(file: UploadFile, language: LanguageEnum = Form(...), source_id: int = Form(...)):
     rag = RAG(language=language)
     store = DocumentStore(rag.vectorstore, rag.chroma_client)
 
@@ -92,34 +102,39 @@ async def add_document(file: UploadFile, language: str = Form(...), source_id: i
     return "Document added"
 
 @app.delete("/rag/documents/{language}/{source_id}")
-async def delete_documents(source_id: int, language: str):
+async def delete_documents(source_id: int, language: LanguageEnum):
+
     rag = RAG(language=language)
 
     store = DocumentStore(rag.vectorstore, rag.chroma_client)
 
     try:
         store.delete_document_by_id(source_id)
+    except DocumentStoreException as e:
+        raise HTTPException(status_code=404, detail=f"Could not delete document: {str(e)}")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Could not add document: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Could not delete document: {str(e)}")
 
     return "Document deleted"
 
 ### WEATHER LLM ###
 
 class WeatherRequest(BaseModel):
-    temperature: float
-    humidity: float
-    language: str
-
+    language: LanguageEnum
+    sensor_data: WeatherLLM.SensorData
 
 @app.post("/weather/text")
 async def weather_text(request: WeatherRequest):
     weather_llm = WeatherLLM(language=request.language)
 
     def generate_stream():
-        sensorData = WeatherLLM.SensorData(request.temperature, request.humidity)
-        for chunk in weather_llm.ask_streaming(sensorData):
-            yield chunk
+        sensorData = WeatherLLM.SensorData(**request.dict()['sensor_data'])
+        try:
+            for chunk in weather_llm.ask_streaming(sensorData):
+                yield chunk
+        except Exception as e:
+            logging.error(f"Error in RAG streaming: {e}", exc_info=True)
+            yield f"\n\n[ERROR: {str(e)}]"
 
     return StreamingResponse(
         generate_stream(),
@@ -152,7 +167,7 @@ async def stt_transcribe(file: UploadFile, language: str = Form(...)):
 ### TEXT TO SPEECH API ###
 
 class TtsRequest(BaseModel):
-    language: str
+    language: LanguageEnum
     text: str
     return_header: bool = True
     format: str = "wav"
@@ -164,12 +179,16 @@ async def synthesize_speech(request: TtsRequest):
         
         if request.format == "wav":
             def generate_audio():
-                if request.return_header:
-                    header = SpeechGenerator.create_wav_header(generator.samplerate(), generator.channels())
-                    yield header
+                try: 
+                    if request.return_header:
+                        header = SpeechGenerator.create_wav_header(generator.samplerate(), generator.channels())
+                        yield header
 
-                for audio_chunk in generator.synthesize(request.text):
-                    yield audio_chunk
+                    for audio_chunk in generator.synthesize(request.text):
+                        yield audio_chunk
+                except Exception as e:
+                    logging.error(f"Error in tts streaming: {e}", exc_info=True)
+                    yield f"\n\n[ERROR: {str(e)}]"
             
             return StreamingResponse(
                 generate_audio(),

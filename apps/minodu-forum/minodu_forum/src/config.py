@@ -33,13 +33,13 @@ class Config:
     @property
     def api_prefix(self):
         if self._api_prefix is None:
-            self._api_prefix = os.getenv("API_PREFIX", "/forum")
+            self._api_prefix = os.getenv("API_PREFIX", "/api/forum")
         return self._api_prefix
     
     @property
     def service_url(self):
         if self._service_url is None:
-            self._service_url = os.getenv("AI_SERVICE_URL", "http://localhost/services")
+            self._service_url = os.getenv("AI_SERVICE_URL", "http://localhost:3002/api/services")
         return self._service_url
     
     @property
@@ -80,4 +80,12 @@ class Config:
     def max_file_size(self):
         if self._max_file_size is None:
             self._max_file_size = os.getenv("MAX_FILE_SIZE", 1024 * 1024 * 5)
-        return self._max_file_size        
+        return self._max_file_size
+
+    @property
+    def static_upload_path(self):
+        return "/static/files"
+    
+    @property
+    def static_avatar_path(self):
+        return "/static/avatars"  

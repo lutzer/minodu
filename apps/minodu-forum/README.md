@@ -18,4 +18,4 @@ Backend for the minodu forum
 
 ### Tests
 
-* run tests with `pytest`or `pytest -s`
+* run tests with `nx test`or `nx test -- -s`

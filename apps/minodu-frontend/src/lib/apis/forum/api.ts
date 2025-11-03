@@ -2,7 +2,10 @@ import type { ForumPost } from "./models/forumPost";
 import { HttpError } from "$lib/errors";
 import type { ForumAvatar } from "./models/fromAvatar";
 import type { ForumAuthor } from "./models/forumAuthor";
-import type { Optional } from "$lib/types";
+import type { Language, Optional } from "$lib/types";
+import type { ForumFile } from "./models/forumFile";
+import { mimeTypeToFileExtension } from "$lib/utils";
+import { Store } from "$lib/store";
 
 type CreateAuthorRequest = {
     name: string,
@@ -16,7 +19,6 @@ type CreatePostRequest = {
 
 export class ForumApi {
     static readonly API_PREFIX = "/api/forum"  // No trailing slash
-    static readonly LOCAL_STORAGE_TOKEN_KEY = "FORUM_AUTH_TOKEN"
 
     public static async getPosts(): Promise<ForumPost[]> {
         const response = await fetch(`${ForumApi.API_PREFIX}/posts/`);
@@ -40,18 +42,19 @@ export class ForumApi {
         return response.json();
     }
 
-    public static async createPost(request: CreatePostRequest) {
+    public static async createPost(request: CreatePostRequest) : Promise<ForumPost> {
         const response = await fetch(`${ForumApi.API_PREFIX}/posts/`, {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${ForumApi.getToken()}`
+                'Authorization': `Bearer ${Store.getForumToken()}`
             },
             body: JSON.stringify(request)
         })
         if (!response.ok) {
             throw new HttpError({ code: response.status, message: await response.text()});
         }
+        return await response.json();
     }
 
     public static async deletePost(id: number) {
@@ -59,12 +62,36 @@ export class ForumApi {
             method: "DELETE",
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${ForumApi.getToken()}`
+                'Authorization': `Bearer ${Store.getForumToken()}`
             }
         })
         if (!response.ok) {
             throw new HttpError({ code: response.status, message: await response.text()});
         }
+    }
+
+    public static async attachFile(post_id: number, file: Blob, language: Language) : Promise<ForumFile>  {
+        
+        let extension = mimeTypeToFileExtension(file.type)
+        if (extension == "")
+            throw Error("File type not supported: " + file.type)
+
+        const formData = new FormData();
+        formData.append('file', file, 'file' + extension)
+        formData.append('post_id', post_id.toString())
+        formData.append('language', language)
+
+        const response = await fetch(`${ForumApi.API_PREFIX}/files/upload`, {
+            method: "POST",
+            headers: {
+                'Authorization': `Bearer ${Store.getForumToken()}`
+            },
+            body: formData
+        })
+        if (!response.ok) {
+            throw new HttpError({ code: response.status, message: await response.text()});
+        }
+        return await response.json()
     }
 
     public static async getAvatars() : Promise<ForumAvatar[]> {
@@ -76,19 +103,11 @@ export class ForumApi {
         
     }
 
-    public static deleteToken() {
-        localStorage.removeItem(ForumApi.LOCAL_STORAGE_TOKEN_KEY)
+    public static getEventSource() : EventSource {
+        return new EventSource(`${ForumApi.API_PREFIX}/events/`);
     }
 
-    public static saveToken(token: string) {
-        localStorage.setItem(ForumApi.LOCAL_STORAGE_TOKEN_KEY, token);
-    }
-
-    public static getToken() : string {
-        return localStorage.getItem(ForumApi.LOCAL_STORAGE_TOKEN_KEY) || "";
-    }
-
-    public static async checkToken(token: string = ForumApi.getToken()) : Promise<Optional<ForumAuthor>> {
+    public static async checkToken(token: string = Store.getForumToken()) : Promise<Optional<ForumAuthor>> {
         if (!token) {
             return undefined
         } else {

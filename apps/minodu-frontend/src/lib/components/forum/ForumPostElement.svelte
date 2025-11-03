@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { ForumPost } from "$lib/apis/forum/models/forumPost";
+	import AudioPlayer from "../common/AudioPlayer.svelte";
     import TextToSpeechButton from "../common/TextToSpeechButton.svelte";
 	import TextToSpeechPlayer from "../common/TextToSpeechPlayer.svelte";
 
@@ -14,15 +15,49 @@
     .post {
         padding: 10px;
         margin: 10px;
-        background-color: lightpink;
+        background-color: lightgray;
+    }
+
+    .image {
+        height: 500px;
+        width: 100%;
+    }
+
+
+    .image > img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
     }
 </style>
 
 
 <div class="post">
-    <p>{post.id} - {post.title} : {post.text}</p>
-    <TextToSpeechButton text={post.text} ttsPlayer={ttsPlayer}/>
+    <h3>{post.title} - from {post.author.name}</h3>
+
+    {#if (post.text.length > 0)}
+    <p>
+        {post.text} <TextToSpeechButton text={post.text} ttsPlayer={ttsPlayer}/> 
+    </p>
+    {/if}
+    
+    <ul>
+        {#each post.files as file }
+        <li class="file">
+        {#if file.content_type.startsWith("audio")}
+            <AudioPlayer audioSource={file.file_urlpath}></AudioPlayer>
+        {:else if file.content_type.startsWith("image")}
+            <div class="image">
+                <img src={file.file_urlpath} alt={"forum image"}/>
+            </div>
+        {:else}
+            {file.id} - {file.filename} : {file.file_urlpath}
+        {/if}
+            <p><i>{file.text}</i></p>
+        </li>
+        {/each}
+    </ul>
     {#if isOwn}
-        <button onclick={onDeleteClicked}>Delete</button>
+    <button onclick={onDeleteClicked}>Delete</button>
     {/if}
 </div>

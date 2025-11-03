@@ -19,7 +19,7 @@ class AvatarResponse(BaseModel):
     filename: str
     content_type: str
     file_hash: str
-
+    file_urlpath: str
 
 @router.get("/", response_model=List[AvatarResponse])
 async def get_avatars(db: Session = Depends(get_db)):

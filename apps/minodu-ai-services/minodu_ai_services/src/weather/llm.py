@@ -1,15 +1,19 @@
+from datetime import datetime
 import os
 import sys
 import logging
 from langchain_ollama.llms import OllamaLLM
-from langchain_ollama import OllamaEmbeddings
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnableParallel, RunnablePassthrough
 from langchain.schema.output_parser import StrOutputParser
-from langchain_chroma import Chroma
 from typing import Iterator
 import textwrap
 from dataclasses import dataclass, asdict
+import langchain
+
+from ..vars import LanguageEnum
+
+# At the top of your file or in __init__
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -20,36 +24,43 @@ class WeatherLLM:
         temperature: float
         humidity: float
         pressure: float
-        luminosity = float
-        ambient_luminosity = float
-        carbon_monoxide = float
-        nitrogen_dioxide = float
+        luminosity: float
+        ambient_luminosity: float
+        carbon_monoxide: float
+        nitrogen_dioxide: float
 
-    def __init__(self, language="en"):
+    def __init__(self, language : LanguageEnum):
 
-        self.language = 0 if language == "en" else 1
+        langchain.debug = True
 
         ollama_host = os.environ.get("OLLAMA_HOST", "http://localhost:11434/")
+        ollama_model = os.environ.get("OLLAMA_MODEL", "llama3.2:1b")
 
-        self.llm = OllamaLLM(base_url=ollama_host, model="llama3.2:1b", temperature=0.1, keep_alive=600 )
+        self.llm = OllamaLLM(base_url=ollama_host, model=ollama_model, temperature=0.1, keep_alive=600 )
 
         # Determine the season based on the current month (Kara, Togo)
         current_month = datetime.now().month
         season = {}
 
+        def get_season():
         # Logic to determine the season
-        if 4 <= current_month <= 10:
-            # Rainy Season (April to October)
-            season["fr"] = "saison des pluies"
-            season["en"] = "rainy season"
-        else:
-            # Dry Season (November to March)
-            season["fr"] = "saison sèche"
-            season["en"] = "dry season"
+            if 4 <= current_month <= 10:
+                # Rainy Season (April to October)
+                match language:
+                    case LanguageEnum.fr:
+                        return "saison des pluies"
+                    case LanguageEnum.en:
+                        return "rainy season"
+            else:
+                # Dry Season (November to March)
+                match language:
+                    case LanguageEnum.fr:
+                        return  "saison sèche" 
+                    case LanguageEnum.en:
+                        return "dry season"
         
         # Simple chaine
-        if language == "en":
-            season_en = season['en'];
+        if language == LanguageEnum.en:
             self.template = textwrap.dedent("""
                 Act as a meteorological expert. Analyze and interpret the raw data from a weather station located in Kara, Northern Togo, for local farmers.
 
@@ -61,12 +72,11 @@ class WeatherLLM:
                 Ambient Luminosity: {ambient_luminosity}
                 Carbon Monoxide (CO): {carbon_monoxide}
                 Nitrogen Dioxide (NO2): {nitrogen_dioxide}
-                Current Season : {season_en}
+                Current Season : {season}
 
                 Provide a single, simple English paragraph presenting the current weather conditions, the rainfall outlook (if relevant), air quality information (if available), and the implications for local plants and crops. Ensure your analysis considers the current season.
                 """)
-        else:
-            season_fr = season['fr']
+        elif language == LanguageEnum.fr:
             self.template = textwrap.dedent("""
                 Agis en tant qu'expert en météorologie. Analyse et interprète les données brutes d'une station météo de Kara, au nord du Togo, pour des agriculteurs.
                                             
@@ -78,7 +88,7 @@ class WeatherLLM:
                 Luminosité ambiante: {ambient_luminosity}
                 Monoxyde de carbone (CO): {carbon_monoxide}
                 Dioxyde d'azote (NO2): {nitrogen_dioxide}
-                Saison actuelle : {season_fr}
+                Saison actuelle : {season}
 
                 Fournis en un seul paragraphe en français simple exposant les conditions météo actuelles, les prévisions de pluie (si pertinentes), les informations sur la pollution (si disponibles), et les implications pour les plantes et les cultures. Tiens compte de la saison actuelle lors de ton analyse.            
             """)
@@ -87,15 +97,9 @@ class WeatherLLM:
         
         # Create the chain
         self.chain = (
-            RunnableParallel({
-                "temperature": lambda x: x["temperature"], 
-                "humidity": lambda x: x["humidity"],
-                "pressure": lambda x: x["pressure"],
-                "luminosity": lambda x: x["luminosity"],
-                "ambient_luminosity": lambda x: x["ambient_luminosity"],
-                "carbon_monoxide": lambda x: x["carbon_monoxide"],
-                "nitrogen_dioxide": lambda x: x["nitrogen_dioxide"]
-            })
+            RunnablePassthrough().assign(
+                season = lambda _: get_season()
+            )
             | self.prompt
             | self.llm
             | StrOutputParser()

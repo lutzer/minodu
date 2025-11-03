@@ -3,12 +3,14 @@ from sqlalchemy.orm import relationship
 from datetime import datetime
 import os
 import logging
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from ..routers.helpers import get_avatar_file_path
 
 logger = logging.getLogger(__name__)
 
 from ..database import Base
+from ..config import Config
 
 class Avatar(Base):
     __tablename__ = "avatars"
@@ -22,6 +24,10 @@ class Avatar(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     authors = relationship('Author', back_populates='avatar', uselist=True)
+
+    @hybrid_property
+    def file_urlpath(self):
+        return Config().api_prefix + Config().static_avatar_path + "/" + self.filename
 
 # Event listener for after delete
 @event.listens_for(Avatar, 'after_delete')

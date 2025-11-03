@@ -6,16 +6,26 @@ import io
 import struct
 from pydub import AudioSegment
 
+from ..vars import LanguageEnum
+
 class SpeechGenerator:
 
     class AudioFormat(Enum):
         WAV = 1
         MP3 = 2
 
-    def __init__(self, language="en"):
+    def __init__(self, language : LanguageEnum):
 
         script_dir = os.path.dirname(os.path.abspath(__file__))
-        model_path = "../../models/tts_models/en_GB-cori-medium.onnx" if language == "en" else "../../models/tts_models/fr_FR-upmc-medium.onnx"
+
+        match language:
+            case LanguageEnum.en:
+                model_path = "../../models/tts_models/en_GB-cori-medium.onnx"
+            case LanguageEnum.fr:
+                model_path = "../../models/tts_models/fr_FR-upmc-medium.onnx"
+            case _:
+                raise Exception("No Model for language:" + str(language))
+
         model_path = os.path.join(script_dir, model_path)
         self.voice = PiperVoice.load(model_path)
 
