@@ -52,6 +52,19 @@ class TestSttAPI:
         data = response.json()
         assert(len(data["text"]) > 0)
 
+    def test_transcribe_webm(self):
+        file_path = os.path.join(script_dir, "audio/english_sample_webm.webm")
+        with open(file_path, "rb") as f:
+            response = client.post(
+                "/stt/transcribe",
+                files={"file": (os.path.basename(file_path), f, "audio/webm")},
+                data={"language": "en"}
+            )
+    
+        assert response.status_code == 200
+        data = response.json()
+        assert(len(data["text"]) > 0)
+
 class TestStt:
 
     def test_transcribe_english_mono(self):
@@ -82,4 +95,11 @@ class TestStt:
             result = transcriber.transcribe_file(file)
         assert(len(result.text) > 0)
         assert(result.confidence < 0.8)
+    
+    def test_transcribe_english_webm(self):
+        transcriber = SttTranscriber(language="en")
+        with open(os.path.join(script_dir, "audio/english_sample_webm.webm"), "rb") as file:
+            result = transcriber.transcribe_file(file)
+        assert(len(result.text) > 0)
+        assert(result.confidence > 0.8)
 

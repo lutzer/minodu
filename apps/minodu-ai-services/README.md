@@ -5,6 +5,7 @@
 * install olama `curl -fsSL https://ollama.com/install.sh | sh` or on mac: `brew install ollama`
 * add olama to autostart: `sudo systemctl enable ollama` (or manually start ollama with `ollama serve`)
 * install models: `ollama pull llama3.2:1b && ollama pull nomic-embed-text && ollama pull all-minilm:l6-v2`
+* install ffmpeg: `sudo apt-get install ffmpeg`
 
 ## Docker Setup
 
@@ -26,27 +27,17 @@ docker run -p 3000:3001 minodu-ai -e OLLAMA_HOST=<host_ip>>:11434
 docker exec -it minodu-ai /bin/sh
 ```
 
-
 ## Dev Setup
 
-* install raspberry pi os
-
-  ```
-  sudo apt update
-  sudo apt upgrade
-  ```
-
-* Install olama `curl -fsSL https://ollama.com/install.sh | sh`
-* install ffmpeg: `sudo apt-get install ffmpeg`
+* install pyenv `brew install pyenv`
+* run `pyenv install 3.12.11` 
+* install poetry with `brew install poetry`
+* run `poetry install`
 * unzip vosk models with `(cd models/stt_models && unzip vosk-model-small-fr-0.22.zip && unzip vosk-model-small-en-us-0.15.zip)`
 
-### Setup Service API
+### Tests
 
-* install pyenv
-* run `pyenv install 3.11` and set global with `pyenv global 3.11`
-* create venv with `python -m venv .venv`
-* then `source .venv/bin/activate`to activate it
-* `pip install -r requirements.txt`  to install dependencies
+* run tests with `nx test`or `nx test -- -s`
 
 ### Add Documents to chatbot
 

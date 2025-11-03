@@ -136,7 +136,7 @@ class TestTts:
 
         assert(os.path.exists(output_path))
 
-        # os.remove(output_path)
+        os.remove(output_path)
 
 
 

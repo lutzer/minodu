@@ -82,3 +82,47 @@ class TestDocumentStore:
         assert score < 1.0
         assert source.metadata["source_id"] == 1
 
+    def test_delete_document_sources(self):
+
+        rag = RAG(language="en")
+        store = DocumentStore(rag.vectorstore, rag.chroma_client)
+        store.delete_document("2_EN_AMANA_SCRIPT AUDIO.pdf")
+
+        documents = store.list_documents()
+
+        assert len(documents) > 0
+        
+        for doc in documents:
+            print(doc["metadata"])
+            assert doc["metadata"]["source"] != "2_EN_AMANA_SCRIPT AUDIO.pdf"
+
+    def test_delete_document_error(self):
+        rag = RAG(language="en")
+        store = DocumentStore(rag.vectorstore, rag.chroma_client)
+        with pytest.raises(Exception):
+            store.delete_document("2_EN_AMANA_SCRIPT AUDIO.pdf")
+
+    def test_delete_document_by_id(self):
+        file_path = os.path.join(script_dir, "docs/1_EN_AKPE_Script.pdf")
+
+        rag = RAG(language="en")
+        store = DocumentStore(rag.vectorstore, rag.chroma_client)
+        store.add_file(file_path, 5)
+
+        store = DocumentStore(rag.vectorstore, rag.chroma_client)
+        store.delete_document_by_id(5)
+
+        documents = store.list_documents()
+
+        assert len(documents) > 0
+        
+        for doc in documents:
+            print(doc["metadata"])
+            assert doc["metadata"]["source_id"] != 5
+
+    def test_delete_document_by_id_error(self):
+        rag = RAG(language="en")
+        store = DocumentStore(rag.vectorstore, rag.chroma_client)
+
+        with pytest.raises(Exception):
+            store.delete_document_by_id(5)
