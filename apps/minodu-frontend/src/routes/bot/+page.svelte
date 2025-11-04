@@ -15,12 +15,17 @@
     })
 
     $ : {
-        generating = messages.reduce((prev, val) => prev || !val.generated, false)
+        messages;
+        generating = isGenerating()
     }
 
     function updateGenerateState() {
-        generating = messages.reduce((prev, val) => prev || !val.generated, false)
         Store.saveChatMessages(messages);
+        generating = isGenerating()
+    }
+
+    function isGenerating() : boolean {
+        return messages.reduce((prev, val) => prev || !val.generated, false)
     }
     
     function submitMessage() {
