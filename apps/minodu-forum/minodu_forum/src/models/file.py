@@ -9,11 +9,11 @@ from ..routers.helpers import get_upload_file_path
 
 logger = logging.getLogger(__name__)
 
-from ..database import Base
+from ..database import PREFIX, Base, get_prefixed_key
 from ..config import Config
 
 class File(Base):
-    __tablename__ = "files"
+    __tablename__ = PREFIX + "files"
     
     id = Column(Integer, primary_key=True, index=True)
     text = Column(Text, nullable=True, default="")
@@ -23,7 +23,7 @@ class File(Base):
     file_hash = Column(String(64), nullable=False, index=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    post_id = Column(Integer, ForeignKey('posts.id'), nullable=False)
+    post_id = Column(Integer, ForeignKey(get_prefixed_key("posts.id")), nullable=False)
 
     post = relationship("Post", back_populates="files")
 
