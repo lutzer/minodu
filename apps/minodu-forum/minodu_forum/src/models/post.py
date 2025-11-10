@@ -1,12 +1,10 @@
 from sqlalchemy import event, Column, Integer, String, Text, DateTime, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime
-from ..database import Base
-
-from .author import Author
+from ..database import PREFIX, Base, get_prefixed_key
 
 class Post(Base):
-    __tablename__ = "posts"
+    __tablename__ = PREFIX + "posts"
     
     id = Column(Integer, primary_key=True, index=True)
 
@@ -17,8 +15,8 @@ class Post(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    author_id = Column(Integer, ForeignKey('authors.id'), nullable=True)
-    parent_id = Column(Integer, ForeignKey('posts.id'), nullable=True, default=None)
+    author_id = Column(Integer, ForeignKey(get_prefixed_key("authors.id")), nullable=True)
+    parent_id = Column(Integer, ForeignKey(get_prefixed_key("posts.id")), nullable=True, default=None)
 
     author = relationship("Author", back_populates="posts")
     files = relationship('File', back_populates='post', uselist=True, cascade="all, delete-orphan")
