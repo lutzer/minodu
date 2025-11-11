@@ -47,6 +47,7 @@
     }
 
     async function createPost(title: string, text: string, audio: Optional<Blob>, image: Optional<File>) {
+        console.log(audio)
         let post = await ForumApi.createPost({ title: title, text : text});
         if (audio) {
             await ForumApi.attachFile(post.id, audio, "en")

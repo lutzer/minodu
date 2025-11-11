@@ -30,6 +30,7 @@ export function mimeTypeToFileExtension(mimeType: string) : string {
         'audio/flac': '.flac',
         'audio/x-ms-wma': '.wma',
         'audio/webm': '.webm',
+        'audio/x-m4a' : 'm4a'
     }
 
     if (!mimeType) 
