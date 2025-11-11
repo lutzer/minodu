@@ -7,6 +7,7 @@ import hashlib
 import mimetypes
 from pathlib import Path
 from PIL import Image
+from pydub import AudioSegment
 
 from ..config import Config
 
@@ -73,6 +74,18 @@ async def convert_image(file_path: str, max_width: int = 1920, max_height: int =
 
     # Save as JPEG
     img.save(outputpath, 'JPEG', quality=95)
+
+    return outputpath
+
+async def convert_audio(file_path: str) -> str:
+    outputpath = os.path.splitext(file_path)[0] + ".mp3"
+
+    audio = AudioSegment.from_file(file_path)
+    export_params = {
+        'format': 'mp3',
+        'bitrate': '128k'
+    }
+    audio.export(outputpath, **export_params)
 
     return outputpath
 
