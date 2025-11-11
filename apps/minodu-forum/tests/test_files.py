@@ -7,7 +7,7 @@ from PIL import Image
 
 from minodu_forum.src.app import app
 from minodu_forum.src.database import get_db_connection, get_db
-from minodu_forum.src.routers.helpers import get_upload_file_path, convert_image
+from minodu_forum.src.routers.helpers import get_upload_file_path, convert_image, convert_audio
 
 
 from .test_authors import create_author
@@ -230,4 +230,34 @@ class TestFilesApi:
                 Path(temp_image).unlink()
             if len(converted_image) > 0 and Path(converted_image).exists():
                 Path(converted_image).unlink()
+    
+    @pytest.mark.asyncio
+    async def test_convert_audio_to_mp3(self):
+        # Setup: Define paths
+        source_audio = os.path.join(script_dir, "files/french_sample.mp3")
+        temp_file = os.path.join(script_dir, "files/tmp.mp3")
+
+        converted_audio = ""
+        
+        try:
+            # Copy the original image to temp location
+            shutil.copy(source_audio, temp_file)
+            assert Path(temp_file).exists(), "Failed to copy source image"
+            
+            # Run your conversion function
+            # Replace this with your actual conversion function
+            converted_audio = await convert_audio(temp_file)
+            
+            # Check if converted file exists
+            assert Path(converted_audio).exists(), "Converted image was not created"
+            
+            # Verify file extension
+            assert Path(converted_audio).suffix == ".mp3", f"Expected .mp3 extension, got {converted_image.suffix}"
+            
+        finally:
+            # Cleanup: Delete temporary files
+            if Path(temp_file).exists():
+                Path(temp_file).unlink()
+            if len(converted_audio) > 0 and Path(converted_audio).exists():
+                Path(converted_audio).unlink()
     
