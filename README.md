@@ -61,6 +61,8 @@ nx g @nx/node:application <name> --directory=apps/<name>
 
 ## Install on raspberry pi
 
+* install base image rasp pi os 64 bit lite
+
 ```
 # install docker
 sudo apt update
