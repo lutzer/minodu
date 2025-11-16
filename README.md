@@ -69,15 +69,12 @@ curl -sSL https://get.docker.com | sh
 sudo usermod -aG docker $USER
 sudo systemctl enable docker
 
-# install npm
-sudo apt install nodejs npm
-
 # install ollama
-curl -fsSL https://ollama.com/install.sh
+curl -fsSL https://ollama.com/install.sh | sh
 sudo systemctl enable ollama
 ollama pull llama3.2:1b && ollama pull nomic-embed-text
 
 # build and start services
-npm run dev:start
+sudo docker compose -f docker-compose.dev.yml up -d --build
 
 ```
