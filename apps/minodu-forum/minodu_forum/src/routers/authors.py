@@ -52,7 +52,10 @@ async def create_author(author: AuthorCreate, db: Session = Depends(get_db)):
         avatar = db.query(Avatar).filter(Avatar.id == author.avatar).first()
         if not avatar:
             raise HTTPException(status_code=404, detail="Avatar not found")
-        
+    
+    if len(author.name) < 3:
+        raise HTTPException(status_code=422, detail="Name too short. Must be minimum 3 characters.")
+
     # create author
     db_author = Author(
         name=author.name,

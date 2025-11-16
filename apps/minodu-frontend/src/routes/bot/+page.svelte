@@ -11,7 +11,7 @@
     let generating = false
 
     onMount(() => {
-        messages = Store.getChatMessages()
+        messages = Store.chatMessages
     })
 
     $ : {
@@ -20,7 +20,7 @@
     }
 
     function updateGenerateState() {
-        Store.saveChatMessages(messages);
+        Store.chatMessages = messages;
         generating = isGenerating()
     }
 
@@ -34,7 +34,7 @@
     }
 
     function clearChat() {
-        Store.clearChatMessages()
+        Store.chatMessages = undefined
         messages = []
     }
     
