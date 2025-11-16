@@ -58,3 +58,29 @@ nx g @nxlv/python:poetry-project <name> --directory=apps/<name> --projectType=ap
 # add node project
 nx g @nx/node:application <name> --directory=apps/<name>
 ```
+
+## Install on raspberry pi
+
+* install base image rasp pi os 64 bit lite
+
+```
+# install docker
+sudo apt update
+sudo apt upgrade
+curl -sSL https://get.docker.com | sh
+sudo usermod -aG docker $USER
+sudo systemctl enable docker
+
+# install ollama
+curl -fsSL https://ollama.com/install.sh | sh
+sudo systemctl enable ollama
+ollama pull llama3.2:1b && ollama pull nomic-embed-text
+
+# install git-lfs and get lfs files
+sudo apt install git-lfs
+git lfs pull
+
+# build and start services
+sudo docker compose -f docker-compose.dev.yml up -d --build
+
+```
