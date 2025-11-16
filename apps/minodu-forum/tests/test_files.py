@@ -232,9 +232,19 @@ class TestFilesApi:
                 Path(converted_image).unlink()
     
     @pytest.mark.asyncio
-    async def test_convert_audio_to_mp3(self):
-        # Setup: Define paths
-        source_audio = os.path.join(script_dir, "files/french_sample.mp3")
+    @pytest.mark.parametrize("input", [
+        "files/audios/ff-16b-2c-44100hz.aac",
+        "files/audios/ff-16b-2c-44100hz.ac3",
+        "files/audios/ff-16b-2c-44100hz.aiff",
+        "files/audios/ff-16b-2c-44100hz.flac",
+        "files/audios/ff-16b-2c-44100hz.mp3",
+        "files/audios/ff-16b-2c-44100hz.mp4",
+        "files/audios/ff-16b-2c-44100hz.ogg",
+        "files/audios/ff-16b-2c-44100hz.opus",
+        "files/audios/ff-16b-2c-44100hz.wma",
+    ])
+    async def test_convert_audio_to_mp3(self, input):
+        source_audio = os.path.join(script_dir, input)
         temp_file = os.path.join(script_dir, "files/tmp.mp3")
 
         converted_audio = ""
