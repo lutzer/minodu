@@ -13,6 +13,7 @@ services:
       - MYSQL_ROOT_PASSWORD=rootpassword
     volumes:
       - ./data/database:/var/lib/mysql
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
@@ -76,5 +77,6 @@ services:
     depends_on:
       - minodu-forum
       - minodu-ai-services
+    restart: unless-stopped
 
     
