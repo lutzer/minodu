@@ -76,8 +76,9 @@ curl -fsSL https://ollama.com/install.sh | sh
 sudo systemctl enable ollama
 ollama pull llama3.2:1b && ollama pull nomic-embed-text
 
-# install git-lfs
+# install git-lfs and get lfs files
 sudo apt install git-lfs
+git lfs pull
 
 # build and start services
 sudo docker compose -f docker-compose.dev.yml up -d --build
