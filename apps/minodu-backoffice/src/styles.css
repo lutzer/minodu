@@ -1,0 +1,27 @@
+/* You can add global styles to this file, and also import other style files */
+.card .view {
+  -webkit-border-top-left-radius: 10px;
+  border-top-left-radius: 10px;
+  -webkit-border-top-right-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+#pButton {
+  float: left;
+}
+
+#timeline {
+  width: 90%;
+  height: 2px;
+  margin-top: 20px;
+  margin-left: 10px;
+  float: left;
+  -webkit-border-radius: 15px;
+  border-radius: 15px;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+#pButton {
+  margin-top: 12px;
+  cursor: pointer;
+}

@@ -152,6 +152,7 @@ export abstract class DataFormater {
         image: BaseConfig.getFileUrl(post.image),
         attachment: BaseConfig.getFileUrl(post.attachment),
         attachment_kb: BaseConfig.getFileUrl(post.attachmentKb),
+        attachment_pdf: BaseConfig.getFileUrl(post.attachmentPdf),
         tags: post.tags.map(this.getTag).filter(tag => !!tag),
         resources: (post.resources) ?post.resources.map(this.getResource).filter(resource => !!resource):[],
       }

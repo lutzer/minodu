@@ -1,7 +1,7 @@
 import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "../../users/entities/user.entity";
 
-@Entity({ name: 'session', schema: 'public' })
+@Entity({ name: 'backend_session', schema: 'public' })
 export class UserSession extends BaseEntity {
 
   @PrimaryGeneratedColumn('increment')

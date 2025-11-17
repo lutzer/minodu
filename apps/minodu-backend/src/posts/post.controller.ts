@@ -68,6 +68,12 @@ export class PostController {
           format: 'binary',
           nullable: false,
         },
+        attachmentPdf: {
+          type: 'string',
+          description: 'Post attachment pdf',
+          format: 'binary',
+          nullable: false,
+        },
         tags: {
           type: 'string',
           items: {
@@ -93,6 +99,7 @@ export class PostController {
         { name: 'image', maxCount: 1 },
         { name: 'attachment', maxCount: 1 },
         { name: 'attachmentKb', maxCount: 1 },
+        { name: 'attachmentPdf', maxCount: 1 },
       ],
       {
         storage: diskStorage({
@@ -108,6 +115,7 @@ export class PostController {
     image?: Express.Multer.File[];
     attachment?: Express.Multer.File[];
     attachmentKb?: Express.Multer.File[];
+    attachmentPdf?: Express.Multer.File[];
   }, @Body() createPostDto: CreatePostDto, @User() currentUser) {
     if (files.image)
       createPostDto.image = files.image[0].filename;
@@ -115,6 +123,8 @@ export class PostController {
       createPostDto.attachment = files.attachment[0].filename;
     if (files.attachmentKb)
       createPostDto.attachmentKb = files.attachmentKb[0].filename;
+    if (files.attachmentPdf)
+      createPostDto.attachmentPdf = files.attachmentPdf[0].filename;
 
     return this.postService.create(createPostDto, currentUser);
   }
@@ -191,6 +201,12 @@ export class PostController {
           format: 'binary',
           nullable: true,
         },
+        attachmentPdf: {
+          type: 'string',
+          description: 'Post attachment kabye',
+          format: 'binary',
+          nullable: true,
+        },
         tags: {
           type: 'string',
           items: {
@@ -217,6 +233,7 @@ export class PostController {
         { name: 'image', maxCount: 1 },
         { name: 'attachment', maxCount: 1 },
         { name: 'attachmentKb', maxCount: 1 },
+        { name: 'attachmentPdf', maxCount: 1 },
       ],
       {
         storage: diskStorage({
@@ -233,6 +250,7 @@ export class PostController {
     image?: Express.Multer.File[];
     attachment?: Express.Multer.File[];
     attachmentKb?: Express.Multer.File[];
+    attachmentPdf?: Express.Multer.File[];
   }) {
     if (files.image)
       updatePostDto.image = files.image[0].filename;
@@ -240,6 +258,8 @@ export class PostController {
       updatePostDto.attachment = files.attachment[0].filename;
     if (files.attachmentKb)
       updatePostDto.attachmentKb = files.attachmentKb[0].filename;
+    if (files.attachmentPdf)
+      updatePostDto.attachmentPdf = files.attachmentPdf[0].filename;
 
     return this.postService.update(+id, updatePostDto);
   }

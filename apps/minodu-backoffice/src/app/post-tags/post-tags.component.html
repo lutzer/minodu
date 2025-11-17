@@ -1,0 +1,80 @@
+<div class="page-header d-print-none">
+    <div class="container-xl">
+      <div class="row g-2 align-items-center">
+        <div class="col">
+          <!-- Page pre-title -->
+          <h2 class="page-title">
+            Les tags
+          </h2>
+          <div class="page-pretitle mt-1">
+
+          </div>
+        </div>
+
+      </div>
+      </div>
+      </div>
+
+      <div class="page-body">
+      <div class="container-xl">
+      <div class="row row-deck row-cards">
+      <div class="col-12">
+          <div class="card">            
+            <div class="table-responsive">
+              <table class="table card-table table-vcenter text-nowrap datatable">
+                <thead>
+                  <tr>
+                    <th class="w-1">No.
+                      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm icon-thick" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 15l6 -6l6 6" /></svg>
+                    </th>
+                    <th>Illustration</th>
+                    <th>Nom</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let tag of tags; let i = index">
+                    <td><span class="text-secondary">{{i+1}}</span></td>
+                    <td><span class="avatar me-3" style="background-image: url({{tag.image}})"></span></td>
+                    <td>{{tag.name}}</td>
+                    <td class="text-end">
+                      <span class="dropdown">
+                        <button class="btn dropdown-toggle align-text-top" data-bs-boundary="viewport" data-bs-toggle="dropdown">Actions</button>
+                        <div class="dropdown-menu dropdown-menu-end">
+                          <a class="dropdown-item" href="#">
+                            Modifier
+                          </a>
+                          <a class="dropdown-item text-danger" href="#">
+                            Supprimer
+                          </a>
+                        </div>
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="card-footer d-flex align-items-center">
+              <p class="m-0 text-secondary">Affichage de <span>1</span> à <span>{{tags?.length}}</span> de <span>{{tags?.length}}</span> éléments</p>
+              <ul class="pagination m-0 ms-auto">
+                <li class="page-item disabled">
+                  <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
+                    <!-- Download SVG icon from http://tabler-icons.io/i/chevron-left -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 6l-6 6l6 6" /></svg>
+                    Précedent
+                  </a>
+                </li>
+                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                <li class="page-item disabled">
+                  <a class="page-link" href="#">
+                    Suivant <!-- Download SVG icon from http://tabler-icons.io/i/chevron-right -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+    </div>
+    </div>
+</div>

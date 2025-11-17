@@ -46,6 +46,7 @@ export class PostService {
       post.image = createPostDto.image;
       post.attachment = createPostDto.attachment;
       post.attachmentKb = createPostDto.attachmentKb;
+      post.attachmentPdf = createPostDto.attachmentPdf;
       post.user = user;
       post.postCategory = category;
       post.resources = resources;
@@ -188,8 +189,10 @@ export class PostService {
       one.image = updatePostDto.image;
       if(updatePostDto.attachment)
       one.attachment = updatePostDto.attachment;
-    if(updatePostDto.attachmentKb)
+      if(updatePostDto.attachmentKb)
       one.attachmentKb = updatePostDto.attachmentKb;
+      if(updatePostDto.attachmentPdf)
+      one.attachmentPdf = updatePostDto.attachmentPdf;
       one.postCategory = category;
       if(resources)
       one.resources = resources;

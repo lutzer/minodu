@@ -1,0 +1,124 @@
+<!-- 
+<section class="section mt-10 pt-110 pb-110">
+    <div class="container mx-auto">
+        <div class="card-toolkit-style-2 col-lg-6 mx-auto d-flex justify-content-center">
+            <div class="card-toolkit">
+                <div class="col-lg-12">
+                    <div class="box-banner-login">
+                        <h2 class="color-brand-1 mb-15">Se connecter</h2>
+                        <p class="font-md color-grey-500">Entrez votre email et votre mot de passe pour vous connecter</p>
+                        <div class="line-login mt-25"></div>
+                        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+                            @if (isFormSubmitted && errorMessage) {
+                                <div class="alert alert-danger mb-25" role="alert">
+                                  {{ errorMessage }}
+                                </div>
+                                }
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group mb-25">
+                                    <input class="form-control icon-email" type="email" formControlName="email" placeholder="Email">
+                                    <div *ngIf="loginForm.get('email')?.invalid && isFormSubmitted" class="mt-10 text-danger">
+                                        <p *ngIf="loginForm.get('email')?.errors?.['required']">
+                                            * L'email est requis.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <div class="form-group mb-25">
+                                    <input class="form-control {{showPassword? 'icon-password':'icon-password'}}" type="{{ showPassword ? 'text' : 'password' }}" formControlName="password" placeholder="Mot de passe"/>
+                                    <div *ngIf="loginForm.get('password')?.invalid && isFormSubmitted" class="mt-10 text-danger">
+                                        <p *ngIf="loginForm.get('password')?.errors?.['required']">
+                                            * Le mot de passe est requis.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 d-flex d-inline-block  mb-15">
+                            <div class="col-lg-6 col-6" >
+                                <div class="form-group">
+                                    <label class="cb-container">
+                                        <input type="checkbox" (click)="togglePasswordVisibility()">
+                                        <span class="text-small">Afficher le mot de passe</span>
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-6 pt-1 text-end">
+                                <a class="font-sm color-grey-500" href="/reset-password">Mot de passe oublié?</a>
+                            </div>
+                            </div>
+                            <div class="col-lg-12 mb-25">
+                                <button class="btn btn-brand-1 btn-full font-md-bold" type="submit">Se connecter</button>
+                            </div>
+                            <div class="col-lg-12">
+                                <span class="color-grey-500 d-inline-block align-middle font-sm">
+                                    Vous ne disposez pas de compte?
+                                </span>
+                                <a class="d-inline-block align-middle color-success ml-3" routerLink="/register"> Créer un compte maintenant</a>
+                            </div>
+                        </div>
+                    </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+   -->
+
+   <div class="page page-center">
+    <div class="container container-tight py-4">
+      <div class="text-center mb-4 mt-8">
+        <h1>Espace Admin</h1>
+      </div>
+      <div class="card card-md">
+        <div class="card-body">
+          <h2 class="h2 text-center mb-4">Se connecter</h2>
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+            <div class="mb-3">
+              <label class="form-label">Identifiant</label>
+              <input formControlName="phone" type="phone" class="form-control" placeholder="Numéro de télephone" autocomplete="off">
+              <div *ngIf="loginForm.get('phone')?.invalid && isFormSubmitted" class="mt-1 text-danger">
+                <p *ngIf="loginForm.get('phone')?.errors?.['required']">
+                    * L'identifiant est requis.
+                </p>
+            </div>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Mot de passe</label>
+              <div class="input-group input-group-flat">
+                <input formControlName="password" type="{{ showPassword ? 'text' : 'password' }}" class="form-control"  placeholder="Votre mot de passe"  autocomplete="off">
+                <span class="input-group-text">
+                  <a (click)="togglePasswordVisibility()" class="link-secondary" title="Show password" data-bs-toggle="tooltip">
+                    @if (!showPassword) {
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" /></svg>
+                    }
+                    @else {
+                        <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-eye-off"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10.585 10.587a2 2 0 0 0 2.829 2.828" /><path d="M16.681 16.673a8.717 8.717 0 0 1 -4.681 1.327c-3.6 0 -6.6 -2 -9 -6c1.272 -2.12 2.712 -3.678 4.32 -4.674m2.86 -1.146a9.055 9.055 0 0 1 1.82 -.18c3.6 0 6.6 2 9 6c-.666 1.11 -1.379 2.067 -2.138 2.87" /><path d="M3 3l18 18" /></svg>                    }
+                  </a>
+                </span>
+              </div>
+              <div *ngIf="loginForm.get('password')?.invalid && isFormSubmitted" class="mt-1 text-danger">
+                <p *ngIf="loginForm.get('password')?.errors?.['required']">
+                    * Le mot de passe est requis.
+                </p>
+              </div>
+            </div>
+            <br/>
+            <div>
+                @if (isFormSubmitted && errorMessage) {
+                    <div class="alert alert-danger mb-25 mt-2" role="alert">
+                      {{ errorMessage }}
+                    </div>
+                    }
+            </div>
+            <div class="form-footer">
+              <button type="submit" class="btn btn-primary w-100">Connexion</button>
+            </div>
+          </form>
+        </div>       
+      </div>
+    </div>
+  </div>

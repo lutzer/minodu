@@ -2,7 +2,7 @@ import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, On
 import { Product } from "src/products/entities/product.entity";
 import { User } from "src/users/entities/user.entity";
 
-@Entity({ name: 'product_offer', schema: 'public' })
+@Entity({ name: 'backend_product_offer', schema: 'public' })
 export class ProductOffer extends BaseEntity {
 
   @PrimaryGeneratedColumn('increment')

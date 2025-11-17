@@ -1,0 +1,29 @@
+{
+  "name": "minodu-backoffice",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/minodu-backoffice/src",
+  "projectType": "application",
+  "targets": {
+    "install": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm install",
+        "cwd": "apps/minodu-backoffice"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "ng build --configuration=production",
+        "cwd": "apps/minodu-backoffice"
+      }
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "ng build --configuration=development",
+        "cwd": "apps/minodu-backoffice"
+      }
+    }
+  }
+}

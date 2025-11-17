@@ -43,7 +43,7 @@
     "shell": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "docker-compose exec minodu-database mysql -u appuser -papppassword myapp",
+        "command": "docker-compose exec minodu-database mysql -u user -ppassword minodu",
         "cwd": "apps/minodu-database"
       }
     },

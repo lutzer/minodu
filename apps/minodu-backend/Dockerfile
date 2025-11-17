@@ -3,16 +3,17 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# copy files --- fix later
-COPY ./minodu_backend ./
+# copy files
+COPY . .
 
 COPY package*.json ./
 RUN npm ci
 
 COPY . .
+
 RUN npm run build
 
-# Étape d'exécuti
+# Étape d'exécution
 FROM node:18-alpine
 
 WORKDIR /app
@@ -20,9 +21,8 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --omit=dev
 
-COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/dist/src ./dist
 COPY --from=builder /app/temp ./temp
-
 
 ENV NODE_ENV=production
 ENV PORT=3000

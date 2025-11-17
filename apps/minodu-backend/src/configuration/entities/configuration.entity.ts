@@ -1,7 +1,7 @@
 import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryColumn, UpdateDateColumn } from "typeorm";
 
 
-@Entity({ name: 'configuration', schema: 'public' })
+@Entity({ name: 'backend_configuration', schema: 'public' })
 export class Configuration extends BaseEntity {
   @PrimaryColumn()
   id: number;
