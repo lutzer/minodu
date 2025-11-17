@@ -8,7 +8,7 @@ from PIL import Image
 from minodu_forum.src.app import app
 from minodu_forum.src.database import get_db_connection, get_db
 from minodu_forum.src.routers.helpers import get_upload_file_path, convert_image, convert_audio
-
+from minodu_forum.src.models.file import File
 
 from .test_authors import create_author
 from .test_posts import create_post
@@ -31,6 +31,50 @@ def upload_file(post_id: int, file_path: str, auth_token: str):
     return response.json()
 
 class TestFilesApi:
+
+    def test_validate_file(self):
+        with pytest.raises(Exception):
+            File(
+                filename="",
+                content_type="image/png",
+                file_size=20,
+                file_hash="hash",
+                post_id=1
+            ).validate()
+        
+        with pytest.raises(Exception):
+            File(
+                filename="test",
+                content_type="sth",
+                file_size=20,
+                file_hash="hash",
+                post_id=1
+            ).validate()
+
+        with pytest.raises(Exception):
+            File(
+                filename="test",
+                content_type="audio",
+                file_size=20,
+                file_hash="",
+                post_id=1
+            ).validate()
+
+        File(
+            filename="test",
+            content_type="image/png",
+            file_size=20,
+            file_hash="hash",
+            post_id=1
+        ).validate()
+
+        File(
+            filename="test",
+            content_type="audio/wav",
+            file_size=20,
+            file_hash="hash",
+            post_id=1
+        ).validate()
 
     def test_upload_image_file(self):
         auth_token = create_author()

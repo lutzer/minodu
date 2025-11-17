@@ -1,3 +1,4 @@
+from __future__ import annotations
 from sqlalchemy import event, Column, Integer, String, Text, DateTime, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -21,3 +22,6 @@ class Post(Base):
     author = relationship("Author", back_populates="posts")
     files = relationship('File', back_populates='post', uselist=True, cascade="all, delete-orphan")
     children = relationship("Post", uselist=True)
+
+    def validate(self) -> Post:
+        return self

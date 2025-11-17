@@ -59,13 +59,16 @@ async def upload_file(file: UploadFile, post_id: int = Form(...), language: str 
         file_info = await save_file(file, Config().upload_dir)
         
         # Create database record
-        db_file = File(
-            filename=file_info["filename"],
-            content_type=file_info["mime_type"],
-            file_size=file_info["file_size"],
-            file_hash=file_info["file_hash"],
-            post_id=post_id
-        )
+        try:
+            db_file = File(
+                filename=file_info["filename"],
+                content_type=file_info["mime_type"],
+                file_size=file_info["file_size"],
+                file_hash=file_info["file_hash"],
+                post_id=post_id
+            ).validate()
+        except Exception as e:
+            raise HTTPException(status_code=422, detail=e)
 
         db.add(db_file)
         db.commit()

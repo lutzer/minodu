@@ -1,3 +1,4 @@
+from __future__ import annotations
 from sqlalchemy import event, Column, Integer, String, Text, DateTime, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -28,6 +29,11 @@ class Avatar(Base):
     @hybrid_property
     def file_urlpath(self):
         return Config().api_prefix + Config().static_avatar_path + "/" + self.filename
+    
+    def validate(self) -> Avatar:
+        if (len(self.filename) == 0):
+             raise ValueError("Filename cant be empty")
+        return self
 
 # Event listener for after delete
 @event.listens_for(Avatar, 'after_delete')

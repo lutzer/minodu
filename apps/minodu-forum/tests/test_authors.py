@@ -5,6 +5,7 @@ from fastapi.testclient import TestClient
 from minodu_forum.src.app import app
 from minodu_forum.src.database import get_db_connection
 from tests.test_avatars import create_avatar
+from minodu_forum.src.models.author import Author
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -21,7 +22,7 @@ def create_author(name: str = "test"):
 
 class TestAuthorsApi:
 
-    def test_create_author(self):
+    def test_create_author_without_avatar(self):
         author_data = {
             "name": "Author1",
             "avatar": None
@@ -32,6 +33,19 @@ class TestAuthorsApi:
         response_data = response.json()
         assert len(response_data["token"]) > 0
         assert response_data["id"] >= 0
+
+    def test_validate_author(self):
+
+        with pytest.raises(Exception):
+            author = Author(
+                name="12",
+                avatar_id=None
+            ).validate()
+
+        author = Author(
+            name="123",
+            avatar_id=None
+        ).validate()
 
     def test_fetch_authors(self):
         author_data = {

@@ -1,0 +1,2 @@
+class VaildationException(Exception):
+    pass

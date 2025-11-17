@@ -53,14 +53,17 @@ async def create_author(author: AuthorCreate, db: Session = Depends(get_db)):
         if not avatar:
             raise HTTPException(status_code=404, detail="Avatar not found")
     
-    if len(author.name) < 3:
-        raise HTTPException(status_code=422, detail="Name too short. Must be minimum 3 characters.")
 
+    try:
     # create author
-    db_author = Author(
-        name=author.name,
-        avatar_id=author.avatar
-    )
+        db_author = Author(
+            name=author.name,
+            avatar_id=author.avatar
+        ).validate()
+    except Exception as e:
+        raise HTTPException(status_code=422, detail=e)
+    
+    print(db_author)
 
     db.add(db_author)
     db.commit()
@@ -93,6 +96,12 @@ async def edit_author(author_id: int, new_data: AuthorEdit, db: Session = Depend
     # Update other fields
     if 'name' in updated_data:
         author.name = updated_data['name']
+    
+    try:
+        author.validate()
+    except Exception as e:
+        raise HTTPException(status_code=422, detail=e)
+
     
     # commit changes
     db.commit()
