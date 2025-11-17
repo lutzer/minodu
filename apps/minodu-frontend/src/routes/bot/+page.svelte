@@ -8,6 +8,7 @@
     let inputText : string = ""
     let messages : BotMessage[] = []
     let ttsPlayer : TextToSpeechPlayer;
+    let conversation: string = ""
     let generating = false
 
     onMount(() => {
@@ -17,6 +18,11 @@
     $ : {
         messages;
         generating = isGenerating()
+        conversation = messages.reduce((acc, val) => {
+            return acc + "\n" + 
+            `Question: ${val.question}` + "\n" +
+            `Answer: ${val.response}` + "\n"
+        },"")
     }
 
     function updateGenerateState() {
@@ -49,7 +55,10 @@
         <ul>
             {#each messages as msg }
                 <li>
-                    <BotMessageElement message={msg} onResponseGenerated={updateGenerateState}/>
+                    <BotMessageElement 
+                        message={msg} 
+                        conversation={conversation} 
+                        ttsPlayer={ttsPlayer}/>
                 </li>
             {/each}
         </ul>

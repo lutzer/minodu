@@ -62,8 +62,6 @@ async def create_author(author: AuthorCreate, db: Session = Depends(get_db)):
         ).validate()
     except Exception as e:
         raise HTTPException(status_code=422, detail=e)
-    
-    print(db_author)
 
     db.add(db_author)
     db.commit()
@@ -102,7 +100,6 @@ async def edit_author(author_id: int, new_data: AuthorEdit, db: Session = Depend
     except Exception as e:
         raise HTTPException(status_code=422, detail=e)
 
-    
     # commit changes
     db.commit()
     db.refresh(author)

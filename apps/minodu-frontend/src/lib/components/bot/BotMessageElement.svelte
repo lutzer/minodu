@@ -1,10 +1,15 @@
 <script lang="ts">
+	import { command } from "$app/server";
 	import { AiServicesApi } from "$lib/apis/ai_services/api";
 	import type { BotMessage, Optional } from "$lib/types";
 	import { delay } from "$lib/utils";
 	import { onMount, tick } from "svelte";
+    import TextToSpeechButton from "../common/TextToSpeechButton.svelte";
+    import TextToSpeechPlayer from "../common/TextToSpeechPlayer.svelte";
 
     export let message : BotMessage
+    export let conversation : string
+    export let ttsPlayer : TextToSpeechPlayer;
 
     export let onResponseGenerated : () => void
 
@@ -14,7 +19,7 @@
 
     onMount(() => {
         if (!message.generated)
-            generateResponse(message.question);
+            generateResponse(message.question, conversation);
     })
 
     export function stop() {
@@ -23,12 +28,14 @@
         onResponseGenerated()
     }
 
-    async function generateResponse(question: string) {
+    async function generateResponse(question: string, conversation: string) {
         streaming = true
+
+        console.log(conversation)
 
         let apiResponse = await AiServicesApi.generateRagResponse({
             language: "en",
-            conversation: "",
+            conversation: conversation,
             question: question
         })
 
@@ -72,10 +79,17 @@
 <div class="bot-message">
     <p>
         {message.question}
+        {#if (message.question.length > 0)}
+            <TextToSpeechButton text={message.question} ttsPlayer={ttsPlayer}/>
+        {/if}
     </p>
     <p>
         {message.response}
-        {#if streaming}<span class="cursor">|</span>{/if}
+        {#if streaming}
+            <span class="cursor">|</span>
+        {:else if (message.response.length > 0)}
+            <TextToSpeechButton text={message.response} ttsPlayer={ttsPlayer}/>
+        {/if}
     </p>
     {#if (streaming)}
     <button onclick={stop}>Stop</button>
