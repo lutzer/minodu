@@ -6,7 +6,7 @@ import { PostResource } from "src/post_resources/entities/post_resources.entity"
 import { PostTag } from "src/post_tags/entities/post_tag.entity";
 
 
-@Entity({ name: 'post', schema: 'public' })
+@Entity({ name: 'backend_post', schema: 'public' })
 export class Post extends BaseEntity {
   @PrimaryGeneratedColumn('increment')
   id: number;
@@ -29,6 +29,9 @@ export class Post extends BaseEntity {
   @Column({ nullable: true })
   attachmentKb: string;
 
+  @Column({ nullable: true })
+  attachmentPdf: string;
+
   @ManyToOne(() => User, (user) => user.posts)
   user: User;
 
@@ -39,7 +42,7 @@ export class Post extends BaseEntity {
     cascade: true
   })
   @JoinTable({
-    name: 'posts_resources',
+    name: 'backend_posts_resources',
     joinColumn: {
       name: 'postId',
       referencedColumnName: 'id',
@@ -55,7 +58,7 @@ export class Post extends BaseEntity {
     cascade: true
   })
   @JoinTable({
-    name: 'posts_tags',
+    name: 'backend_posts_tags',
     joinColumn: {
       name: 'postId',
       referencedColumnName: 'id',

@@ -2,7 +2,7 @@ import { Exclude } from "class-transformer";
 import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 import { User } from "../../users/entities/user.entity";
 
-@Entity({ name: 'user_status', schema: 'public' })
+@Entity({ name: 'backend_user_status', schema: 'public' })
 @Unique('uniq_userStatus', ['name'])
 export class UserStatus extends BaseEntity {
 

@@ -3,7 +3,7 @@ import { Product } from "src/products/entities/product.entity";
 import { User } from "src/users/entities/user.entity";
 import { Partner } from "src/partners/entities/partner.entity";
 
-@Entity({ name: 'product_demand', schema: 'public' })
+@Entity({ name: 'backend_product_demand', schema: 'public' })
 export class ProductDemand extends BaseEntity {
 
   @PrimaryGeneratedColumn('increment')

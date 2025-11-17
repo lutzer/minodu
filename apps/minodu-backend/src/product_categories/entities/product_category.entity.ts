@@ -2,7 +2,7 @@ import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMa
 import { Exclude } from "class-transformer";
 import { Product } from "src/products/entities/product.entity";
 
-@Entity({ name: 'product_category', schema: 'public' })
+@Entity({ name: 'backend_product_category', schema: 'public' })
 @Unique('uniq_product_category', ['name'])
 export class ProductCategory extends BaseEntity {
   @PrimaryGeneratedColumn('increment')

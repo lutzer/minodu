@@ -2,7 +2,7 @@ import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMa
 import { Exclude } from "class-transformer";
 import { Post } from "src/posts/entities/post.entity";
 
-@Entity({ name: 'post_category', schema: 'public' })
+@Entity({ name: 'backend_post_category', schema: 'public' })
 @Unique('uniq_post_category', ['name'])
 export class PostCategory extends BaseEntity {
   @PrimaryGeneratedColumn('increment')

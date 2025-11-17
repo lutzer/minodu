@@ -1,0 +1,92 @@
+<div class="page-header d-print-none">
+    <div class="container-xl">
+      <div class="row g-2 align-items-center">
+        <div class="col">
+          <!-- Page pre-title -->
+
+          <h2 class="page-title">
+            Publié par : {{this.post?.author}}
+          </h2>
+          <div class="page-pretitle mt-1">
+ <div class="breadcrumbs">
+              <a routerLink="/posts">Publications</a> > details
+        </div>
+          </div>
+        </div>
+        <!-- Page title actions -->
+        <div class="col-auto ms-auto d-print-none">
+          <div class="btn-list">
+            <a href="#" class="btn btn-primary d-none d-sm-inline-block" data-bs-toggle="modal" data-bs-target="#modal-report">
+              <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+            <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-edit"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" /><path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z" /><path d="M16 5l3 3" /></svg>
+            Modifier
+            </a>
+            <a href="#" class="btn btn-primary d-sm-none btn-icon" data-bs-toggle="modal" data-bs-target="#modal-report" aria-label="Create new report">
+              <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
+            <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-edit"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" /><path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z" /><path d="M16 5l3 3" /></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+  <!-- Page body -->
+<div class="page-body">
+    <div class="container-xl">
+            <div class="col-12">
+                <div class="card card-md">
+                    <div class="card-body">
+                    <div class="row">
+                        <div class="col-9">
+                        <h3 class="h1">{{this.post?.title}}</h3>
+                        <div class="markdown text-secondary">
+                            {{this.post?.description}}
+                        </div>
+                        <h4 class="h4 mt-3">Catégorie:</h4>
+                        <label>
+                            <span class="form-selectgroup-label">{{this.post?.category?.name}}</span>
+                        </label>
+                        <h4 class="h4 mt-3">Tags:</h4>
+                        @for (tag of this.post?.tags; track $index) {
+                        <span class="avatar me-3" style="background-image: url({{tag.image}})"></span>
+                        }
+                        </div>
+                        <div class="col-3">
+                        <img src="{{post?.image}}" alt="{{post?.title}}" class="rounded img-fluid img-thumbnail">
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>  
+
+            <div class="row row-cards mt-2">
+            <div class="col-md-6">
+                Français
+                <div class="card card-sm mt-1">
+                  <div class="card-body">
+                    <div class="row align-items-center">
+                      <audio controls *ngIf="this.post?.attachment">
+                            <source src="{{this.post?.attachment}}" type="audio/mpeg">
+                            Votre navigateur ne supporte pas la lecture audio HTML5.
+                        </audio>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                Kabyè
+                <div class="card card-sm mt-1">
+                  <div class="card-body">
+                    <div class="row align-items-center">
+                        <audio controls *ngIf="this.post?.attachmentKb">
+                            <source src="{{this.post?.attachmentKb}}" type="audio/mpeg">
+                            Votre navigateur ne supporte pas la lecture audio HTML5.
+                        </audio>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              </div>
+        </div>
+</div>

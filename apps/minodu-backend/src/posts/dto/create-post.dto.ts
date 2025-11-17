@@ -50,6 +50,15 @@ export class CreatePostDto {
   })
   attachmentKb: string;
 
+  @ApiProperty({
+    type: String,
+    name: 'attachmentPdf',
+    description: "URL du fichier de la publication en PDF",
+    example: "https://example.com/images/article-thumbnail.pdf",
+    required: false
+  })
+  attachmentPdf: string;
+
   @ApiProperty({ type: String, name: 'tags', description: "List of post tags ID separated by ," })
   @IsNotEmpty()
   tags: string;

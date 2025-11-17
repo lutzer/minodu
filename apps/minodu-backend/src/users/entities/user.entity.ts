@@ -7,7 +7,7 @@ import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, JoinCol
 import { Post } from 'src/posts/entities/post.entity';
 import { ProductOffer } from 'src/product_offers/entities/product_offer.entity';
 
-@Entity({ name: 'user', schema: 'public' })
+@Entity({ name: 'backend_user', schema: 'public' })
 @Unique('uniq_phone', ['phone'])
 export class User extends BaseEntity {
 

@@ -2,7 +2,7 @@ import { BaseEntity, Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToM
 import { Exclude } from "class-transformer";
 import { Post } from "src/posts/entities/post.entity";
 
-@Entity({ name: 'post_tag', schema: 'public' })
+@Entity({ name: 'backend_post_tag', schema: 'public' })
 @Unique('uniq_post_tag', ['name'])
 export class PostTag extends BaseEntity {
   @PrimaryGeneratedColumn('increment')

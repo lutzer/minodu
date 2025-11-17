@@ -5,7 +5,7 @@ import { ProductCategory } from "src/product_categories/entities/product_categor
 import { ProductDemand } from "src/product_demands/entities/demand.entity";
 import { ProductOffer } from "src/product_offers/entities/product_offer.entity";
 
-@Entity({ name: 'product', schema: 'public' })
+@Entity({ name: 'backend_product', schema: 'public' })
 @Unique('uniq_product', ['name'])
 export class Product extends BaseEntity {
 

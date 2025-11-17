@@ -1,0 +1,101 @@
+<div class="page-header d-print-none">
+    <div class="container-xl">
+      <div class="row g-2 align-items-center">
+        <div class="col">
+          <h2 class="page-title">
+            Configuration
+          </h2>
+        </div>
+      </div>
+    </div>
+</div>
+
+<div class="page-body">
+    <div class="container-xl">
+<div class="col-lg-12">
+              <div class="row row-cards">
+                <div class="col-12">
+                  <form [formGroup]="updateConfigurationForm" (ngSubmit)="onSubmit()" class="card">
+                    <div class="card-body">
+                      <div class="row row-cards">
+                        <div class="col-sm-6 col-md-6">
+                          <div class="mb-3">
+                            <label class="form-label">Nom de la communauté</label>
+                            <input formControlName="name" type="text" class="form-control" placeholder="Communauté" ngModel="{{configuration?.communityName}}">
+                            <div *ngIf="updateConfigurationForm.get('name')?.invalid && isFormSubmitted" class="mt-2 text-danger">
+                                <p *ngIf="updateConfigurationForm.get('name')?.errors?.['required']">
+                                    * Le nom de la communauté est requis.
+                                </p>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6">
+                          <div class="mb-3">
+                            <label class="form-label">Localisation</label>
+                            <input formControlName="location" type="text" class="form-control" placeholder="0.00,0.00" ngModel="{{configuration?.location}}">
+                          </div>
+                        </div>
+                        
+                        <div class="col-md-12">
+                          <div class="mb-3">
+                            <label class="form-label">Adresse</label>
+                            <input formControlName="address" type="text" class="form-control" placeholder="Adresse" ngModel="{{configuration?.adresse}}">
+                            <div *ngIf="updateConfigurationForm.get('address')?.invalid && isFormSubmitted" class="mt-2 text-danger">
+                                <p *ngIf="updateConfigurationForm.get('address')?.errors?.['required']">
+                                    * L'adresse de la communauté est requise.
+                                </p>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6">
+                          <div class="mb-3">
+                            <label class="form-label">Lien du groupe whatsapp</label>
+                            <input formControlName="whatsapp-link" type="text" class="form-control" placeholder="lien whatsapp" ngModel="{{configuration?.whatsappLink}}">
+                          </div>
+                        </div>
+                        <div class="col-sm-6 col-md-6">
+                          <div class="mb-3">
+                            <label class="form-label">Lien de la station téléAgriculture</label>
+                            <input formControlName="station-link" type="text" class="form-control" placeholder="lien de la station méteo" ngModel="{{configuration?.stationLink}}">
+                          </div>
+                        </div>
+                        <div class="col-md-12">
+                          <div class="mb-3 mb-0">
+                            <label class="form-label">Présentation de la communauté</label>
+                            <textarea formControlName="description" rows="5" class="form-control" placeholder="Description ou présentation de la communauté"
+									          ngModel="{{configuration?.communityIntroduction}}"></textarea>
+                            <div *ngIf="updateConfigurationForm.get('description')?.invalid && isFormSubmitted" class="mt-2 text-danger">
+                                <p *ngIf="updateConfigurationForm.get('description')?.errors?.['required']">
+                                    * La description de la communauté est requise.
+                                </p>
+                            </div>
+                          </div>
+                        </div>
+
+                         <div>
+                            @if (isFormSubmitted && isUpdated) {
+                                <div class="alert alert-success mb-25" role="alert">
+                                  Les informations de votre communauté ont été mise à jour avec succès.
+                                </div>
+                                }
+                            @if (isFormSubmitted && errorMessage) {
+                                <div class="alert alert-danger mb-25" role="alert">
+                                  {{ errorMessage }}
+                                </div>
+                                }
+                          </div>
+
+                      </div>
+                    </div>
+                    <div class="card-footer text-end">
+                      <button [disabled]="isSubmitting" type="submit" class="btn btn-primary">
+                        <div *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2" style="width: 1.3rem; height: 1.3rem;"></div>
+                        <span [class.opacity-7]="isSubmitting">Mettre à jour</span>
+                     </button>
+                    </div>
+                  </form>
+                </div>
+                </div>
+            </div>
+            </div>
+        </div>

@@ -35,7 +35,7 @@ export class ProductOfferService {
       const productOffer = new ProductOffer();
       productOffer.user = farmer;
       productOffer.product = product;
-      productOffer.quantity = productOffer.quantity;
+      productOffer.quantity = createProductOfferDto.quantity;
 
       return productOffer.save().then((saved) => {
         return DataFormater.getProductOffer(saved);

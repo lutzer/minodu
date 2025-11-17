@@ -21,6 +21,7 @@ import { ConfigurationModule } from './configuration/configuration.module';
 import { Partner } from './partners/entities/partner.entity';
 import { ProductDemandModule } from './product_demands/demand.module';
 import { ProductOfferModule } from './product_offers/product_offer.module';
+import { PartnerModule } from './partners/partner.module';
 
 @Module({
   imports: [
@@ -64,7 +65,7 @@ import { ProductOfferModule } from './product_offers/product_offer.module';
     WeatherModule,
     ConfigurationModule,
     LoggerModule,
-    Partner,
+    PartnerModule,
     ProductDemandModule,
     ProductOfferModule
   ],

@@ -18,7 +18,6 @@ services:
       timeout: 20s
       retries: 10
 
-
   # Backend Service
   minodu-backend:
     build:
@@ -99,6 +98,7 @@ services:
       timeout: 10s
       retries: 3
 
+  # Frontend Service
   minodu-frontend:
     build:
       context: ./apps/minodu-frontend
@@ -109,4 +109,12 @@ services:
       - minodu-forum
       - minodu-ai-services
 
-    
+  # Backoffice Service
+  minodu-backoffice:
+    build:
+      context: ./apps/minodu-backoffice
+      dockerfile: Dockerfile
+    ports:
+      - "3000:8080"
+    depends_on:
+      - minodu-backend

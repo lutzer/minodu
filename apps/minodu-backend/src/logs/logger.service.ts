@@ -26,7 +26,4 @@ export class LoggerService {
     this.logger.log('error', message, { context });
   }
 
-  trace(message: string, error?: Error, context?: string) {
-    this.logger.error(message, { stack: error?.stack, context });
-  }
 }

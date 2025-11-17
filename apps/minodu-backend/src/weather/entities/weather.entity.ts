@@ -1,6 +1,6 @@
 import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity({ name: 'weather', schema: 'public' })
+@Entity({ name: 'backend_weather', schema: 'public' })
 export class Weather extends BaseEntity {
 
   @PrimaryGeneratedColumn('increment')
