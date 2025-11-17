@@ -53,7 +53,6 @@ async def create_author(author: AuthorCreate, db: Session = Depends(get_db)):
         if not avatar:
             raise HTTPException(status_code=404, detail="Avatar not found")
     
-
     try:
     # create author
         db_author = Author(
@@ -61,7 +60,7 @@ async def create_author(author: AuthorCreate, db: Session = Depends(get_db)):
             avatar_id=author.avatar
         ).validate()
     except Exception as e:
-        raise HTTPException(status_code=422, detail=e)
+        raise HTTPException(status_code=422, detail=str(e))
 
     db.add(db_author)
     db.commit()

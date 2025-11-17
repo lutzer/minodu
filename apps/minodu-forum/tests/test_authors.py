@@ -47,6 +47,16 @@ class TestAuthorsApi:
             avatar_id=None
         ).validate()
 
+    def test_create_author_throws_exception(self):
+
+        author_data = {
+            "name": "12",
+            "avatar": None
+        }
+        response = client.post(app.root_path + "/authors/create", json=author_data)        
+        assert response.status_code == 422
+        print(response)
+
     def test_fetch_authors(self):
         author_data = {
             "name": "test",

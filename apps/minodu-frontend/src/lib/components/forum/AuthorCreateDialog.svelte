@@ -23,8 +23,8 @@
         try {
             let response = await ForumApi.createAuthor({name: name, avatar: avatar})
             Store.forumToken = response.token
-            dialog?.close()
             name = ""
+            dialog?.close()
             onCreated()
         } catch (e) {
             window.alert(e)

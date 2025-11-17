@@ -34,12 +34,15 @@ async def create_avatar(file: UploadFile, db: Session = Depends(get_db)):
         file_info = await save_file(file, Config().avatar_dir, ["image/"])
         
         # Create database record
-        db_avatar = Avatar(
-            filename=file_info["filename"],
-            content_type=file_info["mime_type"],
-            file_size=file_info["file_size"],
-            file_hash=file_info["file_hash"],
-        ).validate()
+        try:
+            db_avatar = Avatar(
+                filename=file_info["filename"],
+                content_type=file_info["mime_type"],
+                file_size=file_info["file_size"],
+                file_hash=file_info["file_hash"],
+            ).validate()
+        except Exception as e:
+            raise HTTPException(status_code=422, detail=str(e))
 
         db.add(db_avatar)
         db.commit()

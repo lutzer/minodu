@@ -76,8 +76,7 @@ async def create_post(post: PostCreate, db: Session = Depends(get_db), token_aut
     try:
         db_post = Post(**post.model_dump(), author_id=author.id).validate()
     except Exception as e:
-        raise HTTPException(status_code=422, detail=e)
-
+        raise HTTPException(status_code=422, detail=str(e))
 
     db.add(db_post)
     db.commit()
