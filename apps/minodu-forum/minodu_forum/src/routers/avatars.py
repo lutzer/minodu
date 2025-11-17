@@ -39,7 +39,7 @@ async def create_avatar(file: UploadFile, db: Session = Depends(get_db)):
             content_type=file_info["mime_type"],
             file_size=file_info["file_size"],
             file_hash=file_info["file_hash"],
-        )
+        ).validate()
 
         db.add(db_avatar)
         db.commit()

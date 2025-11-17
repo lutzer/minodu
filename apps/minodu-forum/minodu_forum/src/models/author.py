@@ -1,6 +1,6 @@
 from __future__ import annotations
 from sqlalchemy import Column, ForeignKey, Integer, String, Text, DateTime, Boolean
-from sqlalchemy.orm import relationship, validates
+from sqlalchemy.orm import relationship
 from datetime import datetime
 
 from ..database import PREFIX, Base, get_prefixed_key

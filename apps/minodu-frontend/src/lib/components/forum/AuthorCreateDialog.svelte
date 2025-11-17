@@ -4,7 +4,8 @@
 	import { Store } from "$lib/store";
 	import type { Optional } from "$lib/types";
 
-    export let onCreated: () => {}
+    export let onCreated: () => void
+
     export function open() {
         dialog?.showModal()
         loadAvatars()

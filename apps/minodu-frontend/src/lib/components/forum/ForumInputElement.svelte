@@ -5,8 +5,8 @@
 	import ForumImagePicker from './ForumImagePicker.svelte';
     
     export let author: Optional<ForumAuthor>
-    export let onCreateAuthorClicked: () => {}
-    export let onLogoutAuthorClicked: () => {}
+    export let onCreateAuthorClicked: () => void
+    export let onLogoutAuthorClicked: () => void
     export let onSubmitPostClicked: (title: string, text: string, audio : Optional<Blob>, image : Optional<File>) => {}
 
     let title : string = ""
