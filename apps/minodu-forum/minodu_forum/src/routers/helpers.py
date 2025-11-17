@@ -50,6 +50,12 @@ async def save_file(
             os.remove(file_path)
             file_path = new_path
     
+    if file.content_type.startswith("audio/"):
+        new_path = await convert_audio(file_path)
+        if (file_path != new_path):
+            os.remove(file_path)
+            file_path = new_path
+    
     return {
         "filename": Path(file_path).name,
         "file_path": file_path,
