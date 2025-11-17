@@ -68,7 +68,7 @@ async def upload_file(file: UploadFile, post_id: int = Form(...), language: str 
                 post_id=post_id
             ).validate()
         except Exception as e:
-            raise HTTPException(status_code=422, detail=e)
+            raise HTTPException(status_code=422, detail=str(e))
 
         db.add(db_file)
         db.commit()
