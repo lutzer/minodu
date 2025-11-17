@@ -40,9 +40,7 @@
         author = await ForumApi.checkToken()
     }
 
-    async function createAuthor(name: string, avatar: number | undefined) {
-        let response = await ForumApi.createAuthor({name: name, avatar: avatar})
-        await Store.saveForumToken(response.token)
+    function onAuthorCreated() {
         update()
     }
 
@@ -63,7 +61,7 @@
     }
 
     async function logout() {
-        Store.deleteForumToken()
+        Store.forumToken = undefined
         author = undefined
     }
 </script>
@@ -114,7 +112,7 @@
             onLogoutAuthorClicked={async () => logout()}/>
 
         <AuthorCreateDialog bind:this={createAuthorDialog} 
-            onSubmit={async (name, avatar) => createAuthor(name, avatar)}/>
+            onCreated={onAuthorCreated}/>
 
         <TextToSpeechPlayer bind:this={ttsPlayer}/>
     </div>

@@ -1,14 +1,21 @@
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session, declarative_base
-from sqlalchemy import Column, Integer, String
+
 from contextlib import contextmanager
 from typing import Generator
 import logging
 
+
+
 from .config import Config
 
 logger = logging.getLogger(__name__)
+
+PREFIX = "forum_"
+
+def get_prefixed_key(key: str) -> str:
+    return PREFIX + key
 
 Base = declarative_base()
 

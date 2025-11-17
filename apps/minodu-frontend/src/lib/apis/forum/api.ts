@@ -47,7 +47,7 @@ export class ForumApi {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${Store.getForumToken()}`
+                'Authorization': `Bearer ${Store.forumToken}`
             },
             body: JSON.stringify(request)
         })
@@ -62,7 +62,7 @@ export class ForumApi {
             method: "DELETE",
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${Store.getForumToken()}`
+                'Authorization': `Bearer ${Store.forumToken}`
             }
         })
         if (!response.ok) {
@@ -84,7 +84,7 @@ export class ForumApi {
         const response = await fetch(`${ForumApi.API_PREFIX}/files/upload`, {
             method: "POST",
             headers: {
-                'Authorization': `Bearer ${Store.getForumToken()}`
+                'Authorization': `Bearer ${Store.forumToken}`
             },
             body: formData
         })
@@ -107,7 +107,7 @@ export class ForumApi {
         return new EventSource(`${ForumApi.API_PREFIX}/events/`);
     }
 
-    public static async checkToken(token: string = Store.getForumToken()) : Promise<Optional<ForumAuthor>> {
+    public static async checkToken(token: string = Store.forumToken) : Promise<Optional<ForumAuthor>> {
         if (!token) {
             return undefined
         } else {

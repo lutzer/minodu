@@ -1,8 +1,11 @@
 <script lang="ts">
 	import { ForumApi } from "$lib/apis/forum/api";
 	import type { ForumAvatar } from "$lib/apis/forum/models/fromAvatar";
+	import { Store } from "$lib/store";
+	import type { Optional } from "$lib/types";
 
-    export let onSubmit: (name : string, avatarId : number | undefined) => {}
+    export let onCreated: () => void
+
     export function open() {
         dialog?.showModal()
         loadAvatars()
@@ -16,9 +19,16 @@
         avatarList = await ForumApi.getAvatars()
     }
 
-    function handleSubmit() {
-        onSubmit(name, undefined)
-        dialog?.close()
+    async function createAuthor(name: string, avatar: Optional<number>) {
+        try {
+            let response = await ForumApi.createAuthor({name: name, avatar: avatar})
+            Store.forumToken = response.token
+            name = ""
+            dialog?.close()
+            onCreated()
+        } catch (e) {
+            window.alert(e)
+        }
     }
 </script>
 
@@ -26,5 +36,5 @@
   <h2>Create Author</h2>
   <input id="name" maxlength=64 type="text" bind:value={name}>
   <button onclick={() => dialog?.close()}>Cancel</button>
-  <button onclick={() => handleSubmit()}>Ok</button>
+  <button onclick={() => createAuthor(name, undefined)}>Ok</button>
 </dialog>

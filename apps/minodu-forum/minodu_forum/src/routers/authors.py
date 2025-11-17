@@ -52,12 +52,15 @@ async def create_author(author: AuthorCreate, db: Session = Depends(get_db)):
         avatar = db.query(Avatar).filter(Avatar.id == author.avatar).first()
         if not avatar:
             raise HTTPException(status_code=404, detail="Avatar not found")
-        
+    
+    try:
     # create author
-    db_author = Author(
-        name=author.name,
-        avatar_id=author.avatar
-    )
+        db_author = Author(
+            name=author.name,
+            avatar_id=author.avatar
+        ).validate()
+    except Exception as e:
+        raise HTTPException(status_code=422, detail=str(e))
 
     db.add(db_author)
     db.commit()
@@ -91,6 +94,11 @@ async def edit_author(author_id: int, new_data: AuthorEdit, db: Session = Depend
     if 'name' in updated_data:
         author.name = updated_data['name']
     
+    try:
+        author.validate()
+    except Exception as e:
+        raise HTTPException(status_code=422, detail=e)
+
     # commit changes
     db.commit()
     db.refresh(author)

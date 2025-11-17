@@ -1,20 +1,27 @@
-from __future__ import annotations
-from sqlalchemy import event, Column, Integer, String, Text, DateTime, Boolean, ForeignKey
+from sqlalchemy import Column, ForeignKey, Integer, String, Text, DateTime, Boolean
 from sqlalchemy.orm import relationship
 from datetime import datetime
-import os
-import logging
 from sqlalchemy.ext.hybrid import hybrid_property
 
-from ..routers.helpers import get_avatar_file_path
+from .database import Base
+from .routers.helpers import get_avatar_file_path
 
-logger = logging.getLogger(__name__)
+class Author(Base):
+    __tablename__ = "authors"
+    
+    id = Column(Integer, primary_key=True, index=True)
 
-from ..database import PREFIX, Base
-from ..config import Config
+    name = Column(String(200), nullable=False, index=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    avatar_id = Column(Integer, ForeignKey(Avatar.id), nullable=True, default=None)
+
+    avatar = relationship("Avatar", back_populates="authors")
+    posts = relationship('Post', back_populates='author', uselist=True)
 
 class Avatar(Base):
-    __tablename__ = PREFIX + "avatars"
+    __tablename__ = "avatars"
     
     id = Column(Integer, primary_key=True, index=True)
 
@@ -29,11 +36,6 @@ class Avatar(Base):
     @hybrid_property
     def file_urlpath(self):
         return Config().api_prefix + Config().static_avatar_path + "/" + self.filename
-    
-    def validate(self) -> Avatar:
-        if (len(self.filename) == 0):
-             raise ValueError("Filename cant be empty")
-        return self
 
 # Event listener for after delete
 @event.listens_for(Avatar, 'after_delete')
