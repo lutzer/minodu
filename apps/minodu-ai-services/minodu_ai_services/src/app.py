@@ -54,7 +54,12 @@ async def rag_ask(request: RagRequest):
 
     return StreamingResponse(
         generate_stream(),
-        media_type="text/plain"
+        media_type="text/plain; charset=utf-8",
+        headers={
+            'Cache-Control': 'no-cache',
+            'X-Accel-Buffering': 'no',
+            'Transfer-Encoding': 'chunked'
+        }
     )
 
 class RagSourceRequest(BaseModel):
@@ -138,7 +143,12 @@ async def weather_text(request: WeatherRequest):
 
     return StreamingResponse(
         generate_stream(),
-        media_type="text/plain"
+        media_type="text/plain; charset=utf-8",
+        headers={
+            'Cache-Control': 'no-cache',
+            'X-Accel-Buffering': 'no',
+            'Transfer-Encoding': 'chunked'
+        }
     )
 
 ### SPEECH TO TEXT API ###
@@ -196,7 +206,10 @@ async def synthesize_speech(request: TtsRequest):
                 headers={
                     "Content-Disposition": "attachment; filename=speech.wav",
                     "X-Sample-Rate": str(generator.samplerate()),
-                    "X-Channels": str(generator.channels())
+                    "X-Channels": str(generator.channels()),
+                    'Cache-Control': 'no-cache',
+                    'X-Accel-Buffering': 'no',
+                    'Transfer-Encoding': 'chunked'
                 }
             )
         elif request.format == "mp3":
@@ -208,7 +221,10 @@ async def synthesize_speech(request: TtsRequest):
                 generate_audio(),
                 media_type="audio/mpeg",
                 headers={
-                    "Content-Disposition": "attachment; filename=speech.mp3"
+                    "Content-Disposition": "attachment; filename=speech.mp3",
+                    'Cache-Control': 'no-cache',
+                    'X-Accel-Buffering': 'no',
+                    'Transfer-Encoding': 'chunked'
                 }
             )
         else:

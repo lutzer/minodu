@@ -5,8 +5,8 @@
 	import ForumImagePicker from './ForumImagePicker.svelte';
     
     export let author: Optional<ForumAuthor>
-    export let onCreateAuthorClicked: () => {}
-    export let onLogoutAuthorClicked: () => {}
+    export let onCreateAuthorClicked: () => void
+    export let onLogoutAuthorClicked: () => void
     export let onSubmitPostClicked: (title: string, text: string, audio : Optional<Blob>, image : Optional<File>) => {}
 
     let title : string = ""
@@ -65,6 +65,7 @@
         <button onclick={onCreateAuthorClicked}>Create Author</button>
         {/if}
     </div>
+    {#if (author !== undefined)}
     <div class="text-input input-block">
         <div class="input">
             <label for="title">Title</label>
@@ -72,7 +73,7 @@
         </div>
         <div class="input">
             <label for="text">Text</label>
-            <textarea id="text" bind:value={text} disabled={author == undefined}></textarea>
+            <textarea id="text" bind:value={text}></textarea>
         </div>
     </div>
     <div class="audio-input input-block">
@@ -85,5 +86,8 @@
         <button onclick={() => onSubmitPostClicked(title, text, audio, image)} 
             disabled={!submitEnabled}>Submit</button>
     </div>
+    {:else}
+    <div><p>Please login</p></div>
+    {/if}
 </div>
 

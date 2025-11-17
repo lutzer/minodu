@@ -8,19 +8,30 @@
     let inputText : string = ""
     let messages : BotMessage[] = []
     let ttsPlayer : TextToSpeechPlayer;
+    let conversation: string = ""
     let generating = false
 
     onMount(() => {
-        messages = Store.getChatMessages()
+        messages = Store.chatMessages
     })
 
     $ : {
-        generating = messages.reduce((prev, val) => prev || !val.generated, false)
+        messages;
+        generating = isGenerating()
+        conversation = messages.reduce((acc, val) => {
+            return acc + "\n" + 
+            `Question: ${val.question}` + "\n" +
+            `Answer: ${val.response}` + "\n"
+        },"")
     }
 
     function updateGenerateState() {
-        generating = messages.reduce((prev, val) => prev || !val.generated, false)
-        Store.saveChatMessages(messages);
+        Store.chatMessages = messages;
+        generating = isGenerating()
+    }
+
+    function isGenerating() : boolean {
+        return messages.reduce((prev, val) => prev || !val.generated, false)
     }
     
     function submitMessage() {
@@ -29,7 +40,7 @@
     }
 
     function clearChat() {
-        Store.clearChatMessages()
+        Store.chatMessages = undefined
         messages = []
     }
     
@@ -44,7 +55,10 @@
         <ul>
             {#each messages as msg }
                 <li>
-                    <BotMessageElement message={msg} onResponseGenerated={updateGenerateState}/>
+                    <BotMessageElement 
+                        message={msg} 
+                        conversation={conversation} 
+                        ttsPlayer={ttsPlayer}/>
                 </li>
             {/each}
         </ul>

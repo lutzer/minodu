@@ -1,32 +1,30 @@
-import type { BotMessage } from "./types";
+import type { BotMessage, Optional } from "./types";
 
 export class Store {
 
     static readonly FORUM_TOKEN_KEY = "FORUM_AUTH_TOKEN"
     static readonly BOT_HISTORY_KEY = "BOT_MESSAGE_HISTORY"
 
-    public static deleteForumToken() {
-        localStorage.removeItem(Store.FORUM_TOKEN_KEY)
+    public static set forumToken(token: Optional<string>) {
+        if (token)
+            localStorage.setItem(Store.FORUM_TOKEN_KEY, token)
+        else
+            localStorage.removeItem(Store.FORUM_TOKEN_KEY)
     }
 
-    public static saveForumToken(token: string) {
-        localStorage.setItem(Store.FORUM_TOKEN_KEY, token);
-    }
-
-    public static getForumToken() : string {
+    public static get forumToken() : string {
         return localStorage.getItem(Store.FORUM_TOKEN_KEY) || "";
     }
 
-    public static saveChatMessages(messages: BotMessage[]) {
-        localStorage.setItem(Store.BOT_HISTORY_KEY, JSON.stringify(messages))
+    public static set chatMessages(messages: Optional<BotMessage[]>) {
+        if (messages)
+            localStorage.setItem(Store.BOT_HISTORY_KEY, JSON.stringify(messages))
+        else
+            localStorage.removeItem(Store.BOT_HISTORY_KEY)
     }
 
-    public static getChatMessages() : BotMessage[] {
+    public static get chatMessages() : BotMessage[] {
         return JSON.parse(localStorage.getItem(Store.BOT_HISTORY_KEY) || "[]")
-    }
-
-    public static clearChatMessages() {
-        localStorage.removeItem(Store.BOT_HISTORY_KEY)
     }
 }
 

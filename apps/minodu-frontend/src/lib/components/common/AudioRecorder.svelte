@@ -4,6 +4,13 @@
 
     export let blob : Optional<Blob>
 
+    let mediaDeviveAvailable : boolean = true
+    let fileInput : HTMLInputElement
+
+    onMount(async () => {
+        mediaDeviveAvailable = navigator.mediaDevices?.getUserMedia !== undefined
+    })
+
     $: {
         if (!blob) {
             reset()
@@ -44,10 +51,6 @@
         prepared = true;
     }
 
-    function loadMedia() {
-        
-    }
-
     async function startRecording() {
         reset()
         if (!prepared) {
@@ -84,6 +87,15 @@
         }
     }
 
+    function handleCapture(e : Event) {
+        const target = e.target as HTMLInputElement
+        const file = target.files?.[0]
+        if (file && file.type.startsWith('audio/')) {
+            audioElement.src = URL.createObjectURL(file)
+            blob = file
+        }
+    }
+
 </script>
 
 <style>
@@ -98,11 +110,22 @@
 
 <div class="audio-recorder">
     <audio bind:this={audioElement} controls></audio>
+{#if mediaDeviveAvailable}
     {#if !recording}
-        <button on:click={startRecording} disabled={blob !== undefined}>Record</button>
+        <button onclick={startRecording} disabled={blob !== undefined}>Record</button>
     {:else}
-        <button on:click={stopRecording}>Stop</button>
+        <button onclick={stopRecording}>Stop</button>
     {/if}
-    <button on:click={reset} disabled={blob === undefined}>Reset</button>
-    <button on:click={startPlayback} disabled={blob === undefined}>Play</button>
+    <button onclick={reset} disabled={blob === undefined}>Reset</button>
+    <button onclick={startPlayback} disabled={blob === undefined}>Play</button>
+{:else}
+    <input 
+        bind:this={fileInput}
+        type="file" 
+        accept="audio/*" 
+        capture="environment"
+        onchange={(e) => handleCapture(e)}
+        style="display: none;">
+    <button onclick={() => fileInput.click()}>Record Audio</button>
+{/if}
 </div>

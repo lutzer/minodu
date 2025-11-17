@@ -7,8 +7,8 @@ from PIL import Image
 
 from minodu_forum.src.app import app
 from minodu_forum.src.database import get_db_connection, get_db
-from minodu_forum.src.routers.helpers import get_upload_file_path, convert_image
-
+from minodu_forum.src.routers.helpers import get_upload_file_path, convert_image, convert_audio
+from minodu_forum.src.models.file import File
 
 from .test_authors import create_author
 from .test_posts import create_post
@@ -31,6 +31,50 @@ def upload_file(post_id: int, file_path: str, auth_token: str):
     return response.json()
 
 class TestFilesApi:
+
+    def test_validate_file(self):
+        with pytest.raises(Exception):
+            File(
+                filename="",
+                content_type="image/png",
+                file_size=20,
+                file_hash="hash",
+                post_id=1
+            ).validate()
+        
+        with pytest.raises(Exception):
+            File(
+                filename="test",
+                content_type="sth",
+                file_size=20,
+                file_hash="hash",
+                post_id=1
+            ).validate()
+
+        with pytest.raises(Exception):
+            File(
+                filename="test",
+                content_type="audio",
+                file_size=20,
+                file_hash="",
+                post_id=1
+            ).validate()
+
+        File(
+            filename="test",
+            content_type="image/png",
+            file_size=20,
+            file_hash="hash",
+            post_id=1
+        ).validate()
+
+        File(
+            filename="test",
+            content_type="audio/wav",
+            file_size=20,
+            file_hash="hash",
+            post_id=1
+        ).validate()
 
     def test_upload_image_file(self):
         auth_token = create_author()
@@ -57,6 +101,7 @@ class TestFilesApi:
         data = upload_file(post["id"], file_path, auth_token)
         assert data["content_type"].startswith("image")
         assert os.path.isfile(get_upload_file_path(data["filename"]))
+        assert data["filename"].endswith(".jpg")
 
     def test_upload_image_webp(self):
         auth_token = create_author()
@@ -83,6 +128,25 @@ class TestFilesApi:
         data = response.json()
         assert data["content_type"].startswith("audio")
         assert os.path.isfile(get_upload_file_path(data["filename"]))
+
+    
+    def test_upload_audio_conversion(self):
+        auth_token = create_author()
+        post = create_post(auth_token, "fetch_test")
+
+        file_path = os.path.join(script_dir, "files/audios/ff-16b-2c-44100hz.aac")
+        with open(file_path, "rb") as f:
+            response = client.post(
+                "/files/upload",
+                files={"file": (os.path.basename(file_path), f, mimetypes.guess_type(file_path)[0])},
+                data={"post_id": post["id"], "language": "fr"},
+                headers={"Authorization": f"Bearer {auth_token}"}
+            )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["content_type"].startswith("audio")
+        assert os.path.isfile(get_upload_file_path(data["filename"]))
+        assert data["filename"].endswith(".mp3")
 
     def test_upload_wrong_file(self):
         auth_token = create_author()
@@ -230,4 +294,44 @@ class TestFilesApi:
                 Path(temp_image).unlink()
             if len(converted_image) > 0 and Path(converted_image).exists():
                 Path(converted_image).unlink()
+    
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("input", [
+        "files/audios/ff-16b-2c-44100hz.aac",
+        "files/audios/ff-16b-2c-44100hz.ac3",
+        "files/audios/ff-16b-2c-44100hz.aiff",
+        "files/audios/ff-16b-2c-44100hz.flac",
+        "files/audios/ff-16b-2c-44100hz.mp3",
+        "files/audios/ff-16b-2c-44100hz.mp4",
+        "files/audios/ff-16b-2c-44100hz.ogg",
+        "files/audios/ff-16b-2c-44100hz.opus",
+        "files/audios/ff-16b-2c-44100hz.wma",
+    ])
+    async def test_convert_audio_to_mp3(self, input):
+        source_audio = os.path.join(script_dir, input)
+        temp_file = os.path.join(script_dir, "files/tmp.mp3")
+
+        converted_audio = ""
+        
+        try:
+            # Copy the original image to temp location
+            shutil.copy(source_audio, temp_file)
+            assert Path(temp_file).exists(), "Failed to copy source image"
+            
+            # Run your conversion function
+            # Replace this with your actual conversion function
+            converted_audio = await convert_audio(temp_file)
+            
+            # Check if converted file exists
+            assert Path(converted_audio).exists(), "Converted image was not created"
+            
+            # Verify file extension
+            assert Path(converted_audio).suffix == ".mp3", f"Expected .mp3 extension, got {converted_image.suffix}"
+            
+        finally:
+            # Cleanup: Delete temporary files
+            if Path(temp_file).exists():
+                Path(temp_file).unlink()
+            if len(converted_audio) > 0 and Path(converted_audio).exists():
+                Path(converted_audio).unlink()
     
