@@ -73,7 +73,12 @@ async def create_post(post: PostCreate, db: Session = Depends(get_db), token_aut
     if not author:
         raise HTTPException(status_code=404, detail="Author not found")
 
-    db_post = Post(**post.model_dump(), author_id=author.id)
+    try:
+        db_post = Post(**post.model_dump(), author_id=author.id).validate()
+    except Exception as e:
+        raise HTTPException(status_code=422, detail=e)
+
+
     db.add(db_post)
     db.commit()
     db.refresh(db_post)

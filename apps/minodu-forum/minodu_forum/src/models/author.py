@@ -1,5 +1,6 @@
+from __future__ import annotations
 from sqlalchemy import Column, ForeignKey, Integer, String, Text, DateTime, Boolean
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, validates
 from datetime import datetime
 
 from ..database import PREFIX, Base, get_prefixed_key
@@ -17,4 +18,8 @@ class Author(Base):
 
     avatar = relationship("Avatar", back_populates="authors")
     posts = relationship('Post', back_populates='author', uselist=True)
-    
+
+    def validate(self) -> Author:
+        if (len(self.name) < 3):
+             raise ValueError("Name should be at least 3 characters")
+        return self

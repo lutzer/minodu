@@ -1,3 +1,4 @@
+from __future__ import annotations
 from sqlalchemy import event, Column, Integer, String, Text, DateTime, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -30,6 +31,16 @@ class File(Base):
     @hybrid_property
     def file_urlpath(self):
         return Config().api_prefix + Config().static_upload_path + "/" + self.filename
+    
+    def validate(self) -> File:
+        if (len(self.filename) == 0):
+            raise ValueError("Filename cant be empty.")
+        if not (self.content_type.startswith("audio") or  
+                self.content_type.startswith("image")):
+            raise ValueError("Content type needs to start with image or audio.")
+        if len(self.file_hash) == 0:
+            raise ValueError("Hash cant be zero")
+        return self
 
 # Event listener for after delete
 @event.listens_for(File, 'after_delete')
