@@ -101,6 +101,7 @@ class TestFilesApi:
         data = upload_file(post["id"], file_path, auth_token)
         assert data["content_type"].startswith("image")
         assert os.path.isfile(get_upload_file_path(data["filename"]))
+        assert data["filename"].endswith(".jpg")
 
     def test_upload_image_webp(self):
         auth_token = create_author()
@@ -127,6 +128,25 @@ class TestFilesApi:
         data = response.json()
         assert data["content_type"].startswith("audio")
         assert os.path.isfile(get_upload_file_path(data["filename"]))
+
+    
+    def test_upload_audio_conversion(self):
+        auth_token = create_author()
+        post = create_post(auth_token, "fetch_test")
+
+        file_path = os.path.join(script_dir, "files/audios/ff-16b-2c-44100hz.aac")
+        with open(file_path, "rb") as f:
+            response = client.post(
+                "/files/upload",
+                files={"file": (os.path.basename(file_path), f, mimetypes.guess_type(file_path)[0])},
+                data={"post_id": post["id"], "language": "fr"},
+                headers={"Authorization": f"Bearer {auth_token}"}
+            )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["content_type"].startswith("audio")
+        assert os.path.isfile(get_upload_file_path(data["filename"]))
+        assert data["filename"].endswith(".mp3")
 
     def test_upload_wrong_file(self):
         auth_token = create_author()
