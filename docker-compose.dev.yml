@@ -18,39 +18,6 @@ services:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
       retries: 10
-
-  # Backend Service
-  minodu-backend:
-    build:
-      context: ./apps/minodu-backend
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    environment:
-      - DB_HOST=db
-      - DB_PORT=3306
-      - DB_USERNAME=user
-      - DB_PASSWORD=password
-      - DB_NAME=minodu
-      - APP_PORT=3000
-      - APP_HOST=http://localhost:3000
-      - APP_FRONT=http://localhost
-      - JWT_SECRET_KEY=dev_secret_key_1234
-      - AI_SERVICE_URL=http://minodu-ai-services:3002/services
-    volumes:
-      - ./data/minodu-backend/audios:/app/static/audios
-      - ./data/minodu-backend/images:/app/static/images
-    depends_on:
-      minodu-database:
-        condition: service_healthy
-      minodu-ai-services:
-        condition: service_healthy
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
       
   # AI Services
   minodu-ai-services:
@@ -112,13 +79,3 @@ services:
       - minodu-forum
       - minodu-ai-services
     restart: unless-stopped
-
-  # Backoffice Service
-  minodu-backoffice:
-    build:
-      context: ./apps/minodu-backoffice
-      dockerfile: Dockerfile
-    ports:
-      - "3000:8080"
-    depends_on:
-      - minodu-backend

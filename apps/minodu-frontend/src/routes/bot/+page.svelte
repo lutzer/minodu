@@ -67,6 +67,8 @@
         <textarea class="input-text" bind:value={inputText}>
 
         </textarea>
+        <p/>
+        <button>Record</button>
         <button onclick={submitMessage} disabled={generating || inputText.length <=3}>Submit</button>
         <button onclick={clearChat}>Clear Chat</button>
     </div>
