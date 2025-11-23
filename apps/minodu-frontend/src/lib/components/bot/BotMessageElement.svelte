@@ -11,7 +11,7 @@
     export let conversation : string
     export let ttsPlayer : TextToSpeechPlayer;
 
-    export let onResponseGenerated : () => void
+    export let onResponseGenerated : Optional<() => void>
 
     let streaming: boolean = false
 
@@ -60,7 +60,7 @@
         
         streaming = false
         reader = undefined
-        onResponseGenerated()
+        onResponseGenerated?.()
     }
 
 </script>

@@ -3,9 +3,16 @@
     import { onMount } from 'svelte'
 
     export let blob : Optional<Blob>
+    export let recording : boolean = false;
+    
+    let prepared : boolean = false;
 
     let mediaDeviveAvailable : boolean = true
     let fileInput : HTMLInputElement
+
+    let mediaChunks : Blob[] = [];
+    let mediaRecorder : MediaRecorder;
+    let audioElement : HTMLAudioElement;
 
     onMount(async () => {
         mediaDeviveAvailable = navigator.mediaDevices?.getUserMedia !== undefined
@@ -17,27 +24,16 @@
         }
     }
 
-    let media : Blob[] = [];
-    let mediaRecorder : MediaRecorder;
-    let audioElement : HTMLAudioElement;
-
-    let recording : boolean = false;
-    let prepared : boolean = false;
-
-    function isPlaying() : boolean {
-        return !audioElement?.paused || false
-    }
-
     async function prepareRecorder() {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-        mediaRecorder.ondataavailable = (e) => media.push(e.data)
+        mediaRecorder.ondataavailable = (e) => mediaChunks.push(e.data)
 
         mediaRecorder.onstop = () => {
             recording = false;
-            blob = new Blob(media, {'type' : mediaRecorder.mimeType });
+            blob = new Blob(mediaChunks, {'type' : mediaRecorder.mimeType });
             audioElement.src = URL.createObjectURL(blob);
-            media = []
+            mediaChunks = []
         }
 
         mediaRecorder.onerror = (err) => {
@@ -51,40 +47,48 @@
         prepared = true;
     }
 
-    async function startRecording() {
+    export async function startRecording() {
         reset()
-        if (!prepared) {
-            await prepareRecorder()
+        if (mediaDeviveAvailable) {
+            if (!prepared) {
+                await prepareRecorder()
+            }
+            mediaRecorder?.start()
+        } else {
+            fileInput.click()
         }
-        mediaRecorder?.start()
     }
 
-    function stopRecording() {
+    export function stopRecording() {
         mediaRecorder?.stop()
     }
 
-    function reset() {
+    export function reset() {
         mediaRecorder?.stop()
         blob = undefined
-        media = []
+        mediaChunks = []
         if (audioElement) {
             audioElement.src = ""
         }
     }
 
-    function startPlayback() {
+    export function startPlayback() {
         audioElement?.play()
     }
 
-    function pausePlayback() {
+    export function pausePlayback() {
         audioElement?.pause()
     }
 
-    function stopPlayback() {
+    export function resetPlayback() {
         if (audioElement) {
             audioElement.currentTime = 0;
             audioElement.pause()
         }
+    }
+
+    export function isPlaying() : boolean {
+        return !audioElement?.paused || false
     }
 
     function handleCapture(e : Event) {
@@ -109,16 +113,8 @@
 </style>
 
 <div class="audio-recorder">
-    <audio bind:this={audioElement} controls></audio>
-{#if mediaDeviveAvailable}
-    {#if !recording}
-        <button onclick={startRecording} disabled={blob !== undefined}>Record</button>
-    {:else}
-        <button onclick={stopRecording}>Stop</button>
-    {/if}
-    <button onclick={reset} disabled={blob === undefined}>Reset</button>
-    <button onclick={startPlayback} disabled={blob === undefined}>Play</button>
-{:else}
+    <audio bind:this={audioElement}></audio>
+    {#if !mediaDeviveAvailable}
     <input 
         bind:this={fileInput}
         type="file" 
@@ -126,6 +122,5 @@
         capture="environment"
         onchange={(e) => handleCapture(e)}
         style="display: none;">
-    <button onclick={() => fileInput.click()}>Record Audio</button>
-{/if}
+    {/if}
 </div>

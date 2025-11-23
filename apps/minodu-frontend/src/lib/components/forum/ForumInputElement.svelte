@@ -9,6 +9,10 @@
     export let onLogoutAuthorClicked: () => void
     export let onSubmitPostClicked: (title: string, text: string, audio : Optional<Blob>, image : Optional<File>) => {}
 
+    let audioRecorder : AudioRecorder
+    let audioRecorderRecording : boolean = false
+    let audioRecorderPlaying : boolean = false
+
     let title : string = ""
     let text : string = ""
     let audio : Optional<Blob>
@@ -77,7 +81,11 @@
         </div>
     </div>
     <div class="audio-input input-block">
-        <AudioRecorder bind:blob={audio}></AudioRecorder>
+        <AudioRecorder bind:this={audioRecorder} bind:recording={audioRecorderRecording} bind:blob={audio}></AudioRecorder>
+        <button onclick={audioRecorder.startRecording} disabled={audio !== undefined || audioRecorderRecording}>Record</button>
+        <button onclick={audioRecorder.stopRecording} disabled={audio !== undefined || !audioRecorderRecording}>Stop</button>
+        <button onclick={audioRecorder.startPlayback} disabled={audio === undefined}>Play</button>
+        <button onclick={audioRecorder.reset} disabled={audio === undefined}>Reset</button>
     </div>
     <div class="input-block">
         <ForumImagePicker bind:image={image}/>
