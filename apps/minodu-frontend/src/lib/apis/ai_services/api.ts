@@ -1,5 +1,6 @@
 import { HttpError } from "$lib/errors";
 import type { Language, Optional } from "$lib/types";
+import { mimeTypeToFileExtension } from "$lib/utils";
 
 type TtsRequest = {
     text: string,
@@ -17,6 +18,11 @@ type RagRequest = {
     conversation: string
     question: string
     language: Language
+}
+
+type TtsRespone = {
+    text: string
+    confidence: number
 }
 
 export class AiServicesApi {
@@ -48,6 +54,25 @@ export class AiServicesApi {
             throw new HttpError({ code: response.status, message: await response.text()});
         }
         return response
+    }
+
+    public static async transcribeSpeech(audioFile: Blob, language: Language) : Promise<TtsRespone> {
+        let extension = mimeTypeToFileExtension(audioFile.type)
+        if (extension == "")
+            throw Error("File type not supported: " + audioFile.type)
+
+        const formData = new FormData();
+        formData.append('file', audioFile , 'file' + extension)
+        formData.append('language', language)
+
+        const response = await fetch(`${AiServicesApi.API_PREFIX}/stt/transcribe`, {
+            method: "POST",
+            body: formData
+        })
+        if (!response.ok) {
+            throw new HttpError({ code: response.status, message: await response.text()});
+        }
+        return await response.json()
     }
 
 }
