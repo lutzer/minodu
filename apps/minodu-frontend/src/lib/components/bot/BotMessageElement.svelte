@@ -10,8 +10,7 @@
     export let message : BotMessage
     export let conversation : string
     export let ttsPlayer : TextToSpeechPlayer;
-
-    export let onResponseGenerated : Optional<() => void>
+    export let onResponseGenerated : Optional<() => void> = undefined
 
     let streaming: boolean = false
 
@@ -25,7 +24,7 @@
     export function stop() {
         reader?.cancel()
         streaming = false;
-        onResponseGenerated()
+        onResponseGenerated?.()
     }
 
     async function generateResponse(question: string, conversation: string) {

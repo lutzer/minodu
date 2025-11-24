@@ -1,11 +1,12 @@
+import asyncio
 from dataclasses import asdict
 from enum import Enum
 import json
 from typing import Any, Optional
-from fastapi import FastAPI, UploadFile, HTTPException
+from fastapi import FastAPI, UploadFile, HTTPException, Request
 from pydantic import BaseModel
 from fastapi.responses import StreamingResponse
-from fastapi import Form
+from fastapi import Form, Query
 import tempfile
 import logging
 
@@ -172,6 +173,40 @@ async def stt_transcribe(file: UploadFile, language: str = Form(...)):
         confidence=result.confidence
     )
 
+@app.post("/stt/stream")
+async def transcribe_stream_endpoint(request: Request, language: str = Query(...)):
+    transcriber = SttTranscriber(language=language)
+    
+    def async_to_sync_chunk_generator(async_iterator):
+        loop = asyncio.get_event_loop()
+
+        # this wraps async chunks into a sync generator
+        async_gen = async_iterator.__aiter__()
+
+        while True:
+            try:
+                chunk = loop.run_until_complete(async_gen.__anext__())
+            except StopAsyncIteration:
+                break
+            yield chunk
+
+    async_chunks = request.stream()
+    sync_chunks = async_to_sync_chunk_generator(async_chunks)
+
+    def generate_stream():
+        for text in transcriber.transcribe_stream(sync_chunks):
+            # stream each piece of text as JSON lines
+            yield json.dumps({"text": text}) + "\n"
+
+    return StreamingResponse(
+        generate_stream(),
+        media_type="text/plain; charset=utf-8",
+        headers={
+            'Cache-Control': 'no-cache',
+            'X-Accel-Buffering': 'no',
+            'Transfer-Encoding': 'chunked'
+        }
+    )
 
 
 ### TEXT TO SPEECH API ###
