@@ -17,9 +17,11 @@
     })
 
     $: {
+        blob;
         if (!blob) {
             reset()
         }
+        
     }
 
     async function prepareRecorder() {
@@ -116,10 +118,14 @@
         display: block;
         padding-bottom: 10px;
     }
+
+    .hidden {
+        display:none
+    }
 </style>
 
 <div class="audio-recorder">
-    <audio bind:this={audioElement}></audio>
+    <audio bind:this={audioElement} controls class={ blob !== undefined ? "" : "hidden"}></audio>
     {#if !mediaDeviveAvailable}
     <input 
         bind:this={fileInput}
