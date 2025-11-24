@@ -26,7 +26,6 @@
     $: {
         message;
         error = message.response.trimStart().startsWith("[ERROR:")
-        console.log(message)
     }
 
     export function stop() {
