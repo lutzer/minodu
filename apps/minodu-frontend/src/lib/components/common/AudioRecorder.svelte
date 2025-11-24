@@ -4,14 +4,12 @@
 
     export let blob : Optional<Blob>
     export let recording : boolean = false;
-    
-    let prepared : boolean = false;
 
     let mediaDeviveAvailable : boolean = true
     let fileInput : HTMLInputElement
 
     let mediaChunks : Blob[] = [];
-    let mediaRecorder : MediaRecorder;
+    let mediaRecorder : Optional<MediaRecorder>;
     let audioElement : HTMLAudioElement;
 
     onMount(async () => {
@@ -31,9 +29,18 @@
 
         mediaRecorder.onstop = () => {
             recording = false;
-            blob = new Blob(mediaChunks, {'type' : mediaRecorder.mimeType });
+
+            // create playable audio
+            blob = new Blob(mediaChunks, {'type' : mediaRecorder?.mimeType });
             audioElement.src = URL.createObjectURL(blob);
             mediaChunks = []
+            
+            // cleanup tracks
+            stream.getAudioTracks().forEach((t) => {
+                t.stop()
+                stream.removeTrack(t);
+            })
+            mediaRecorder = undefined
         }
 
         mediaRecorder.onerror = (err) => {
@@ -44,13 +51,12 @@
             recording = true
         }
 
-        prepared = true;
     }
 
     export async function startRecording() {
         reset()
         if (mediaDeviveAvailable) {
-            if (!prepared) {
+            if (!mediaRecorder) {
                 await prepareRecorder()
             }
             mediaRecorder?.start()

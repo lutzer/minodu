@@ -77,11 +77,7 @@
         <textarea class="input-text" bind:value={inputText}>
 
         </textarea>
-        <div>
-            <button>Record</button>
-            <button onclick={submitMessage} disabled={generating || inputText.length <=3}>Submit</button>
-            <button onclick={clearChat}>Clear Chat</button>
-        </div>
+        
         <div>
             <AudioRecorder bind:this={audioRecorder} bind:blob={audioBlob} bind:recording={audioRecording}/>
             {#if !audioBlob && !audioRecording}
@@ -92,6 +88,10 @@
                 <button onclick={audioRecorder.reset}>Cancel</button>
                 <button onclick={() => transcribeAudio(audioBlob)}>Send</button>
             {/if}
+        </div>
+        <div>
+            <button onclick={submitMessage} disabled={generating || inputText.length <=3}>Submit</button>
+            <button onclick={clearChat}>Clear Chat</button>
         </div>
     </div>
     <TextToSpeechPlayer bind:this={ttsPlayer}/>
