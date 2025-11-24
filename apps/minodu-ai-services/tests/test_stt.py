@@ -69,6 +69,19 @@ class TestSttAPI:
         data = response.json()
         assert(len(data["text"]) > 0)
 
+    def test_transcribe_empty(self):
+        file_path = os.path.join(script_dir, "audio/empty.wav")
+        with open(file_path, "rb") as f:
+            response = client.post(
+                "/stt/transcribe",
+                files={"file": (os.path.basename(file_path), f, "audio/wav")},
+                data={"language": "en"}
+            )
+    
+        assert response.status_code == 200
+        data = response.json()
+        assert(len(data["text"]) == 0)
+
     @pytest.mark.skip()  
     @pytest.mark.asyncio
     async def test_transcribe_stream(self):
