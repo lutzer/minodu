@@ -74,12 +74,18 @@ class SttTranscriber:
                 recognizer.AcceptWaveform(data)
             
             result = json.loads(recognizer.FinalResult())
-            confidenceLen = len(result["result"])
-            confidenceSum = reduce(lambda acc, curr: acc + curr["conf"], result["result"], 0.0)
-            return SttResult(
-                text = result["text"],
-                confidence = confidenceSum / confidenceLen
-            )
+            if not "result" in result:
+                return SttResult(
+                    text = result["text"],
+                    confidence = 0
+                ) 
+            else:
+                confidenceLen = len(result["result"])
+                confidenceSum = reduce(lambda acc, curr: acc + curr["conf"], result["result"], 0.0)
+                return SttResult(
+                    text = result["text"],
+                    confidence = confidenceSum / confidenceLen if (confidenceLen > 0 ) else 0
+                )
     
     def transcribe_file_buffer(self, file_buffer, filename) -> SttResult:
 
