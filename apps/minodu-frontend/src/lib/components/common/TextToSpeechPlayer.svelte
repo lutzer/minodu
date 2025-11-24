@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Config } from "$lib";
 	import { AiServicesApi } from "$lib/apis/ai_services/api";
 	import type { Optional } from "$lib/types";
     import { writable } from 'svelte/store';
@@ -21,7 +22,7 @@
 
         let response = await AiServicesApi.generateTextToSpeechStream({
             text: text,
-            language: "en",
+            language: Config.language,
             format: "mp3",
             return_header: false
         })

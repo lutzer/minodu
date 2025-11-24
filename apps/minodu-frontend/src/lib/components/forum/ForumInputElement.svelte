@@ -10,53 +10,46 @@
     export let onSubmitPostClicked: (title: string, text: string, audio : Optional<Blob>, image : Optional<File>) => {}
 
     let audioRecorder : AudioRecorder
-    let audioRecorderRecording : boolean = false
-    let audioRecorderPlaying : boolean = false
+    let audioBlob : Optional<Blob>
+    let audioRecording : boolean = false
 
     let title : string = ""
     let text : string = ""
-    let audio : Optional<Blob>
     let image : Optional<File>
 
     let submitEnabled: boolean = false
 
     $ : {
         submitEnabled = (title.length >= 3 && text.length >= 3) 
-            || audio != undefined 
+            || audioBlob != undefined 
             || image != undefined
     }
 
     export function reset() {
         title = ""
         text = ""
-        audio = undefined
+        audioBlob = undefined
         image = undefined
     }
 
 </script>
 
 <style>
-    .forum-input-container {
-        display: flex; 
-    }
-
     .input-block {
         background-color: lightgray;
         margin: 10px;
         padding: 10px;
     }
 
+
+    .input-block.text {
+        min-width: 300px;
+    }
+
     .author {
         width: 100px;
         text-align: center;
     }
-
-    .text-input {
-    }
-
-    .audio-input {
-    }
-
 </style>
 
 <div class="forum-input-container">
@@ -70,28 +63,35 @@
         {/if}
     </div>
     {#if (author !== undefined)}
-    <div class="text-input input-block">
+    <div class="input-block text">
         <div class="input">
             <label for="title">Title</label>
-            <input id="title" type="text" bind:value={title}/>
+            <div class="input-text">
+                <input id="title" type="text" bind:value={title}/>
+            </div>
         </div>
         <div class="input">
             <label for="text">Text</label>
-            <textarea id="text" bind:value={text}></textarea>
+            <div class="input-textarea">
+                <textarea id="text" bind:value={text}></textarea>
+            </div>
         </div>
     </div>
-    <div class="audio-input input-block">
-        <AudioRecorder bind:this={audioRecorder} bind:recording={audioRecorderRecording} bind:blob={audio}></AudioRecorder>
-        <button onclick={audioRecorder.startRecording} disabled={audio !== undefined || audioRecorderRecording}>Record</button>
-        <button onclick={audioRecorder.stopRecording} disabled={audio !== undefined || !audioRecorderRecording}>Stop</button>
-        <button onclick={audioRecorder.startPlayback} disabled={audio === undefined}>Play</button>
-        <button onclick={audioRecorder.reset} disabled={audio === undefined}>Reset</button>
+    <div class="input-block audio">
+        <AudioRecorder bind:this={audioRecorder} bind:recording={audioRecording} bind:blob={audioBlob}></AudioRecorder>
+        {#if !audioBlob && !audioRecording}
+            <button onclick={audioRecorder.startRecording}>Record</button>
+        {:else if !audioBlob && audioRecording}
+            <button onclick={audioRecorder.stopRecording}>Stop</button>
+        {:else}
+            <button onclick={audioRecorder.reset}>Reset</button>
+        {/if}
     </div>
     <div class="input-block">
         <ForumImagePicker bind:image={image}/>
     </div>
     <div class="submit input-block">
-        <button onclick={() => onSubmitPostClicked(title, text, audio, image)} 
+        <button onclick={() => onSubmitPostClicked(title, text, audioBlob, image)} 
             disabled={!submitEnabled}>Submit</button>
     </div>
     {:else}

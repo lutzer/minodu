@@ -14,6 +14,7 @@
     export let onResponseGenerated : Optional<() => void> = undefined
 
     let streaming: boolean = false
+    let error: boolean = false
 
     let reader : Optional<ReadableStreamDefaultReader<Uint8Array<ArrayBuffer>>> = undefined
 
@@ -21,6 +22,12 @@
         if (!message.generated)
             generateResponse(message.question, conversation);
     })
+
+    $: {
+        message;
+        error = message.response.trimStart().startsWith("[ERROR:")
+        console.log(message)
+    }
 
     export function stop() {
         reader?.cancel()
@@ -30,8 +37,6 @@
 
     async function generateResponse(question: string, conversation: string) {
         streaming = true
-
-        console.log(conversation)
 
         let apiResponse = await AiServicesApi.generateRagResponse({
             language: Config.language,
@@ -74,6 +79,12 @@
         0%, 50% { opacity: 1; }
         51%, 100% { opacity: 0; }
     }
+
+    p.error {
+        color: white;
+        background-color: red;
+        padding: 5px;
+    }
 </style>
 
 <div class="bot-message">
@@ -83,11 +94,11 @@
             <TextToSpeechButton text={message.question} ttsPlayer={ttsPlayer}/>
         {/if}
     </p>
-    <p>
+    <p class={error ? "error" : ""}>
         {message.response}
         {#if streaming}
             <span class="cursor">|</span>
-        {:else if (message.response.length > 0)}
+        {:else if (message.response.length > 0 && !error)}
             <TextToSpeechButton text={message.response} ttsPlayer={ttsPlayer}/>
         {/if}
     </p>

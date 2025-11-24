@@ -60,25 +60,45 @@
     
 </script>
 
+<style>
+    .chat-input {
+        background-color: lightblue;
+        padding: 10px;
+    }
+
+    .chat-messages {
+        background-color: lightcyan;
+        padding: 10px;
+    }
+
+    .input-block {
+        background-color: lightgray;
+        margin: 10px;
+        padding: 10px;
+    }
+</style>
+
 <div class="chat-container">
-    <div class="chat">
+    <div class="chat-messages">
         <ul>
             {#each messages as msg }
                 <li>
                     <BotMessageElement 
                         message={msg} 
                         conversation={conversation} 
-                        ttsPlayer={ttsPlayer}/>
+                        ttsPlayer={ttsPlayer}
+                        onResponseGenerated={updateGenerateState}/>
                 </li>
             {/each}
         </ul>
     </div>
-    <div class="input">
-        <textarea class="input-text" bind:value={inputText}>
-
-        </textarea>
-        
-        <div>
+    <div class="chat-input">
+        <div class="input-block">
+            <div class="input-textarea">
+                <textarea class="input-text" bind:value={inputText}></textarea>
+            </div>
+        </div>
+        <div class="input-block">
             <AudioRecorder bind:this={audioRecorder} bind:blob={audioBlob} bind:recording={audioRecording}/>
             {#if !audioBlob && !audioRecording}
                 <button onclick={audioRecorder.startRecording}>Record</button>
@@ -89,7 +109,7 @@
                 <button onclick={() => transcribeAudio(audioBlob)}>Send</button>
             {/if}
         </div>
-        <div>
+        <div class="input-block">
             <button onclick={submitMessage} disabled={generating || inputText.length <=3}>Submit</button>
             <button onclick={clearChat}>Clear Chat</button>
         </div>
