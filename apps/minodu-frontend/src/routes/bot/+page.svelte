@@ -3,6 +3,7 @@
 </script>
 
 <div>
+    <a href="/">Home</a>
     <h2>Chatbot</h2>
     <ChatbotPage/>
 </div>
