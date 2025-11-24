@@ -6,6 +6,7 @@
 	import { onMount, tick } from "svelte";
     import TextToSpeechButton from "../common/TextToSpeechButton.svelte";
     import TextToSpeechPlayer from "../common/TextToSpeechPlayer.svelte";
+	import { Config } from "$lib";
 
     export let message : BotMessage
     export let conversation : string
@@ -33,7 +34,7 @@
         console.log(conversation)
 
         let apiResponse = await AiServicesApi.generateRagResponse({
-            language: "en",
+            language: Config.language,
             conversation: conversation,
             question: question
         })

@@ -2,75 +2,112 @@
 	import type { Optional } from '$lib/types';
     import { onMount } from 'svelte'
 
-    export let streaming : boolean = false;
     export let mediaDeviveAvailable : boolean = true
+    export let recording : boolean = false;
+    export let onAudioR
     
-    let prepared : boolean = false;
-    let mediaRecorder : MediaRecorder;
+    let audioContext : AudioContext;
+    let audioWorkletNode : AudioWorkletNode;
+    let stream : MediaStream
+
+    const workletCode = `
+        class PCMProcessor extends AudioWorkletProcessor {
+        process(inputs, outputs, parameters) {
+            const input = inputs[0];
+            if (input.length > 0) {
+            const channelData = input[0];
+            // Convert Float32 to Int16 PCM
+            const pcmData = new Int16Array(channelData.length);
+            for (let i = 0; i < channelData.length; i++) {
+                const s = Math.max(-1, Math.min(1, channelData[i]));
+                pcmData[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+            }
+            // Send to main thread
+            this.port.postMessage(pcmData);
+            }
+            return true;
+        }
+        }
+        registerProcessor('pcm-processor', PCMProcessor);
+    `;
 
     onMount(async () => {
         mediaDeviveAvailable = navigator.mediaDevices?.getUserMedia !== undefined
     })
 
-    async function prepareRecorder() {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-        mediaRecorder.ondataavailable = (e) => {
-            console.log(e.data)
-        }
 
-        mediaRecorder.onstop = () => {
-            streaming = false;
-        }
+    export async function startRecording() {
+        try {
+            // Request microphone access
+            stream = await navigator.mediaDevices.getUserMedia({ 
+                audio: {
+                channelCount: 1,
+                sampleRate: 16000,
+                echoCancellation: true,
+                noiseSuppression: true
+                } 
+            });
 
-        mediaRecorder.onerror = (err) => {
-            console.error(err)
-        }
+            // Create AudioContext
+            audioContext = new AudioContext({ sampleRate: 16000 });
 
-        mediaRecorder.onstart = () => {
-            streaming = true
-        }
+            // Create blob URL for worklet
+            const blob = new Blob([workletCode], { type: 'application/javascript' });
+            const workletUrl = URL.createObjectURL(blob);
 
-        prepared = true;
+            // Load the worklet
+            await audioContext.audioWorklet.addModule(workletUrl);
+            URL.revokeObjectURL(workletUrl);
+
+            // Create worklet node
+            audioWorkletNode = new AudioWorkletNode(audioContext, 'pcm-processor');
+
+            // Handle messages from worklet
+            audioWorkletNode.port.onmessage = (event) => {
+                console.log(event.data);
+            };
+
+            // Connect audio graph
+            const source = audioContext.createMediaStreamSource(stream);
+            source.connect(audioWorkletNode);
+            audioWorkletNode.connect(audioContext.destination);
+
+            recording = true;
+        } catch (error) {
+            console.error('Error accessing microphone:', error);
+        }
     }
 
-    export async function startStream() {
-        reset()
-        if (!prepared) {
-            await prepareRecorder()
+    export async function stopRecording() {
+        if (!recording) return;
+
+        recording = false;
+
+        // Disconnect audio graph
+        if (audioWorkletNode) {
+            audioWorkletNode.disconnect();
+            audioWorkletNode.port.onmessage = null;
         }
-        mediaRecorder?.start()
-    }
 
-    export function stopStream() {
-        mediaRecorder?.stop()
-    }
+        // Close audio context
+        await audioContext?.close();
 
-    export function reset() {
-        mediaRecorder?.stop()
+        // Stop all tracks
+        stream?.getTracks().forEach(track => track.stop());
     }
 
 </script>
 
-<style>
-    .audio-recorder {
-        text-align: center;
-    }
-    audio {
-        display: block;
-        padding-bottom: 10px;
-    }
-</style>
-
-<div class="audio-recorder">
-    <audio bind:this={audioElement}></audio>
-    {#if !mediaDeviveAvailable}
-    <input 
-        bind:this={fileInput}
-        type="file" 
-        accept="audio/*" 
-        capture="environment"
-        onchange={(e) => handleCapture(e)}
-        style="display: none;">
-    {/if}
+<div class="streaming-audio-recorder">
+    <div class="controls">
+      {#if !recording}
+        <button on:click={startRecording} class="btn record">
+          Start Recording
+        </button>
+      {:else}
+        <button on:click={stopRecording} class="btn stop">
+          Stop Recording
+        </button>
+      {/if}
+    </div>
 </div>
