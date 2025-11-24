@@ -33,10 +33,20 @@
         border: none;
         background: none;
     }
+
 	:global(input[type="text"]:focus) {
         outline: none;
 		box-shadow: none; 
     }
+
+	:global(h3) {
+		margin:0;
+        font-size: 110%;
+    }
+
+	:global(.paragraph:not(:first-of-type)) {
+		margin-top: 10px;
+	}
 
 </style>
 

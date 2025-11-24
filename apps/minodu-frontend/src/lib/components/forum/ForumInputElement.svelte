@@ -47,7 +47,6 @@
     }
 
     .author {
-        width: 100px;
         text-align: center;
     }
 </style>

@@ -33,12 +33,21 @@
 
 
 <div class="post">
-    <h3>{post.title} - from {post.author.name}</h3>
-
+    <div class="paragraph">
+        <h3>Author</h3>
+        {post.author.name}
+    </div>
     {#if (post.text.length > 0)}
-    <p>
+    <div class="paragraph">
+        <h3>Title</h3>
+        {post.title}
+    </div>
+    {/if}
+    {#if (post.text.length > 0)}
+    <div class="paragraph">
+        <h3>Text</h3>
         {post.text} <TextToSpeechButton text={post.text} ttsPlayer={ttsPlayer}/> 
-    </p>
+    </div>
     {/if}
     
     <ul>

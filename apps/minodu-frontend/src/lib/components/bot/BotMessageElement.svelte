@@ -70,6 +70,12 @@
 </script>
 
 <style>
+    .bot-message {
+        padding: 10px;
+        margin: 10px;
+        background-color: lightgray;
+    }
+
     .cursor {
         animation: blink 1s infinite;
     }
@@ -84,15 +90,21 @@
         background-color: red;
         padding: 5px;
     }
+
+    p {
+        margin: 0 0 10px 0;
+    }
 </style>
 
 <div class="bot-message">
+    <h3>Question</h3>
     <p>
         {message.question}
         {#if (message.question.length > 0)}
             <TextToSpeechButton text={message.question} ttsPlayer={ttsPlayer}/>
         {/if}
     </p>
+    <h3>Answer</h3>
     <p class={error ? "error" : ""}>
         {message.response}
         {#if streaming}
