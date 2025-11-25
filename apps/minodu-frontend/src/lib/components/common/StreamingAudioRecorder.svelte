@@ -1,16 +1,15 @@
 <script lang="ts">
 	import type { Optional } from '$lib/types';
-    import { onMount } from 'svelte'
+	import { onMount } from 'svelte';
 
-    export let mediaDeviveAvailable : boolean = true
-    export let recording : boolean = false;
-    export let onAudioR
-    
-    let audioContext : AudioContext;
-    let audioWorkletNode : AudioWorkletNode;
-    let stream : MediaStream
+	export let mediaDeviveAvailable: boolean = true;
+	export let recording: boolean = false;
 
-    const workletCode = `
+	let audioContext: AudioContext;
+	let audioWorkletNode: AudioWorkletNode;
+	let stream: MediaStream;
+
+	const workletCode = `
         class PCMProcessor extends AudioWorkletProcessor {
         process(inputs, outputs, parameters) {
             const input = inputs[0];
@@ -31,83 +30,77 @@
         registerProcessor('pcm-processor', PCMProcessor);
     `;
 
-    onMount(async () => {
-        mediaDeviveAvailable = navigator.mediaDevices?.getUserMedia !== undefined
-    })
+	onMount(async () => {
+		mediaDeviveAvailable = navigator.mediaDevices?.getUserMedia !== undefined;
+	});
 
+	export async function startRecording() {
+		try {
+			// Request microphone access
+			stream = await navigator.mediaDevices.getUserMedia({
+				audio: {
+					channelCount: 1,
+					sampleRate: 16000,
+					echoCancellation: true,
+					noiseSuppression: true
+				}
+			});
 
-    export async function startRecording() {
-        try {
-            // Request microphone access
-            stream = await navigator.mediaDevices.getUserMedia({ 
-                audio: {
-                channelCount: 1,
-                sampleRate: 16000,
-                echoCancellation: true,
-                noiseSuppression: true
-                } 
-            });
+			// Create AudioContext
+			audioContext = new AudioContext({ sampleRate: 16000 });
 
-            // Create AudioContext
-            audioContext = new AudioContext({ sampleRate: 16000 });
+			// Create blob URL for worklet
+			const blob = new Blob([workletCode], { type: 'application/javascript' });
+			const workletUrl = URL.createObjectURL(blob);
 
-            // Create blob URL for worklet
-            const blob = new Blob([workletCode], { type: 'application/javascript' });
-            const workletUrl = URL.createObjectURL(blob);
+			// Load the worklet
+			await audioContext.audioWorklet.addModule(workletUrl);
+			URL.revokeObjectURL(workletUrl);
 
-            // Load the worklet
-            await audioContext.audioWorklet.addModule(workletUrl);
-            URL.revokeObjectURL(workletUrl);
+			// Create worklet node
+			audioWorkletNode = new AudioWorkletNode(audioContext, 'pcm-processor');
 
-            // Create worklet node
-            audioWorkletNode = new AudioWorkletNode(audioContext, 'pcm-processor');
+			// Handle messages from worklet
+			audioWorkletNode.port.onmessage = (event) => {
+				console.log(event.data);
+			};
 
-            // Handle messages from worklet
-            audioWorkletNode.port.onmessage = (event) => {
-                console.log(event.data);
-            };
+			// Connect audio graph
+			const source = audioContext.createMediaStreamSource(stream);
+			source.connect(audioWorkletNode);
+			audioWorkletNode.connect(audioContext.destination);
 
-            // Connect audio graph
-            const source = audioContext.createMediaStreamSource(stream);
-            source.connect(audioWorkletNode);
-            audioWorkletNode.connect(audioContext.destination);
+			recording = true;
+		} catch (error) {
+			console.error('Error accessing microphone:', error);
+		}
+	}
 
-            recording = true;
-        } catch (error) {
-            console.error('Error accessing microphone:', error);
-        }
-    }
+	export async function stopRecording() {
+		if (!recording) return;
 
-    export async function stopRecording() {
-        if (!recording) return;
+		recording = false;
 
-        recording = false;
+		// Disconnect audio graph
+		if (audioWorkletNode) {
+			audioWorkletNode.disconnect();
+			audioWorkletNode.port.onmessage = null;
+		}
 
-        // Disconnect audio graph
-        if (audioWorkletNode) {
-            audioWorkletNode.disconnect();
-            audioWorkletNode.port.onmessage = null;
-        }
+		// Close audio context
+		await audioContext?.close();
 
-        // Close audio context
-        await audioContext?.close();
-
-        // Stop all tracks
-        stream?.getTracks().forEach(track => track.stop());
-    }
-
+		// Stop all tracks
+		stream?.getTracks().forEach((track) => track.stop());
+	}
 </script>
 
 <div class="streaming-audio-recorder">
-    <div class="controls">
-      {#if !recording}
-        <button on:click={startRecording} class="btn record">
-          Start Recording
-        </button>
-      {:else}
-        <button on:click={stopRecording} class="btn stop">
-          Stop Recording
-        </button>
-      {/if}
-    </div>
+	<div class="controls">
+		{#if !recording}
+			<button on:click={startRecording} class="btn record"> Start Recording </button>
+		{:else}
+			<button on:click={stopRecording} class="btn stop"> Stop Recording </button>
+		{/if}
+	</div>
 </div>

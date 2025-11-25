@@ -1,5 +1,5 @@
 export interface ForumAuthor {
-    id: number
-    name: string
-    avatar: number
+	id: number;
+	name: string;
+	avatar: number;
 }
