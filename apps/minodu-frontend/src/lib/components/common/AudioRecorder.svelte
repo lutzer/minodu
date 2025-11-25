@@ -1,138 +1,136 @@
 <script lang="ts">
 	import type { Optional } from '$lib/types';
-    import { onMount } from 'svelte'
+	import { onMount } from 'svelte';
 
-    export let blob : Optional<Blob>
-    export let recording : boolean = false;
+	export let blob: Optional<Blob>;
+	export let recording: boolean = false;
 
-    let mediaDeviveAvailable : boolean = true
-    let fileInput : HTMLInputElement
+	let mediaDeviveAvailable: boolean = true;
+	let fileInput: HTMLInputElement;
 
-    let mediaChunks : Blob[] = [];
-    let mediaRecorder : Optional<MediaRecorder>;
-    let audioElement : HTMLAudioElement;
+	let mediaChunks: Blob[] = [];
+	let mediaRecorder: Optional<MediaRecorder>;
+	let audioElement: HTMLAudioElement;
 
-    onMount(async () => {
-        mediaDeviveAvailable = navigator.mediaDevices?.getUserMedia !== undefined
-    })
+	onMount(async () => {
+		mediaDeviveAvailable = navigator.mediaDevices?.getUserMedia !== undefined;
+	});
 
-    $: {
-        blob;
-        if (!blob) {
-            reset()
-        }
-        
-    }
+	$: {
+		blob;
+		if (!blob) {
+			reset();
+		}
+	}
 
-    async function prepareRecorder() {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-        mediaRecorder.ondataavailable = (e) => mediaChunks.push(e.data)
+	async function prepareRecorder() {
+		const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+		mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+		mediaRecorder.ondataavailable = (e) => mediaChunks.push(e.data);
 
-        mediaRecorder.onstop = () => {
-            recording = false;
+		mediaRecorder.onstop = () => {
+			recording = false;
 
-            // create playable audio
-            blob = new Blob(mediaChunks, {'type' : mediaRecorder?.mimeType });
-            audioElement.src = URL.createObjectURL(blob);
-            mediaChunks = []
-            
-            // cleanup tracks
-            stream.getAudioTracks().forEach((t) => {
-                t.stop()
-                stream.removeTrack(t);
-            })
-            mediaRecorder = undefined
-        }
+			// create playable audio
+			blob = new Blob(mediaChunks, { type: mediaRecorder?.mimeType });
+			audioElement.src = URL.createObjectURL(blob);
+			mediaChunks = [];
 
-        mediaRecorder.onerror = (err) => {
-            console.error(err)
-        }
+			// cleanup tracks
+			stream.getAudioTracks().forEach((t) => {
+				t.stop();
+				stream.removeTrack(t);
+			});
+			mediaRecorder = undefined;
+		};
 
-        mediaRecorder.onstart = () => {
-            recording = true
-        }
+		mediaRecorder.onerror = (err) => {
+			console.error(err);
+		};
 
-    }
+		mediaRecorder.onstart = () => {
+			recording = true;
+		};
+	}
 
-    export async function startRecording() {
-        reset()
-        if (mediaDeviveAvailable) {
-            if (!mediaRecorder) {
-                await prepareRecorder()
-            }
-            mediaRecorder?.start()
-        } else {
-            fileInput.click()
-        }
-    }
+	export async function startRecording() {
+		reset();
+		if (mediaDeviveAvailable) {
+			if (!mediaRecorder) {
+				await prepareRecorder();
+			}
+			mediaRecorder?.start();
+		} else {
+			fileInput.click();
+		}
+	}
 
-    export function stopRecording() {
-        mediaRecorder?.stop()
-    }
+	export function stopRecording() {
+		mediaRecorder?.stop();
+	}
 
-    export function reset() {
-        mediaRecorder?.stop()
-        blob = undefined
-        mediaChunks = []
-        if (audioElement) {
-            audioElement.src = ""
-        }
-    }
+	export function reset() {
+		mediaRecorder?.stop();
+		blob = undefined;
+		mediaChunks = [];
+		if (audioElement) {
+			audioElement.src = '';
+		}
+	}
 
-    export function startPlayback() {
-        audioElement?.play()
-    }
+	export function startPlayback() {
+		audioElement?.play();
+	}
 
-    export function pausePlayback() {
-        audioElement?.pause()
-    }
+	export function pausePlayback() {
+		audioElement?.pause();
+	}
 
-    export function resetPlayback() {
-        if (audioElement) {
-            audioElement.currentTime = 0;
-            audioElement.pause()
-        }
-    }
+	export function resetPlayback() {
+		if (audioElement) {
+			audioElement.currentTime = 0;
+			audioElement.pause();
+		}
+	}
 
-    export function isPlaying() : boolean {
-        return !audioElement?.paused || false
-    }
+	export function isPlaying(): boolean {
+		return !audioElement?.paused || false;
+	}
 
-    function handleCapture(e : Event) {
-        const target = e.target as HTMLInputElement
-        const file = target.files?.[0]
-        if (file && file.type.startsWith('audio/')) {
-            audioElement.src = URL.createObjectURL(file)
-            blob = file
-        }
-    }
-
+	function handleCapture(e: Event) {
+		const target = e.target as HTMLInputElement;
+		const file = target.files?.[0];
+		if (file && file.type.startsWith('audio/')) {
+			audioElement.src = URL.createObjectURL(file);
+			blob = file;
+		}
+	}
 </script>
 
-<style>
-    .audio-recorder {
-        text-align: center;
-    }
-    audio {
-        display: block;
-        padding-bottom: 10px;
-    }
-
-    .hidden {
-        display:none
-    }
-</style>
-
 <div class="audio-recorder">
-    <audio bind:this={audioElement} controls class={ blob !== undefined ? "" : "hidden"}></audio>
-    {#if !mediaDeviveAvailable}
-    <input 
-        bind:this={fileInput}
-        type="file" 
-        accept="audio/*" 
-        capture="environment"
-        onchange={(e) => handleCapture(e)}
-        style="display: none;">
-    {/if}
+	<audio bind:this={audioElement} controls class={blob !== undefined ? '' : 'hidden'}></audio>
+	{#if !mediaDeviveAvailable}
+		<input
+			bind:this={fileInput}
+			type="file"
+			accept="audio/*"
+			capture="environment"
+			onchange={(e) => handleCapture(e)}
+			style="display: none;"
+		/>
+	{/if}
 </div>
+
+<style>
+	.audio-recorder {
+		text-align: center;
+	}
+	audio {
+		display: block;
+		padding-bottom: 10px;
+	}
+
+	.hidden {
+		display: none;
+	}
+</style>

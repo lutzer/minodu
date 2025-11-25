@@ -1,4 +1,4 @@
 export interface ForumAvatar {
-    id: number
-    filename: string
+	id: number;
+	filename: string;
 }
