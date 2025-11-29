@@ -1,13 +1,13 @@
-from typing import List
+import asyncio
+import json
+
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
-import asyncio
-import time
-import json
 
 from ..events import active_connections
 
 router = APIRouter()
+
 
 async def event_generator(queue: asyncio.Queue):
     """Generate SSE formatted events from queue"""
@@ -15,10 +15,11 @@ async def event_generator(queue: asyncio.Queue):
         while True:
             data = await queue.get()
             yield f"data: {json.dumps(data)}\n\n"
-            
+
     except asyncio.CancelledError:
         # Client disconnected
         pass
+
 
 @router.get("/")
 async def stream_events():
@@ -31,11 +32,12 @@ async def stream_events():
                 yield event
         finally:
             active_connections.remove(queue)
-    
+
     return StreamingResponse(
-        response_generator(), 
+        response_generator(),
         media_type="text/event-stream",
         headers={
             "Cache-Control": "no-cache",
             "Connection": "keep-alive",
-        })
+        },
+    )

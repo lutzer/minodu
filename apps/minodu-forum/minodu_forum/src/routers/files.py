@@ -1,28 +1,21 @@
-from concurrent.futures import ThreadPoolExecutor
-from fastapi import APIRouter, HTTPException, Depends, UploadFile, Form
-from pydantic import BaseModel
-from typing import List, Optional
-from sqlalchemy.orm import Session
-import os
 import asyncio
 
-from ..database import get_db, get_db_session
+from fastapi import APIRouter, Depends, Form, HTTPException, UploadFile
+from pydantic import BaseModel
+from sqlalchemy.orm import Session
 
 from ..config import Config
-
+from ..database import get_db, get_db_session
 from ..events import broadcast, broadcast_async
-
+from ..models.author import Author
 from ..models.file import File
 from ..models.post import Post
-from ..models.author import Author
-
 from ..services.ai_services import transcribe_audio
-
-from .helpers import get_upload_file_path, save_file, cleanup_file
-
 from .auth import get_author_from_token
+from .helpers import cleanup_file, get_upload_file_path, save_file
 
 router = APIRouter()
+
 
 class FileResponse(BaseModel):
     id: int
@@ -32,10 +25,12 @@ class FileResponse(BaseModel):
     file_hash: str
     file_urlpath: str
 
-@router.get("/", response_model=List[FileResponse])
+
+@router.get("/", response_model=list[FileResponse])
 async def get_files(db: Session = Depends(get_db)):
     query = db.query(File)
     return query.all()
+
 
 @router.get("/{file_id}", response_model=FileResponse)
 async def get_file(file_id: int, db: Session = Depends(get_db)):
@@ -44,8 +39,15 @@ async def get_file(file_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="File not found")
     return file
 
+
 @router.post("/upload", response_model=FileResponse)
-async def upload_file(file: UploadFile, post_id: int = Form(...), language: str = Form(...), db: Session = Depends(get_db), token_author_id: int = Depends(get_author_from_token)):
+async def upload_file(
+    file: UploadFile,
+    post_id: int = Form(...),
+    language: str = Form(...),
+    db: Session = Depends(get_db),
+    token_author_id: int = Depends(get_author_from_token),
+):
     post = db.query(Post).filter(Post.id == post_id).first()
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
@@ -53,11 +55,11 @@ async def upload_file(file: UploadFile, post_id: int = Form(...), language: str 
     author = db.get(Author, post.author_id)
     if author.id != token_author_id:
         raise HTTPException(status_code=401)
-    
+
     try:
         # Validate and save file
         file_info = await save_file(file, Config().upload_dir)
-        
+
         # Create database record
         try:
             db_file = File(
@@ -65,7 +67,7 @@ async def upload_file(file: UploadFile, post_id: int = Form(...), language: str 
                 content_type=file_info["mime_type"],
                 file_size=file_info["file_size"],
                 file_hash=file_info["file_hash"],
-                post_id=post_id
+                post_id=post_id,
             ).validate()
         except Exception as e:
             raise HTTPException(status_code=422, detail=str(e))
@@ -73,30 +75,28 @@ async def upload_file(file: UploadFile, post_id: int = Form(...), language: str 
         db.add(db_file)
         db.commit()
         db.refresh(db_file)
-        
+
         if db_file.content_type.startswith("audio/"):
-            asyncio.create_task(transcribe_file_and_update_record(
-                get_upload_file_path(db_file.filename), 
-                db_file.id, 
-                language
-            ))
-        
+            asyncio.create_task(
+                transcribe_file_and_update_record(get_upload_file_path(db_file.filename), db_file.id, language)
+            )
+
         broadcast("update")
         return db_file
-        
+
     except HTTPException:
         raise
     except Exception as e:
         # Clean up file if database operation fails
-        if 'file_info' in locals():
+        if "file_info" in locals():
             cleanup_file(file_info["file_path"])
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to save image: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to save image: {str(e)}")
+
 
 @router.delete("/{file_id}")
-async def delete_file(file_id: int, db: Session = Depends(get_db), token_author_id: int = Depends(get_author_from_token)):
+async def delete_file(
+    file_id: int, db: Session = Depends(get_db), token_author_id: int = Depends(get_author_from_token)
+):
     file = db.get(File, file_id)
     if not file:
         raise HTTPException(status_code=404, detail="File not found")
@@ -106,7 +106,8 @@ async def delete_file(file_id: int, db: Session = Depends(get_db), token_author_
     db.delete(file)
     db.commit()
     broadcast("update")
-    return { "message" : "File deleted" }
+    return {"message": "File deleted"}
+
 
 async def transcribe_file_and_update_record(file_path: str, file_id: int, language: str):
     result = transcribe_audio(file_path, language)
@@ -117,5 +118,3 @@ async def transcribe_file_and_update_record(file_path: str, file_id: int, langua
                 file.text = result
                 db.commit()
                 await broadcast_async("update")
-
-        

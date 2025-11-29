@@ -1,13 +1,13 @@
-from fastapi.testclient import TestClient
-import pytest
-import os
 import asyncio
+import os
+
+import pytest
 import requests
+from fastapi.testclient import TestClient
 
 from minodu_forum.src.app import app
 from minodu_forum.src.config import Config
 from minodu_forum.src.services.ai_services import transcribe_audio
-
 from tests.test_authors import create_author
 from tests.test_files import upload_file
 from tests.test_posts import create_post
@@ -16,6 +16,7 @@ client = TestClient(app)
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
+
 def is_service_available():
     try:
         response = requests.get(Config().service_url, timeout=5)
@@ -23,15 +24,16 @@ def is_service_available():
     except requests.ConnectionError:
         return False
 
+
 class TestAiServices:
-    ''' These Tests require the api services to run'''
+    """These Tests require the api services to run"""
 
     def test_speech_to_text(self):
         if not is_service_available():
             pytest.skip("Service are not available")
 
         file_path = os.path.join(script_dir, "files/french_sample.mp3")
-        result = transcribe_audio(file_path,"fr")
+        result = transcribe_audio(file_path, "fr")
         assert result != None
         assert len(result) > 0
 
@@ -45,7 +47,7 @@ class TestAiServices:
 
         auth_token = create_author()
         post = create_post(auth_token, "fetch_test")
-        file = upload_file(post["id"],file_path, auth_token)
+        file = upload_file(post["id"], file_path, auth_token)
         file_id = file["id"]
         assert "text" in file
 
@@ -57,7 +59,3 @@ class TestAiServices:
             await asyncio.sleep(0.1)
 
         assert True
-        
-    
-    
-    

@@ -1,28 +1,20 @@
 import os
-from fastapi import FastAPI, UploadFile, HTTPException
-from pydantic import BaseModel
-from fastapi.responses import StreamingResponse
-from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 
-from .config import Config
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 
+from .config import Config
 from .database import get_db_connection
+from .routers import authors, avatars, events, files, login, posts
 
-from .routers import posts
-from .routers import authors
-from .routers import files
-from .routers import avatars
-from .routers import login
-from .routers import events
-
-from .config import Config
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Initialize database on startup."""
     get_db_connection().create_tables()
     yield
+
 
 # Initialize FastAPI app with root_path prefix
 app = FastAPI(root_path=Config().api_prefix, lifespan=lifespan)
@@ -41,6 +33,7 @@ os.makedirs(Config().avatar_dir, exist_ok=True)
 # mount static dirs
 app.mount(Config().static_upload_path, StaticFiles(directory=Config().upload_dir), name="files")
 app.mount(Config().static_avatar_path, StaticFiles(directory=Config().avatar_dir), name="avatars")
+
 
 @app.get("/")
 async def root():
