@@ -19,3 +19,8 @@ Backend for the minodu forum
 ### Tests
 
 * run tests with `nx test`or `nx test -- -s`
+
+### Format & Linting
+
+* run `nx run minodu-forum:format` to format code
+* run `nx run minodu-forum:lint:ruff:fix` to autofix linting issues

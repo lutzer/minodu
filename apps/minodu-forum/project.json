@@ -49,6 +49,44 @@
       },
       "cache": true
     },
+    "lint:ruff": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "poetry run ruff check .",
+        "cwd": "{projectRoot}"
+      },
+      "cache": true
+    },
+    "lint:ruff:fix": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "poetry run ruff check . --fix",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "format": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "poetry run black .",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "format:check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "poetry run black --check .",
+        "cwd": "{projectRoot}"
+      },
+      "cache": true
+    },
+    "type-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "poetry run mypy .",
+        "cwd": "{projectRoot}"
+      },
+      "cache": true
+    },
     "test": {
       "executor": "@nxlv/python:run-commands",
       "outputs": [

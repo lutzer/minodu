@@ -1,18 +1,21 @@
 import os
+
 from dotenv import load_dotenv
 
 load_dotenv()
 
 config = None
+
+
 class Config:
     _instance = None
-    
+
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
             cls._instance._setup()
         return cls._instance
-    
+
     def _setup(self):
         self._port = None
         self._api_prefix = None
@@ -35,13 +38,13 @@ class Config:
         if self._api_prefix is None:
             self._api_prefix = os.getenv("API_PREFIX", "/api/forum")
         return self._api_prefix
-    
+
     @property
     def service_url(self):
         if self._service_url is None:
             self._service_url = os.getenv("AI_SERVICE_URL", "http://localhost:3002/api/services")
         return self._service_url
-    
+
     @property
     def upload_dir(self):
         if self._upload_dir is None:
@@ -49,7 +52,7 @@ class Config:
             upload_dir = os.getenv("UPLOAD_DIR", "static/uploads")
             self._upload_dir = os.path.join(script_dir, "..", upload_dir)
         return self._upload_dir
-    
+
     @property
     def avatar_dir(self):
         if self._avatar_dir is None:
@@ -85,7 +88,7 @@ class Config:
     @property
     def static_upload_path(self):
         return "/static/files"
-    
+
     @property
     def static_avatar_path(self):
-        return "/static/avatars"  
+        return "/static/avatars"

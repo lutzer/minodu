@@ -1,24 +1,24 @@
-import shutil
-import pytest
+import mimetypes
 import os
+import shutil
 from pathlib import Path
+
+import pytest
 from fastapi.testclient import TestClient
 from PIL import Image
 
 from minodu_forum.src.app import app
-from minodu_forum.src.database import get_db_connection, get_db
-from minodu_forum.src.routers.helpers import get_upload_file_path, convert_image, convert_audio
 from minodu_forum.src.models.file import File
+from minodu_forum.src.routers.helpers import convert_audio, convert_image, get_upload_file_path
 
 from .test_authors import create_author
 from .test_posts import create_post
-
-import mimetypes
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Create test client
 client = TestClient(app)
+
 
 def upload_file(post_id: int, file_path: str, auth_token: str):
     with open(file_path, "rb") as f:
@@ -26,55 +26,26 @@ def upload_file(post_id: int, file_path: str, auth_token: str):
             "/files/upload",
             files={"file": (os.path.basename(file_path), f, mimetypes.guess_type(file_path)[0])},
             data={"post_id": post_id, "language": "en"},
-            headers={"Authorization": f"Bearer {auth_token}"}
+            headers={"Authorization": f"Bearer {auth_token}"},
         )
     return response.json()
+
 
 class TestFilesApi:
 
     def test_validate_file(self):
         with pytest.raises(Exception):
-            File(
-                filename="",
-                content_type="image/png",
-                file_size=20,
-                file_hash="hash",
-                post_id=1
-            ).validate()
-        
-        with pytest.raises(Exception):
-            File(
-                filename="test",
-                content_type="sth",
-                file_size=20,
-                file_hash="hash",
-                post_id=1
-            ).validate()
+            File(filename="", content_type="image/png", file_size=20, file_hash="hash", post_id=1).validate()
 
         with pytest.raises(Exception):
-            File(
-                filename="test",
-                content_type="audio",
-                file_size=20,
-                file_hash="",
-                post_id=1
-            ).validate()
+            File(filename="test", content_type="sth", file_size=20, file_hash="hash", post_id=1).validate()
 
-        File(
-            filename="test",
-            content_type="image/png",
-            file_size=20,
-            file_hash="hash",
-            post_id=1
-        ).validate()
+        with pytest.raises(Exception):
+            File(filename="test", content_type="audio", file_size=20, file_hash="", post_id=1).validate()
 
-        File(
-            filename="test",
-            content_type="audio/wav",
-            file_size=20,
-            file_hash="hash",
-            post_id=1
-        ).validate()
+        File(filename="test", content_type="image/png", file_size=20, file_hash="hash", post_id=1).validate()
+
+        File(filename="test", content_type="audio/wav", file_size=20, file_hash="hash", post_id=1).validate()
 
     def test_upload_image_file(self):
         auth_token = create_author()
@@ -86,7 +57,7 @@ class TestFilesApi:
                 "/files/upload",
                 files={"file": (os.path.basename(file_path), f, mimetypes.guess_type(file_path)[0])},
                 data={"post_id": post["id"], "language": "en"},
-                headers={"Authorization": f"Bearer {auth_token}"}
+                headers={"Authorization": f"Bearer {auth_token}"},
             )
         assert response.status_code == 200
         data = response.json()
@@ -111,7 +82,7 @@ class TestFilesApi:
         data = upload_file(post["id"], file_path, auth_token)
         assert data["content_type"].startswith("image")
         assert os.path.isfile(get_upload_file_path(data["filename"]))
-    
+
     def test_upload_audio_file(self):
         auth_token = create_author()
         post = create_post(auth_token, "fetch_test")
@@ -122,14 +93,13 @@ class TestFilesApi:
                 "/files/upload",
                 files={"file": (os.path.basename(file_path), f, mimetypes.guess_type(file_path)[0])},
                 data={"post_id": post["id"], "language": "fr"},
-                headers={"Authorization": f"Bearer {auth_token}"}
+                headers={"Authorization": f"Bearer {auth_token}"},
             )
         assert response.status_code == 200
         data = response.json()
         assert data["content_type"].startswith("audio")
         assert os.path.isfile(get_upload_file_path(data["filename"]))
 
-    
     def test_upload_audio_conversion(self):
         auth_token = create_author()
         post = create_post(auth_token, "fetch_test")
@@ -140,7 +110,7 @@ class TestFilesApi:
                 "/files/upload",
                 files={"file": (os.path.basename(file_path), f, mimetypes.guess_type(file_path)[0])},
                 data={"post_id": post["id"], "language": "fr"},
-                headers={"Authorization": f"Bearer {auth_token}"}
+                headers={"Authorization": f"Bearer {auth_token}"},
             )
         assert response.status_code == 200
         data = response.json()
@@ -158,22 +128,21 @@ class TestFilesApi:
                 "/files/upload",
                 files={"file": (os.path.basename(file_path), f, mimetypes.guess_type(file_path)[0])},
                 data={"post_id": post["id"], "language": "en"},
-                headers={"Authorization": f"Bearer {auth_token}"}
+                headers={"Authorization": f"Bearer {auth_token}"},
             )
         assert response.status_code == 500
-
 
     def test_attach_file(self):
         auth_token = create_author()
         post = create_post(auth_token, "fetch_test")
 
         file_path = os.path.join(script_dir, "files/laura.jpeg")
-        file = upload_file(post['id'],file_path, auth_token)
+        file = upload_file(post["id"], file_path, auth_token)
 
-        response = client.get(app.root_path + "/posts/")        
+        response = client.get(app.root_path + "/posts/")
         assert response.status_code == 200
         response_data = response.json()
-        assert response_data[0]["files"][0]['filename'] == file["filename"]
+        assert response_data[0]["files"][0]["filename"] == file["filename"]
 
     def test_attach_file_restricted(self):
         auth_token1 = create_author()
@@ -186,7 +155,7 @@ class TestFilesApi:
                 "/files/upload",
                 files={"file": (os.path.basename(file_path), f, mimetypes.guess_type(file_path)[0])},
                 data={"post_id": post["id"], "language": "en"},
-                headers={"Authorization": f"Bearer {auth_token2}"}
+                headers={"Authorization": f"Bearer {auth_token2}"},
             )
         assert response.status_code == 401
 
@@ -195,17 +164,14 @@ class TestFilesApi:
         post = create_post(auth_token, "fetch_test")
 
         file_path = os.path.join(script_dir, "files/laura.jpeg")
-        file = upload_file(post['id'],file_path, auth_token)
+        file = upload_file(post["id"], file_path, auth_token)
 
-        assert os.path.isfile(get_upload_file_path(file['filename']))
-    
-        response = client.delete(
-            f"/files/{file['id']}",
-            headers={"Authorization": f"Bearer {auth_token}"}
-        )
+        assert os.path.isfile(get_upload_file_path(file["filename"]))
+
+        response = client.delete(f"/files/{file['id']}", headers={"Authorization": f"Bearer {auth_token}"})
 
         assert response.status_code == 200
-        assert not os.path.isfile(get_upload_file_path(file['filename']))
+        assert not os.path.isfile(get_upload_file_path(file["filename"]))
 
     def test_delete_file_restricted(self):
         auth_token = create_author()
@@ -213,12 +179,9 @@ class TestFilesApi:
         post = create_post(auth_token, "fetch_test")
 
         file_path = os.path.join(script_dir, "files/laura.jpeg")
-        file = upload_file(post['id'],file_path, auth_token)
-    
-        response = client.delete(
-            f"/files/{file['id']}",
-            headers={"Authorization": f"Bearer {auth_token2}"}
-        )
+        file = upload_file(post["id"], file_path, auth_token)
+
+        response = client.delete(f"/files/{file['id']}", headers={"Authorization": f"Bearer {auth_token2}"})
 
         assert response.status_code == 401
 
@@ -227,24 +190,21 @@ class TestFilesApi:
         post = create_post(auth_token, "fetch_test")
 
         file_path = os.path.join(script_dir, "files/laura.jpeg")
-        file = upload_file(post['id'], file_path, auth_token)
-        
-        assert os.path.isfile(get_upload_file_path(file['filename']))
+        file = upload_file(post["id"], file_path, auth_token)
 
-        response = client.delete(
-            f"/posts/{post['id']}",
-            headers={"Authorization": f"Bearer {auth_token}"}
-        )
+        assert os.path.isfile(get_upload_file_path(file["filename"]))
+
+        response = client.delete(f"/posts/{post['id']}", headers={"Authorization": f"Bearer {auth_token}"})
         assert response.status_code == 200
-        assert not os.path.isfile(get_upload_file_path(file['filename']))
+        assert not os.path.isfile(get_upload_file_path(file["filename"]))
 
     def test_get_static_file(self):
         auth_token = create_author()
         post = create_post(auth_token, "fetch_test")
 
         file_path = os.path.join(script_dir, "files/laura.jpeg")
-        file = upload_file(post['id'], file_path, auth_token)
-        
+        file = upload_file(post["id"], file_path, auth_token)
+
         response = client.get(app.root_path + "/static/files/" + file["filename"])
 
         assert response.status_code == 200
@@ -256,7 +216,7 @@ class TestFilesApi:
         post = create_post(auth_token, "fetch_test")
 
         file_path = os.path.join(script_dir, "files/laura.jpeg")
-        file = upload_file(post['id'],file_path, auth_token)
+        file = upload_file(post["id"], file_path, auth_token)
 
         assert len(file["file_urlpath"]) > 0
 
@@ -267,22 +227,22 @@ class TestFilesApi:
         temp_image = os.path.join(script_dir, "files/tmp.png")
 
         converted_image = ""
-        
+
         try:
             # Copy the original image to temp location
             shutil.copy(source_image, temp_image)
             assert Path(temp_image).exists(), "Failed to copy source image"
-            
+
             # Run your conversion function
             # Replace this with your actual conversion function
             converted_image = await convert_image(temp_image, max_width=100, max_height=100)
-            
+
             # Check if converted file exists
             assert Path(converted_image).exists(), "Converted image was not created"
-            
+
             # Verify file extension
             assert Path(converted_image).suffix == ".jpg", f"Expected .jpg extension, got {converted_image.suffix}"
-            
+
             # Verify dimensions
             with Image.open(converted_image) as img:
                 width, height = img.size
@@ -294,44 +254,46 @@ class TestFilesApi:
                 Path(temp_image).unlink()
             if len(converted_image) > 0 and Path(converted_image).exists():
                 Path(converted_image).unlink()
-    
+
     @pytest.mark.asyncio
-    @pytest.mark.parametrize("input", [
-        "files/audios/ff-16b-2c-44100hz.aac",
-        "files/audios/ff-16b-2c-44100hz.ac3",
-        "files/audios/ff-16b-2c-44100hz.aiff",
-        "files/audios/ff-16b-2c-44100hz.flac",
-        "files/audios/ff-16b-2c-44100hz.mp3",
-        "files/audios/ff-16b-2c-44100hz.mp4",
-        "files/audios/ff-16b-2c-44100hz.ogg",
-        "files/audios/ff-16b-2c-44100hz.opus",
-        "files/audios/ff-16b-2c-44100hz.wma",
-    ])
+    @pytest.mark.parametrize(
+        "input",
+        [
+            "files/audios/ff-16b-2c-44100hz.aac",
+            "files/audios/ff-16b-2c-44100hz.ac3",
+            "files/audios/ff-16b-2c-44100hz.aiff",
+            "files/audios/ff-16b-2c-44100hz.flac",
+            "files/audios/ff-16b-2c-44100hz.mp3",
+            "files/audios/ff-16b-2c-44100hz.mp4",
+            "files/audios/ff-16b-2c-44100hz.ogg",
+            "files/audios/ff-16b-2c-44100hz.opus",
+            "files/audios/ff-16b-2c-44100hz.wma",
+        ],
+    )
     async def test_convert_audio_to_mp3(self, input):
         source_audio = os.path.join(script_dir, input)
         temp_file = os.path.join(script_dir, "files/tmp.mp3")
 
         converted_audio = ""
-        
+
         try:
             # Copy the original image to temp location
             shutil.copy(source_audio, temp_file)
             assert Path(temp_file).exists(), "Failed to copy source image"
-            
+
             # Run your conversion function
             # Replace this with your actual conversion function
             converted_audio = await convert_audio(temp_file)
-            
+
             # Check if converted file exists
             assert Path(converted_audio).exists(), "Converted image was not created"
-            
+
             # Verify file extension
             assert Path(converted_audio).suffix == ".mp3", f"Expected .mp3 extension, got {converted_image.suffix}"
-            
+
         finally:
             # Cleanup: Delete temporary files
             if Path(temp_file).exists():
                 Path(temp_file).unlink()
             if len(converted_audio) > 0 and Path(converted_audio).exists():
                 Path(converted_audio).unlink()
-    
