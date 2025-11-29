@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { Config } from '$lib';
 	import { AiServicesApi } from '$lib/apis/ai_services/api';
-	import type { Optional } from '$lib/types';
 	import { writable } from 'svelte/store';
 
 	export const playbackReset = writable<{ timestamp: number } | null>(null);

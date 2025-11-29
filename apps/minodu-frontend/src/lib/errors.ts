@@ -1,5 +1,5 @@
 class HttpError extends Error {
-	code: Number;
+	code: number;
 	message: string;
 
 	constructor({ code, message }: { code: number; message: string }) {

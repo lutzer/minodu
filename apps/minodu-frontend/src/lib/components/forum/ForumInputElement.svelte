@@ -12,7 +12,7 @@
 		text: string,
 		audio: Optional<Blob>,
 		image: Optional<File>
-	) => {};
+	) => void;
 
 	let audioRecorder: AudioRecorder;
 	let audioBlob: Optional<Blob>;

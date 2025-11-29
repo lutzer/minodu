@@ -4,6 +4,8 @@
 
 	export let mediaDeviveAvailable: boolean = true;
 	export let recording: boolean = false;
+	export let onDataReceived: Optional<(blob: Blob) => void> = undefined;
+	export let onCompleted: Optional<() => void> = undefined;
 
 	let audioContext: AudioContext;
 	let audioWorkletNode: AudioWorkletNode;
@@ -62,7 +64,7 @@
 
 			// Handle messages from worklet
 			audioWorkletNode.port.onmessage = (event) => {
-				console.log(event.data);
+				onDataReceived?.(event.data);
 			};
 
 			// Connect audio graph
@@ -92,6 +94,8 @@
 
 		// Stop all tracks
 		stream?.getTracks().forEach((track) => track.stop());
+
+		onCompleted?.();
 	}
 </script>
 

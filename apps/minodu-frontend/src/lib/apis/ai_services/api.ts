@@ -9,11 +9,6 @@ type TtsRequest = {
 	format: 'mp3' | 'wav';
 };
 
-type CreatePostRequest = {
-	title: string;
-	text: string;
-};
-
 type RagRequest = {
 	conversation: string;
 	question: string;
@@ -50,14 +45,15 @@ export class AiServicesApi {
 			},
 			body: JSON.stringify(request)
 		});
-		if (!response.ok) {
+
+		if (!response.ok)
 			throw new HttpError({ code: response.status, message: await response.text() });
-		}
+
 		return response;
 	}
 
 	public static async transcribeSpeech(audioFile: Blob, language: Language): Promise<TtsRespone> {
-		let extension = mimeTypeToFileExtension(audioFile.type);
+		const extension = mimeTypeToFileExtension(audioFile.type);
 		if (extension == '') throw Error('File type not supported: ' + audioFile.type);
 
 		const formData = new FormData();
