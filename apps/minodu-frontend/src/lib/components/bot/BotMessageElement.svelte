@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { command } from '$app/server';
 	import { AiServicesApi } from '$lib/apis/ai_services/api';
 	import type { BotMessage, Optional } from '$lib/types';
 	import { delay } from '$lib/utils';

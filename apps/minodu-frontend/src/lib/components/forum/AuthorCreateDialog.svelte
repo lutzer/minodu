@@ -35,6 +35,12 @@
 <dialog bind:this={dialog}>
 	<h2>Create Author</h2>
 	<input id="name" maxlength="64" type="text" bind:value={name} />
+	<div class="avatar-list">
+		{#each avatarList as avatar}
+			<label for={`avatar-${avatar.id}`}>Avatar</label>
+			<input type="radio" id={`avatar-${avatar.id}`} name="avatar" value={`avatar-${avatar.id}`} />
+		{/each}
+	</div>
 	<button onclick={() => dialog?.close()}>Cancel</button>
 	<button onclick={() => createAuthor(name, undefined)}>Ok</button>
 </dialog>

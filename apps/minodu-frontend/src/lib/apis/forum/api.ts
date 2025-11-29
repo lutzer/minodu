@@ -77,7 +77,7 @@ export class ForumApi {
 		file: Blob,
 		language: Language
 	): Promise<ForumFile> {
-		let extension = mimeTypeToFileExtension(file.type);
+		const extension = mimeTypeToFileExtension(file.type);
 		if (extension == '') throw Error('File type not supported: ' + file.type);
 
 		const formData = new FormData();

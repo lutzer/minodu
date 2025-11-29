@@ -7,7 +7,7 @@
 	export let ttsPlayer: TextToSpeechPlayer;
 	export let post: ForumPost;
 	export let isOwn: boolean;
-	export let onDeleteClicked: () => {};
+	export let onDeleteClicked: () => void;
 </script>
 
 <div class="post">
@@ -36,7 +36,7 @@
 					<AudioPlayer audioSource={file.file_urlpath}></AudioPlayer>
 				{:else if file.content_type.startsWith('image')}
 					<div class="image">
-						<img src={file.file_urlpath} alt={'forum image'} />
+						<img src={file.file_urlpath} alt="forum image" />
 					</div>
 				{:else}
 					{file.id} - {file.filename} : {file.file_urlpath}
