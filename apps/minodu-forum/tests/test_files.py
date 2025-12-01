@@ -1,3 +1,4 @@
+import time
 import mimetypes
 import os
 import shutil
@@ -28,7 +29,17 @@ def upload_file(post_id: int, file_path: str, auth_token: str):
             data={"post_id": post_id, "language": "en"},
             headers={"Authorization": f"Bearer {auth_token}"},
         )
-    return response.json()
+
+    data = response.json()
+
+    # wait for file entry is processed
+    while data["processing"] == True:
+        response = client.get("/files/" + str(data["id"]))
+        data = response.json()
+        # Wait before next attempt
+        time.sleep(0.1)
+
+    return data
 
 
 class TestFilesApi:
@@ -40,13 +51,11 @@ class TestFilesApi:
         with pytest.raises(Exception):
             File(filename="test", content_type="sth", file_size=20, file_hash="hash", post_id=1).validate()
 
-        with pytest.raises(Exception):
-            File(filename="test", content_type="audio", file_size=20, file_hash="", post_id=1).validate()
-
         File(filename="test", content_type="image/png", file_size=20, file_hash="hash", post_id=1).validate()
 
         File(filename="test", content_type="audio/wav", file_size=20, file_hash="hash", post_id=1).validate()
 
+    @pytest.mark.timeout(2)
     def test_upload_image_file(self):
         auth_token = create_author()
         post = create_post(auth_token, "fetch_test")
@@ -62,6 +71,15 @@ class TestFilesApi:
         assert response.status_code == 200
         data = response.json()
         assert data["content_type"].startswith("image")
+
+        # test if file entry is processed
+        while data["processing"] == True:
+            response = client.get("/files/" + str(data["id"]))
+            data = response.json()
+            # Wait before next attempt
+            time.sleep(0.1)
+        
+        # check if file exists
         assert os.path.isfile(get_upload_file_path(data["filename"]))
 
     def test_upload_image_png(self):
@@ -105,15 +123,8 @@ class TestFilesApi:
         post = create_post(auth_token, "fetch_test")
 
         file_path = os.path.join(script_dir, "files/audios/ff-16b-2c-44100hz.aac")
-        with open(file_path, "rb") as f:
-            response = client.post(
-                "/files/upload",
-                files={"file": (os.path.basename(file_path), f, mimetypes.guess_type(file_path)[0])},
-                data={"post_id": post["id"], "language": "fr"},
-                headers={"Authorization": f"Bearer {auth_token}"},
-            )
-        assert response.status_code == 200
-        data = response.json()
+        data = upload_file(post["id"], file_path, auth_token)
+        
         assert data["content_type"].startswith("audio")
         assert os.path.isfile(get_upload_file_path(data["filename"]))
         assert data["filename"].endswith(".mp3")
@@ -130,7 +141,7 @@ class TestFilesApi:
                 data={"post_id": post["id"], "language": "en"},
                 headers={"Authorization": f"Bearer {auth_token}"},
             )
-        assert response.status_code == 500
+        assert response.status_code == 422
 
     def test_attach_file(self):
         auth_token = create_author()

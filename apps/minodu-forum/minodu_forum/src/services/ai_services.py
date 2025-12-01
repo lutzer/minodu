@@ -20,5 +20,5 @@ def transcribe_audio(file_path, language: str) -> Optional[str]:
         data = response.json()
         return data["text"] if data["confidence"] > 0.8 else None
     except Exception as e:
-        logger.error(f"Transciotion error: {e}")
+        logger.error(f"Transcrption error: {e}")
         return None
