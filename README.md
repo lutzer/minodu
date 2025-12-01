@@ -95,7 +95,7 @@ sudo apt install git-lfs
 git lfs pull
 
 # build and start services
-sudo docker compose -f docker-compose.dev.yml up -d --build
+sudo npm run dev:start
 
 ```
 
