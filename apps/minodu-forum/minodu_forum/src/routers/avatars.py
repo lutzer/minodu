@@ -1,12 +1,18 @@
 
+import asyncio
 from fastapi import APIRouter, Depends, HTTPException, UploadFile
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
+import logging
+
+from minodu_forum.src.events import broadcast_async
 
 from ..config import Config
-from ..database import get_db
+from ..database import get_db, get_db_session
 from ..models.avatar import Avatar
-from .helpers import cleanup_file, save_file
+from .helpers import cleanup_file, get_file_info_and_validate, save_file
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -27,35 +33,31 @@ async def get_avatars(db: Session = Depends(get_db)):
 
 @router.post("/create", response_model=AvatarResponse)
 async def create_avatar(file: UploadFile, db: Session = Depends(get_db)):
-
     try:
-        # Validate and save file
-        file_info = await save_file(file, Config().avatar_dir, ["image/"])
+        # validate file and get info
+        file_info = get_file_info_and_validate(file, ["image/"])
 
-        # Create database record
-        try:
-            db_avatar = Avatar(
-                filename=file_info["filename"],
-                content_type=file_info["mime_type"],
-                file_size=file_info["file_size"],
-                file_hash=file_info["file_hash"],
-            ).validate()
-        except Exception as e:
-            raise HTTPException(status_code=422, detail=str(e))
-
+        # create record
+        db_avatar = Avatar(
+             filename=file_info.filename,
+             content_type=file_info.content_type,
+             file_size=file_info.file_size,
+             file_hash=file_info.hash
+        ).validate()
+        
         db.add(db_avatar)
         db.commit()
         db.refresh(db_avatar)
 
-        return db_avatar
+        # save file in different task
+        asyncio.create_task(
+            save_avatar_and_update_record(db_avatar.id, db_avatar.filename, file)
+        )
 
-    except HTTPException:
-        raise
+        return db_avatar
+        
     except Exception as e:
-        # Clean up file if database operation fails
-        if "file_info" in locals():
-            cleanup_file(file_info["file_path"])
-        raise HTTPException(status_code=500, detail=f"Failed to save avatar: {str(e)}")
+            raise HTTPException(status_code=422, detail=str(e))
 
 
 @router.delete("/{avatar_id}")
@@ -66,3 +68,16 @@ async def delete_file(avatar_id: int, db: Session = Depends(get_db)):
     db.commit()
 
     return {"message": "Avatar deleted"}
+
+async def save_avatar_and_update_record(avatar_id: int, file_name: str, file: UploadFile):
+    try:
+        uploaded_file_info = await save_file(file_name, file, Config().avatar_dir)
+        with get_db_session() as db:
+            avatar = db.get(Avatar, avatar_id)
+            if avatar != None:
+                avatar.filename = uploaded_file_info.filename
+                avatar.file_hash = uploaded_file_info.hash
+                db.commit()
+                return file
+    except Exception as e:
+        logger.error("Error saving avatar: " + str(e))
