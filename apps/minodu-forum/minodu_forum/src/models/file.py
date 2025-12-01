@@ -4,7 +4,7 @@ import logging
 import os
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text, event
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text, event, Boolean
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 
@@ -24,8 +24,9 @@ class File(Base):
     filename = Column(String(255), nullable=False)
     content_type = Column(String(100), nullable=False)
     file_size = Column(Integer, nullable=False)
-    file_hash = Column(String(64), nullable=False, index=True)
+    file_hash = Column(String(64), default="")
     created_at = Column(DateTime, default=datetime.utcnow)
+    processing = Column(Boolean, default=True)
 
     post_id = Column(Integer, ForeignKey(get_prefixed_key("posts.id")), nullable=False)
 
@@ -40,8 +41,6 @@ class File(Base):
             raise ValueError("Filename cant be empty.")
         if not (self.content_type.startswith("audio") or self.content_type.startswith("image")):
             raise ValueError("Content type needs to start with image or audio.")
-        if len(self.file_hash) == 0:
-            raise ValueError("Hash cant be zero")
         return self
 
 
