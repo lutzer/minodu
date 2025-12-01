@@ -34,7 +34,10 @@
 
 <dialog bind:this={dialog}>
 	<h2>Create Author</h2>
-	<input id="name" maxlength="64" type="text" bind:value={name} />
+	<div class="form-row">
+		<label for="name">Name</label>
+		<input id="name" maxlength="64" type="text" bind:value={name} />
+	</div>
 	<div class="avatar-list">
 		{#each avatarList as avatar}
 			<label for={`avatar-${avatar.id}`}>Avatar</label>
@@ -44,3 +47,22 @@
 	<button onclick={() => dialog?.close()}>Cancel</button>
 	<button onclick={() => createAuthor(name, undefined)}>Ok</button>
 </dialog>
+
+<style>
+	.form-row {
+		display: flex;
+		align-items: center;
+		margin-bottom: 15px;
+	}
+	
+	.form-row label {
+		width: 80px;
+		margin-right: 10px;
+	}
+	
+	.form-row input {
+		background-color: lightgray;
+		padding:5px;
+		flex: 1;
+    }
+</style>
