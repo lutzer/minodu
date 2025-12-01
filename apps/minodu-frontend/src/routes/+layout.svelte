@@ -35,7 +35,7 @@
 	}
 
 	:global(.input-text) {
-		background: white;
+		background: none;
 		border: 1px;
 	}
 
