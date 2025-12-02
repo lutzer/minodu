@@ -5,8 +5,6 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 import logging
 
-from minodu_forum.src.events import broadcast_async
-
 from ..config import Config
 from ..database import get_db, get_db_session
 from ..models.avatar import Avatar
