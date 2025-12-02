@@ -143,25 +143,22 @@ async def delete_file(
     return {"message": "File deleted"}
 
 async def save_and_transcribe_file(file_id: int, file_name: str, file: UploadFile, language: str):
-    file_entry = await save_file_and_update_record(file_id, file_name, file)
-    if file_entry != None and file_entry.content_type.startswith("audio"):
-        await transcribe_file_and_update_record(get_upload_file_path(
-            file_entry.filename), 
-            file_entry.id, 
-            language)
+    filename = await save_file_and_update_record(file_id, file_name, file)
+    if filename != None and file.content_type.startswith("audio"):
+        await transcribe_file_and_update_record(file_id, filename, language)
 
-async def save_file_and_update_record(file_id: int, file_name: str, file: UploadFile) -> Optional[File]:
+async def save_file_and_update_record(file_id: int, file_name: str, file: UploadFile) -> Optional[str]:
     try:
         uploaded_file_info = await save_file(file_name, file, Config().upload_dir)
         with get_db_session() as db:
-            file = db.get(File, file_id)
-            if file != None:
-                file.filename = uploaded_file_info.filename
-                file.file_hash = uploaded_file_info.hash
-                file.processing = False
+            db_file = db.get(File, file_id)
+            if db_file != None:
+                db_file.filename = uploaded_file_info.filename
+                db_file.file_hash = uploaded_file_info.hash
+                db_file.processing = False
                 db.commit()
                 await broadcast_async("update")
-                return file
+                return uploaded_file_info.filename
     except Exception as e:
         logger.error("Error saving file: " + str(e))
         cleanup_file(file["file_path"])
@@ -173,7 +170,8 @@ async def save_file_and_update_record(file_id: int, file_name: str, file: Upload
             return None
 
 
-async def transcribe_file_and_update_record(file_path: str, file_id: int, language: str):
+async def transcribe_file_and_update_record(file_id: int, file_name: str, language: str):
+    file_path = get_upload_file_path(file_name)
     try:
         result = transcribe_audio(file_path, language)
         if result != None:

@@ -32,7 +32,9 @@
 	<ul>
 		{#each post.files as file}
 			<li class="file">
-				{#if file.content_type.startsWith('audio')}
+				{#if file.processing }
+					<div>Processing File</div>
+				{:else if file.content_type.startsWith('audio')}
 					<AudioPlayer audioSource={file.file_urlpath}></AudioPlayer>
 				{:else if file.content_type.startsWith('image')}
 					<div class="image">

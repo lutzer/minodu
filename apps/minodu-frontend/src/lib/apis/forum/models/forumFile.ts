@@ -4,4 +4,5 @@ export interface ForumFile {
 	text: string;
 	content_type: string;
 	file_urlpath: string;
+	processing: boolean;
 }

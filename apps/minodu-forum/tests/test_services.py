@@ -28,7 +28,15 @@ def is_service_available():
 class TestAiServices:
     """These Tests require the api services to run"""
 
-    def test_speech_to_text(self):
+    def test_speech_to_text_en(self):
+        if not is_service_available():
+            pytest.skip("Service are not available")
+
+        file_path = os.path.join(script_dir, "files/french_sample.mp3")
+        result = transcribe_audio(file_path, "en")
+        assert result == None
+
+    def test_speech_to_text_fr(self):
         if not is_service_available():
             pytest.skip("Service are not available")
 
@@ -37,7 +45,7 @@ class TestAiServices:
         assert result != None
         assert len(result) > 0
 
-    @pytest.mark.timeout(10)
+    @pytest.mark.timeout(30)
     @pytest.mark.asyncio
     async def test_audio_file_transcription(self):
         if not is_service_available():
@@ -47,7 +55,7 @@ class TestAiServices:
 
         auth_token = create_author()
         post = create_post(auth_token, "fetch_test")
-        file = upload_file(post["id"], file_path, auth_token)
+        file = upload_file(post["id"], file_path, auth_token, "fr")
         file_id = file["id"]
         assert "text" in file
 
