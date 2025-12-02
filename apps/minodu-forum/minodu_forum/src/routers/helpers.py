@@ -26,7 +26,7 @@ class FileInfo:
 
 def get_file_info_and_validate(file: UploadFile, allowed_mime_types: list[str] = ["image/", "audio/"]) -> FileInfo:
     if file.size > Config().max_file_size:
-        raise Exception("File size too large. Max size is: " + Config().max_file_size)
+        raise Exception("File size too large. Max size is: " + str(Config().max_file_size))
     
     file_type_allowed = reduce(lambda acc, val: acc or file.content_type.startswith(val), allowed_mime_types, False)
     if not file_type_allowed:
@@ -132,9 +132,9 @@ def cleanup_file(file_path: str):
 
 def get_upload_file_path(filename: str):
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(script_dir, "../..", Config().upload_dir, filename)
+    return os.path.normpath(os.path.join(script_dir, "../..", Config().upload_dir, filename))
 
 
 def get_avatar_file_path(filename: str):
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(script_dir, "../..", Config().avatar_dir, filename)
+    return os.path.normpath(os.path.join(script_dir, "../..", Config().avatar_dir, filename))

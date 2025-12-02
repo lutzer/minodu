@@ -88,44 +88,8 @@ async def upload_file(
         return db_file
         
     except Exception as e:
-            raise HTTPException(status_code=422, detail=str(e))
-    
-    # try:
-    #     # Validate and save file
-    #     file_info = await save_file(file, Config().upload_dir)
-
-    #     # Create database record
-    #     try:
-    #         db_file = File(
-    #             filename=file_info["filename"],
-    #             content_type=file_info["mime_type"],
-    #             file_size=file_info["file_size"],
-    #             file_hash=file_info["file_hash"],
-    #             post_id=post_id,
-    #         ).validate()
-    #     except Exception as e:
-    #         raise HTTPException(status_code=422, detail=str(e))
-
-    #     db.add(db_file)
-    #     db.commit()
-    #     db.refresh(db_file)
-
-    #     if db_file.content_type.startswith("audio/"):
-    #         asyncio.create_task(
-    #             transcribe_file_and_update_record(get_upload_file_path(db_file.filename), db_file.id, language)
-    #         )
-
-    #     broadcast("update")
-    #     return db_file
-
-    # except HTTPException:
-    #     raise
-    # except Exception as e:
-    #     # Clean up file if database operation fails
-    #     if "file_info" in locals():
-    #         cleanup_file(file_info["file_path"])
-    #     raise HTTPException(status_code=500, detail=f"Failed to save image: {str(e)}")
-
+        logger.exception(e)
+        raise HTTPException(status_code=422, detail=str(e))
 
 @router.delete("/{file_id}")
 async def delete_file(
@@ -160,7 +124,7 @@ async def save_file_and_update_record(file_id: int, file_name: str, file: Upload
                 await broadcast_async("update")
                 return uploaded_file_info.filename
     except Exception as e:
-        logger.error("Error saving file: " + str(e))
+        logger.error("Error saving file:" + str(e))
         cleanup_file(file["file_path"])
         with get_db_session() as db:
             file = db.get(File, file_id)
@@ -173,7 +137,7 @@ async def save_file_and_update_record(file_id: int, file_name: str, file: Upload
 async def transcribe_file_and_update_record(file_id: int, file_name: str, language: str):
     file_path = get_upload_file_path(file_name)
     try:
-        result = transcribe_audio(file_path, language)
+        result = await transcribe_audio(file_path, language)
         if result != None:
             with get_db_session() as db:
                 file = db.get(File, file_id)
@@ -182,4 +146,5 @@ async def transcribe_file_and_update_record(file_id: int, file_name: str, langua
                     db.commit()
                     await broadcast_async("update")
     except Exception as e:
+        logger.exception(e)
         logger.error("Error transcribing file: " + str(e))

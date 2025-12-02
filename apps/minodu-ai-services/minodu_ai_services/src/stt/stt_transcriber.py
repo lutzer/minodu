@@ -88,7 +88,6 @@ class SttTranscriber:
                 )
     
     def transcribe_file_buffer(self, file_buffer, filename) -> SttResult:
-
         if filename.lower().endswith(".mp3"):
             audio = AudioSegment.from_mp3(file_buffer)
             audio = audio.set_channels(1).set_sample_width(2)
