@@ -5,4 +5,4 @@ __pycache__
 .python-version
 
 tests/tmp
-minodu_forum/static
+minodu_forum/data

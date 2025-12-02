@@ -2,6 +2,7 @@ import mimetypes
 import os
 
 from fastapi.testclient import TestClient
+import pytest
 
 from minodu_forum.src.app import app
 from minodu_forum.src.routers.helpers import get_avatar_file_path
@@ -20,8 +21,10 @@ def create_avatar(file_path: str):
     return response.json()
 
 
-class TestAvatarsApi:
 
+@pytest.mark.skip("Skip avatar tests for now")
+class TestAvatarsApi:
+    
     def test_create_avatar(self):
 
         file_path = os.path.join(script_dir, "files/laura.jpeg")

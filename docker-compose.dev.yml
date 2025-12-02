@@ -54,8 +54,8 @@ services:
       - PORT=3003
       - AI_SERVICE_URL=http://minodu-ai-services:3002/api/services
     volumes:
-      - ./data/minodu-forum/uploads:/app/static/uploads
-      - ./data/minodu-forum/avatars:/app/static/avatars
+      - ./data/minodu-forum/uploads:/app/data/uploads
+      - ./data/minodu-forum/avatars:/app/data/avatars
     depends_on:
       minodu-database:
         condition: service_healthy

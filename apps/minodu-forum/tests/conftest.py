@@ -12,8 +12,6 @@ from minodu_forum.src.routers.helpers import get_avatar_file_path, get_upload_fi
 def set_test_database_url(monkeypatch):
     # Set a test-specific database URL and create tables
     monkeypatch.setenv("DATABASE_URL", "sqlite:///./test_database.db")
-    # database = f"mysql+pymysql://user:password@localhost:3306/minodu"
-    # monkeypatch.setenv("DATABASE_URL", database)
     monkeypatch.setenv("UPLOAD_DIR", "tests/tmp")
     monkeypatch.setenv("AVATAR_UPLOAD_DIR", "tests/tmp")
 
