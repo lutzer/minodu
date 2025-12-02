@@ -4,5 +4,5 @@ import type { Language } from './types';
 export const Config: {
 	language: Language;
 } = {
-	language: 'en'
+	language: 'fr'
 };

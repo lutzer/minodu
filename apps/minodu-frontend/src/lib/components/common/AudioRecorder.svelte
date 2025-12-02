@@ -13,7 +13,8 @@
 	let audioElement: HTMLAudioElement;
 
 	onMount(async () => {
-		mediaDeviveAvailable = navigator.mediaDevices?.getUserMedia !== undefined;
+		// mediaDeviveAvailable = navigator.mediaDevices?.getUserMedia !== undefined;
+		mediaDeviveAvailable = false
 	});
 
 	$: {

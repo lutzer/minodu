@@ -26,6 +26,8 @@ from .vars import LanguageEnum
 
 api_prefix = os.getenv('API_PREFIX', "/api/services")
 
+logger = logging.getLogger(__name__)
+
 # Initialize FastAPI app with root_path prefix
 app = FastAPI(root_path=api_prefix)
 
@@ -104,7 +106,7 @@ async def add_document(file: UploadFile, language: LanguageEnum = Form(...), sou
     finally:
         # Clean up the temporary file
         os.unlink(temp_file_path)
-        
+
     return "Document added"
 
 @app.delete("/rag/documents/{language}/{source_id}")
