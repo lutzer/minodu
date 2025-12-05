@@ -5,4 +5,9 @@ services:
     command: redis-server --maxmemory 32mb
     ports:
       - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     
