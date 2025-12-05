@@ -7,7 +7,7 @@ import requests
 from celery import Celery
 import os
 
-from .file_converter import FileConverter
+from .file_converter import ConversionResult, process_file
 
 logger = logging.getLogger(__name__)
 
@@ -18,14 +18,21 @@ broker_url = os.getenv('CELERY_BROKER_URL', 'redis://redis:6379/0')
 app = Celery('myapp', broker=broker_url, backend=None)
 
 @app.task
-def convert_file(file_id: int, output_filepath: str, tmp_filepath: str, callback_url: str = None) -> FileConverter.ConversionResult:
-    time.sleep(2)
-
-    result = FileConverter.ConversionResult(
-        file_id=file_id,
-        tmp_file=tmp_filepath,
-        error=None
-    )
+def convert_file(file_id: int, output_filepath: str, tmp_filepath: str, callback_url: str = None) -> ConversionResult:
+    try:
+        process_file(output_filepath, tmp_filepath)
+        result = ConversionResult(
+            file_id=file_id,
+            tmp_file=tmp_filepath,
+            error=None
+        )
+    except Exception as e:
+        logger.error("Error converting file " + str(e))
+        result = ConversionResult(
+            file_id=file_id,
+            tmp_file=tmp_filepath,
+            error=str(e)
+        )
 
     if callback_url:
         try:
