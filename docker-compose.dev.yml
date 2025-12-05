@@ -80,3 +80,20 @@ services:
       - minodu-forum
       - minodu-ai-services
     restart: unless-stopped
+
+  minodu-file-converter:
+    build:
+      context: ./apps/minodu-file-converter
+      dockerfile: Dockerfile
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:alpine
+    command: redis-server --maxmemory 32mb
+
+  

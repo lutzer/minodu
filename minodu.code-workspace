@@ -21,6 +21,9 @@
     },
     {
       "path": "apps/minodu-backoffice"
+    },
+    {
+      "path": "apps/minodu-file-converter"
     }
   ]
 }
