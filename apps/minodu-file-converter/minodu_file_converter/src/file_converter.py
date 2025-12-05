@@ -11,25 +11,19 @@ from pydub import AudioSegment
 
 logger = logging.getLogger(__name__)
 
-@dataclass
-class ConversionResult:
-    file_id: int
-    tmp_file: str
-    error: Optional[str]
-
-def process_file(output_path: str, tmp_filepath: str):
-    logger.info(f"Converting file {tmp_filepath}")
+def process_file(input_filepath: str, output_path: str):
+    logger.info(f"Converting file {input_filepath}")
 
     create_dir_if_not_exists(os.path.dirname(output_path))
 
-    content_type, _ = mimetypes.guess_type(tmp_filepath)
+    content_type, _ = mimetypes.guess_type(input_filepath)
 
     # if file is image, resize and convert to jpg
     if content_type.startswith("image/"):
-        convert_image(tmp_filepath, output_path)
+        convert_image(input_filepath, output_path)
 
     if content_type.startswith("audio/") or content_type.startswith("video/webm"):
-        convert_audio(tmp_filepath, output_path)
+        convert_audio(input_filepath, output_path)
 
 def convert_image(input_path: str, output_path: str, max_width: int = 1920, max_height: int = 1080):
     img = Image.open(input_path)

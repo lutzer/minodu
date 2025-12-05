@@ -7,4 +7,4 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S')
 
 if __name__ == '__main__':
-    app.worker_main(['worker', '--loglevel=INFO'])
+    app.worker_main(['worker', '--loglevel=INFO', '--concurrency=1'])

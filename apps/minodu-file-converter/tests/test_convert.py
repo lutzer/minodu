@@ -7,8 +7,8 @@ import pytest
 from PIL import Image
 from pytest_httpserver import HTTPServer
 
-from minodu_file_converter.src.celery_app import convert_file
-from minodu_file_converter.src.file_converter import ConversionResult, convert_audio, convert_image
+from minodu_file_converter.src.celery_app import convert_file, ConversionResult
+from minodu_file_converter.src.file_converter import convert_audio, convert_image
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -101,7 +101,7 @@ def test_convert_image_file():
         assert Path(temp_file).exists(), "Failed to copy source image"
         assert not Path(converted_file).exists(), "Converted file should not exist"
 
-        result = convert_file(0, converted_file, temp_file)
+        result = convert_file(0, temp_file, converted_file)
 
         assert Path(converted_file).exists(), "Converted file should exist"
         assert result.error == None
@@ -123,7 +123,7 @@ def test_convert_audio_file():
         assert Path(temp_file).exists(), "Failed to copy source file"
         assert not Path(converted_file).exists(), "Converted file should not exist"
 
-        result = convert_file(0, converted_file, temp_file)
+        result = convert_file(0, temp_file, converted_file)
 
         assert Path(converted_file).exists(), "Converted file should exist"
         assert result.error == None
@@ -146,7 +146,8 @@ def test_convert_file_callback(httpserver: HTTPServer):
         assert not Path(converted_file).exists(), "Converted file should not exist"
 
         result = ConversionResult(
-            tmp_file=temp_file,
+            input_file=temp_file,
+            output_file=converted_file,
             file_id=0,
             error=None
         )
@@ -157,7 +158,7 @@ def test_convert_file_callback(httpserver: HTTPServer):
             json=json.dumps(dataclasses.asdict(result))
         ).respond_with_json({}, status=200)
 
-        result = convert_file(0, converted_file, temp_file, callback_url=httpserver.url_for("/api/callback"))
+        result = convert_file(result.file_id, result.input_file, result.output_file, callback_url=httpserver.url_for("/api/callback"))
 
         httpserver.check_assertions()
 
