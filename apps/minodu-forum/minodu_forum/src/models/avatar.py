@@ -8,7 +8,7 @@ from sqlalchemy import Column, DateTime, Integer, String, event
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 
-from ..routers.helpers import get_avatar_file_path
+from ..utils import get_avatar_file_path
 
 logger = logging.getLogger(__name__)
 
@@ -20,12 +20,7 @@ class Avatar(Base):
     __tablename__ = PREFIX + "avatars"
 
     id = Column(Integer, primary_key=True, index=True)
-
     filename = Column(String(255), nullable=False)
-    content_type = Column(String(100), nullable=False)
-    file_size = Column(Integer, nullable=False)
-    file_hash = Column(String(64), nullable=False, index=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
 
     authors = relationship("Author", back_populates="avatar", uselist=True)
 
@@ -37,15 +32,3 @@ class Avatar(Base):
         if len(self.filename) == 0:
             raise ValueError("Filename cant be empty")
         return self
-
-
-# Event listener for after delete
-@event.listens_for(Avatar, "after_delete")
-def delete_file_after_delete(mapper, connection, target):
-    """Delete the physical file after database record is deleted"""
-    file_path = get_avatar_file_path(target.filename)
-    if os.path.exists(file_path):
-        try:
-            os.remove(file_path)
-        except OSError as e:
-            logger.error(f"Error deleting file {file_path}: {e}")

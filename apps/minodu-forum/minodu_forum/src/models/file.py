@@ -8,7 +8,7 @@ from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text, even
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 
-from ..routers.helpers import get_upload_file_path
+from ..utils import get_upload_file_path
 
 logger = logging.getLogger(__name__)
 
