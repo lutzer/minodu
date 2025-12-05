@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 
 from minodu_forum.src.app import app
 from minodu_forum.src.config import Config
-from minodu_forum.src.routers.helpers import get_upload_file_path
+from minodu_forum.src.utils import get_upload_file_path
 from minodu_forum.src.services.ai_services import transcribe_audio
 from tests.test_authors import create_author
 from tests.test_files import upload_file

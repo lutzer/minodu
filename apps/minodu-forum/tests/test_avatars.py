@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 import pytest
 
 from minodu_forum.src.app import app
-from minodu_forum.src.routers.helpers import get_avatar_file_path
+from minodu_forum.src.utils import get_avatar_file_path
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 

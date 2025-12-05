@@ -10,7 +10,7 @@ from PIL import Image
 
 from minodu_forum.src.app import app
 from minodu_forum.src.models.file import File
-from minodu_forum.src.routers.helpers import convert_audio, convert_image, get_upload_file_path
+from minodu_forum.src.utils import get_upload_file_path
 
 from .test_authors import create_author
 from .test_posts import create_post
@@ -230,81 +230,3 @@ class TestFilesApi:
         file = upload_file(post["id"], file_path, auth_token)
 
         assert len(file["file_urlpath"]) > 0
-
-    @pytest.mark.asyncio
-    async def test_convert_image_to_jpg_and_resize(self):
-        # Setup: Define paths
-        source_image = os.path.join(script_dir, "files/sample.png")
-        temp_image = os.path.join(script_dir, "files/tmp.png")
-
-        converted_image = ""
-
-        try:
-            # Copy the original image to temp location
-            shutil.copy(source_image, temp_image)
-            assert Path(temp_image).exists(), "Failed to copy source image"
-
-            # Run your conversion function
-            # Replace this with your actual conversion function
-            converted_image = await convert_image(temp_image, max_width=100, max_height=100)
-
-            # Check if converted file exists
-            assert Path(converted_image).exists(), "Converted image was not created"
-
-            # Verify file extension
-            assert Path(converted_image).suffix == ".jpg", f"Expected .jpg extension, got {converted_image.suffix}"
-
-            # Verify dimensions
-            with Image.open(converted_image) as img:
-                width, height = img.size
-                assert width <= 100, f"Expected width lower than 100, got {width}"
-                assert height <= 100, f"Expected height lower than 100, got {height}"
-        finally:
-            # Cleanup: Delete temporary files
-            if Path(temp_image).exists():
-                Path(temp_image).unlink()
-            if len(converted_image) > 0 and Path(converted_image).exists():
-                Path(converted_image).unlink()
-
-    @pytest.mark.asyncio
-    @pytest.mark.parametrize(
-        "input",
-        [
-            "files/audios/ff-16b-2c-44100hz.aac",
-            "files/audios/ff-16b-2c-44100hz.ac3",
-            "files/audios/ff-16b-2c-44100hz.aiff",
-            "files/audios/ff-16b-2c-44100hz.flac",
-            "files/audios/ff-16b-2c-44100hz.mp3",
-            "files/audios/ff-16b-2c-44100hz.mp4",
-            "files/audios/ff-16b-2c-44100hz.ogg",
-            "files/audios/ff-16b-2c-44100hz.opus",
-            "files/audios/ff-16b-2c-44100hz.wma",
-        ],
-    )
-    async def test_convert_audio_to_mp3(self, input):
-        source_audio = os.path.join(script_dir, input)
-        temp_file = os.path.join(script_dir, "files/tmp.mp3")
-
-        converted_audio = ""
-
-        try:
-            # Copy the original image to temp location
-            shutil.copy(source_audio, temp_file)
-            assert Path(temp_file).exists(), "Failed to copy source image"
-
-            # Run your conversion function
-            # Replace this with your actual conversion function
-            converted_audio = await convert_audio(temp_file)
-
-            # Check if converted file exists
-            assert Path(converted_audio).exists(), "Converted image was not created"
-
-            # Verify file extension
-            assert Path(converted_audio).suffix == ".mp3", f"Expected .mp3 extension, got {converted_image.suffix}"
-
-        finally:
-            # Cleanup: Delete temporary files
-            if Path(temp_file).exists():
-                Path(temp_file).unlink()
-            if len(converted_audio) > 0 and Path(converted_audio).exists():
-                Path(converted_audio).unlink()
