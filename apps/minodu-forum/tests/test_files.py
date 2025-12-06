@@ -1,13 +1,10 @@
-import asyncio
 import time
 import mimetypes
 import os
-import shutil
 from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
-from PIL import Image
 
 from minodu_forum.src.app import app
 from minodu_forum.src.models.file import File

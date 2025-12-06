@@ -5,6 +5,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
+from minodu_forum.src.models.avatar import create_avatar_table
+
 from .config import Config
 from .database import get_db_connection
 from .routers import authors, avatars, events, files, login, posts
@@ -13,6 +15,7 @@ from .routers import authors, avatars, events, files, login, posts
 async def lifespan(app: FastAPI):
     """Initialize database on startup."""
     get_db_connection().create_tables()
+    create_avatar_table()
     yield
 
 
@@ -31,8 +34,8 @@ os.makedirs(Config().upload_dir, exist_ok=True)
 os.makedirs(Config().avatar_dir, exist_ok=True)
 
 # mount static dirs
-app.mount(Config().static_upload_path, StaticFiles(directory=Config().upload_dir), name="files")
-app.mount(Config().static_avatar_path, StaticFiles(directory=Config().avatar_dir), name="avatars")
+app.mount(Config().static_upload_url, StaticFiles(directory=Config().upload_dir), name="files")
+app.mount(Config().static_avatar_url, StaticFiles(directory=Config().avatar_dir), name="avatars")
 
 
 @app.get("/")
