@@ -12,12 +12,14 @@ from .file_converter import process_file
 
 logger = logging.getLogger(__name__)
 
-broker_url = os.getenv('CELERY_BROKER_URL', 'redis://redis:6379/0')
+broker_url = os.getenv('CELERY_BROKER_URL', 'redis://localhost:6379/0')
+backend_url = os.getenv('CELERY_BACKEND_URL', 'redis://localhost:6379/1')
 
 # callback_url = os.getenv('CALLBACK_URL', "http://minodu-forum:3002/api/forum/files/')
 
-app = Celery('myapp', broker=broker_url, backend=None)
+app = Celery('myapp', broker=broker_url, backend=backend_url)
 
+print("CELERY_BROKER_URL " + broker_url)
 
 @dataclasses.dataclass
 class ConversionResult:
@@ -26,8 +28,12 @@ class ConversionResult:
     output_file: str
     error: Optional[str]
 
-@app.task
-def convert_file(file_id: int, input_filepath: str, output_filepath: str, callback_url: str = None) -> ConversionResult:
+@app.task(name='src.celery_app.check_connection')
+def check_connection(value: int):
+    return value
+
+@app.task(name='src.celery_app.convert_file')
+def convert_file(file_id: int, input_filepath: str, output_filepath: str, callback_url: str = None) -> dict:
     try:
         process_file(input_filepath, output_filepath)
         result = ConversionResult(
@@ -55,4 +61,4 @@ def convert_file(file_id: int, input_filepath: str, output_filepath: str, callba
         except Exception as e:
             logger.error("Error sending callback to " + callback_url)
 
-    return result
+    return dataclasses.asdict(result)

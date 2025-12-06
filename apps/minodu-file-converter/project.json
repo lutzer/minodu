@@ -74,17 +74,28 @@
     "dev": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "poetry run python minodu_file_converter/main.py",
-        "cwd": "{projectRoot}",
-        "env": {
-          "CELERY_BROKER_URL": "redis://localhost:6379/0"
-        }
+        "command": "bash run_dev.sh",
+        "cwd": "{projectRoot}"
       }
     },
-    "redis": {
+    "serve": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "docker compose -f docker-compose.redis.yml up --build",
+        "command": "poetry run python minodu_file_converter/main.py",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "redis:start": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker compose -f docker-compose.redis.yml up -d --build",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "redis:stop": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker compose -f docker-compose.redis.yml down",
         "cwd": "{projectRoot}"
       }
     }

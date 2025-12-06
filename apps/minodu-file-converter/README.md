@@ -1,3 +1,6 @@
 # minodu-file-converter
+Celery app that handles file conversion of uploaded files
 
-Project description here.
+## Development
+
+* start with `nx run dev` to start redis server and celery app
