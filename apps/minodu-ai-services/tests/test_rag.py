@@ -10,8 +10,6 @@ from minodu_ai_services.src.rag.rag import RAG
 from minodu_ai_services.src.rag.document_store import DocumentStore
 from minodu_ai_services.src.vars import LanguageEnum
 
-from .conftest import database_path
-
 # Create test client
 client = TestClient(app)
 

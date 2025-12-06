@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import enum
 import logging
 import os
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text, event, Boolean
+from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, String, Text, event, Boolean
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 
@@ -15,6 +16,10 @@ logger = logging.getLogger(__name__)
 from ..config import Config
 from ..database import PREFIX, Base, get_prefixed_key
 
+class FileProcessingStatus(enum.Enum):
+    PROCESSING = "processing"
+    DONE = "done"
+    ERROR = "error"
 
 class File(Base):
     __tablename__ = PREFIX + "files"
@@ -26,7 +31,7 @@ class File(Base):
     file_size = Column(Integer, nullable=False)
     file_hash = Column(String(64), default="")
     created_at = Column(DateTime, default=datetime.utcnow)
-    processing = Column(Boolean, default=True)
+    processing_state = Column(Enum(FileProcessingStatus), default=FileProcessingStatus.PROCESSING)
 
     post_id = Column(Integer, ForeignKey(get_prefixed_key("posts.id")), nullable=False)
 

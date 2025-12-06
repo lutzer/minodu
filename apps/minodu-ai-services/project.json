@@ -57,7 +57,10 @@
       ],
       "options": {
         "command": "poetry run pytest tests/",
-        "cwd": "{projectRoot}"
+        "cwd": "{projectRoot}",
+        "env": {
+          "EMBEDDING_DATABASE_PATH" : "../tests/testdata"
+        }
       },
       "cache": true
     },
@@ -76,9 +79,6 @@
       "options": {
         "command": "poetry run python minodu_ai_services/main.py",
         "cwd": "{projectRoot}",
-        "env": {
-          "PORT": "3002"
-        }
       }
     }
   },

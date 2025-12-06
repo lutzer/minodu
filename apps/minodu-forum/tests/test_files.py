@@ -7,7 +7,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from minodu_forum.src.app import app
-from minodu_forum.src.models.file import File
+from minodu_forum.src.models.file import File, FileProcessingStatus
 from minodu_forum.src.utils import get_upload_file_path
 from tests.test_convert import is_celery_available
 
@@ -28,7 +28,7 @@ def upload_file(client: TestClient, post_id: int, file_path: str, auth_token: st
     data = response.json()
 
     # wait for file entry is processed
-    while data["processing"] == True:
+    while data["processing_state"] == FileProcessingStatus.PROCESSING.value:
         response = client.get("/files/" + str(data["id"]))
         data = response.json()
         # Wait before next attempt
@@ -61,7 +61,7 @@ class TestFilesApi:
         auth_token = create_author(client)
         post = create_post(client, auth_token, "fetch_test")
 
-        file_path = os.path.join(script_dir, "files/laura.jpeg")
+        file_path = os.path.join(script_dir, "files/laura.jpeg") 
         with open(file_path, "rb") as f:
             response = client.post(
                 "/files/upload",
@@ -74,7 +74,7 @@ class TestFilesApi:
         assert data["content_type"].startswith("image")
 
         # test if file entry is processed
-        while data["processing"] == True:
+        while data["processing_state"] == FileProcessingStatus.PROCESSING.value:
             response = client.get("/files/" + str(data["id"]))
             data = response.json()
             # Wait before next attempt
