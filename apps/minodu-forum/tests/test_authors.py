@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 
 from minodu_forum.src.app import app
 from minodu_forum.src.models.author import Author
-from tests.test_avatars import create_avatar
+from tests.test_avatars import list_avatars
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -65,10 +65,8 @@ class TestAuthorsApi:
         assert response.status_code == 200
         assert response.json()["name"] == new_data["name"]
 
-    @pytest.mark.skip("needs to fix aavatr system") 
     def test_create_author_with_avatar(self, client):
-        file_path = os.path.join(script_dir, "files/laura.jpeg")
-        avatar = create_avatar(client, file_path)
+        avatar = list_avatars(client)[0]
 
         author_data = {"name": "Author1", "avatar": avatar["id"]}
         response = client.post(app.root_path + "/authors/create", json=author_data)
@@ -79,10 +77,8 @@ class TestAuthorsApi:
         assert response.status_code == 200
         assert response.json()["avatar"] != None
 
-    @pytest.mark.skip("needs to fix avatar system") 
     def test_edit_author_avatar(self, client):
-        file_path = os.path.join(script_dir, "files/laura.jpeg")
-        avatar = create_avatar(client, file_path)
+        avatar = list_avatars(client)[0]
 
         old_data = {"name": "test"}
 
@@ -113,7 +109,7 @@ class TestAuthorsApi:
         token = response.json()["token"]
         author_id = response.json()["id"]
 
-        new_data = {"avatar": 10}
+        new_data = {"avatar": 99}
 
         response = client.put(
             app.root_path + f"/authors/{author_id}", json=new_data, headers={"Authorization": f"Bearer {token}"}

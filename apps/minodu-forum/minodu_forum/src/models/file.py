@@ -34,7 +34,7 @@ class File(Base):
 
     @hybrid_property
     def file_urlpath(self):
-        return Config().api_prefix + Config().static_upload_path + "/" + self.filename
+        return Config().api_prefix + Config().static_upload_url + "/" + self.filename
 
     def validate(self) -> File:
         if len(self.filename) == 0:

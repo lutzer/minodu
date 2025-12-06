@@ -25,7 +25,6 @@ class Config:
         self._upload_dir = None
         self._max_file_size = None
         self._service_url = None
-        self._avatar_dir = None
         self._tmp_dir = None
 
     @property
@@ -56,11 +55,8 @@ class Config:
 
     @property
     def avatar_dir(self):
-        if self._avatar_dir is None:
-            script_dir = os.path.dirname(os.path.abspath(__file__))
-            upload_dir = os.getenv("FILE_DIR", "data")
-            self._avatar_dir = os.path.join(script_dir, "..", upload_dir, "data")
-        return self._avatar_dir
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        return os.path.join(script_dir,"assets/avatars")
     
     @property
     def tmp_dir(self):
@@ -95,10 +91,10 @@ class Config:
         return self._max_file_size
 
     @property
-    def static_upload_path(self):
+    def static_upload_url(self):
         return "/static/files"
 
     @property
-    def static_avatar_path(self):
+    def static_avatar_url(self):
         return "/static/avatars"
 

@@ -40,8 +40,6 @@ readme = 'README.md'
   pytest-timeout = "^2.4.0"
   pytest-asyncio = "^1.2.0"
   pymysql = "^1.1.2"
-  pydub = "^0.25.1"
-  pillow = "^12.0.0"
   minodu-file-converter = {path = "../minodu-file-converter", develop = true}
 
   [tool.poetry.group.dev.dependencies]

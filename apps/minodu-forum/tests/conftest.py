@@ -37,12 +37,6 @@ def set_test_database_url(monkeypatch):
     for file in files:
         os.remove(get_upload_file_path(file.filename))
 
-    # Delete all avatars
-    db = get_db_connection().get_session_direct()
-    avatars = db.query(Avatar).all()
-    for avatar in avatars:
-        os.remove(get_avatar_file_path(avatar.filename))
-
 @pytest.fixture
 def client():
     '''creates fast api testclient'''
