@@ -14,7 +14,7 @@ from ..config import Config
 from ..database import get_db, get_db_session
 from ..events import broadcast, broadcast_async
 from ..models.author import Author
-from ..models.file import File
+from ..models.file import File, FileProcessingStatus
 from ..models.post import Post
 from ..services.ai_services import transcribe_audio
 from .auth import get_author_from_token
@@ -30,7 +30,7 @@ class FileResponse(BaseModel):
     content_type: str
     file_hash: str
     file_urlpath: str
-    processing: bool
+    processing_state: FileProcessingStatus
 
 class ConversionCallbackRequest(BaseModel):
     file_id: int
@@ -88,7 +88,7 @@ async def upload_file(
             file_size=file_info.file_size,
             file_hash=file_info.hash,
             post_id=post_id,
-            processing=True
+            processing_state=FileProcessingStatus.PROCESSING
         ).validate()
         
         db.add(db_file)
@@ -135,12 +135,11 @@ async def save_file_and_convert(file_id: int, input_filepath: str, output_filepa
 
     if data["error"]:
         logger.error("Conversion Error: " + data["error"])
-        raise Exception(data["error"])
 
     with get_db_session() as db:
         db_file = db.get(File, data["file_id"])
         if db_file != None:
-            db_file.processing = False
+            db_file.processing_state = FileProcessingStatus.ERROR if data["error"] else FileProcessingStatus.DONE
             db.commit()
             await broadcast_async("update")
     

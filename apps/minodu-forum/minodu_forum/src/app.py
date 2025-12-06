@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from minodu_forum.src.models.avatar import create_avatar_table
+from .models.avatar import create_avatar_table
 
 from .config import Config
 from .database import get_db_connection

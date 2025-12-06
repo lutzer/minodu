@@ -13,6 +13,8 @@ import textwrap
 from typing import Iterator, Optional
 from dataclasses import dataclass, asdict
 
+from ..config import Config
+
 from ..vars import LanguageEnum
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -30,19 +32,13 @@ class RAG:
 
     def __init__(self, language : LanguageEnum):
 
-        ollama_host = os.environ.get("OLLAMA_HOST", "http://localhost:11434/")
-        ollama_model = os.environ.get("OLLAMA_MODEL", "llama3.2:1b")
-
-        self.llm = OllamaLLM(base_url=ollama_host, model=ollama_model, temperature=0.1, keep_alive=600 )
-        
-        embedding_model = os.environ.get("EMBEDDING_MODEL", "all-minilm:l6-v2")
-        database_path = os.environ.get("EMBEDDING_DATABASE_PATH", os.path.join(os.path.dirname(__file__), "../../data/minodu-ai-services"))
+        self.llm = OllamaLLM(base_url=Config().ollama_host, model=Config().ollama_model, temperature=0.1, keep_alive=600 )
 
         # Vector store setup (same as above)
-        self.embeddings = OllamaEmbeddings(base_url=ollama_host, model=embedding_model)
+        self.embeddings = OllamaEmbeddings(base_url=Config().ollama_host, model=Config().embedding_model)
 
         self.chroma_client = chromadb.PersistentClient(
-            path=database_path,
+            path=Config().database_path,
             settings=Settings(anonymized_telemetry=False)
         )
 
