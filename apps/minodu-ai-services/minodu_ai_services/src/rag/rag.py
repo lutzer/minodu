@@ -36,7 +36,7 @@ class RAG:
         self.llm = OllamaLLM(base_url=ollama_host, model=ollama_model, temperature=0.1, keep_alive=600 )
         
         embedding_model = os.environ.get("EMBEDDING_MODEL", "all-minilm:l6-v2")
-        database_path = os.environ.get("EMBEDDING_DATABASE_PATH", os.path.join(os.path.dirname(__file__), "../../data"))
+        database_path = os.environ.get("EMBEDDING_DATABASE_PATH", os.path.join(os.path.dirname(__file__), "../../data/minodu-ai-services"))
 
         # Vector store setup (same as above)
         self.embeddings = OllamaEmbeddings(base_url=ollama_host, model=embedding_model)
