@@ -48,8 +48,8 @@ class Config:
     def data_dir(self):
         if self._data_dir is None:
             script_dir = os.path.dirname(os.path.abspath(__file__))
-            upload_dir = os.getenv("FILE_DIR", "data/minodu_forum")
-            self._data_dir = os.path.join(script_dir, "..", upload_dir, "uploads")
+            file_dir = os.getenv("FILE_DIR", "data/minodu_forum")
+            self._data_dir = os.path.join(script_dir, "..", file_dir)
         return self._data_dir
 
     @property

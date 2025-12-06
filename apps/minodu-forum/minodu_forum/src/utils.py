@@ -31,6 +31,9 @@ def get_file_info_and_validate(file: UploadFile, allowed_mime_types: list[str] =
     
     upload_content_type = "audio/webm" if (file.content_type == "video/webm") else file.content_type
 
+    if upload_content_type == None:
+        upload_content_type, _ = mimetypes.guess_type(file.filename) or "NoneType"
+
     file_type_allowed = reduce(lambda acc, val: acc or upload_content_type.startswith(val), allowed_mime_types, False)
     if not file_type_allowed:
         raise Exception("Wrong file type: " + upload_content_type)

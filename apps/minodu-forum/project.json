@@ -95,7 +95,11 @@
       ],
       "options": {
         "command": "poetry run pytest tests/",
-        "cwd": "{projectRoot}"
+        "cwd": "{projectRoot}",
+        "env": {
+          "DATABASE_URL" : "sqlite:///./tests/files/test_database.db",
+          "FILE_DIR" :"../tests/testdata"
+        }
       },
       "cache": true
     },
