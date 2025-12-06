@@ -8,7 +8,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, Form, HTTPException, Up
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from ..converter.file_converter import FileConverter
+from minodu_file_converter.src.celery_app import convert_file
 
 from ..config import Config
 from ..database import get_db, get_db_session
@@ -23,23 +23,6 @@ from ..utils import cleanup_file, create_dir_if_not_exists, get_file_info_and_va
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
-def handle_conversion_result(result: FileConverter.ConversionResult):
-    print("received result" + str(result))
-    with get_db_session() as db:
-        db_file = db.get(File, result.file_id)
-        if db_file != None:
-            if (result.error == None):
-                db_file.processing = False
-                db.commit()
-            else:
-                db.delete(db_file)
-                db.commit()
-            broadcast("update")
-        
-    cleanup_file(result.tmp_file)
-
-file_converter : FileConverter = FileConverter(callback_handler=handle_conversion_result)
-
 class FileResponse(BaseModel):
     id: int
     text: str
@@ -48,6 +31,12 @@ class FileResponse(BaseModel):
     file_hash: str
     file_urlpath: str
     processing: bool
+
+class ConversionCallbackRequest(BaseModel):
+    file_id: int
+    input_path: str
+    output_path: str
+    error: Optional[str]
 
 
 @router.get("/", response_model=list[FileResponse])
@@ -62,7 +51,6 @@ def get_file(file_id: int, db: Session = Depends(get_db)):
     if not file:
         raise HTTPException(status_code=404, detail="File not found")
     return file
-
 
 @router.post("/upload", response_model=FileResponse)
 async def upload_file(
@@ -79,7 +67,6 @@ async def upload_file(
     author = db.get(Author, post.author_id)
     if author.id != token_author_id:
         raise HTTPException(status_code=401, detail="Not authorized to modify post.")
-    
 
     try:
         # validate file and get info
@@ -110,14 +97,35 @@ async def upload_file(
 
         await broadcast_async("update")
 
-        # add file conversion and save job
-        save_file_and_convert(db_file.id, get_upload_file_path(db_file.filename), tmp_file_path)
+        # add file conversion job
+        asyncio.create_task(save_file_and_convert(db_file.id, tmp_file_path, get_upload_file_path(db_file.filename)))
 
         return db_file
         
     except Exception as e:
         logger.exception(e)
         raise HTTPException(status_code=422, detail=str(e))
+
+@router.post("/convert_callback", response_model=FileResponse)
+async def create_post(
+    conversionResult: ConversionCallbackRequest, db: Session = Depends(get_db)
+):
+    cleanup_file(conversionResult.input_path)
+
+    db_file = db.get(File, conversionResult.file_id)
+    if not db_file:
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    if db_file.filename != os.path.basename(conversionResult.output_path):
+        raise HTTPException(status_code=404, detail="Converted filename doesnt match the file entry")
+
+    db_file.processing = False
+    db.commit()
+    db.refresh(db_file)
+
+    await broadcast_async("update")
+
+    return db_file
 
 @router.delete("/{file_id}")
 def delete_file(
@@ -134,8 +142,34 @@ def delete_file(
     broadcast("update")
     return {"message": "File deleted"}
 
-def save_file_and_convert(file_id: int, output_filepath: str, tmp_file_path: str):
-    file_converter.convert(file_id, output_filepath, tmp_file_path)
+async def save_file_and_convert(file_id: int, input_filepath: str, output_filepath: str):
+    result = convert_file.delay(file_id, input_filepath, output_filepath)
+
+    while not result.ready():
+        await asyncio.sleep(1.0)
+
+    cleanup_file(input_filepath)
+
+    data = result.get()
+
+    print(data)
+
+    if data["error"]:
+        logger.error("Conversion Error:" + data["error"])
+        raise Exception(data["error"])
+
+    with get_db_session() as db:
+        db_file = db.get(File, data["file_id"])
+        if db_file != None:
+            db_file.processing = False
+            db.commit()
+            await broadcast_async("update")
+    
+
+
+
+# def save_file_and_convert(file_id: int, output_filepath: str, tmp_file_path: str):
+#     file_converter.convert(file_id, output_filepath, tmp_file_path)
 
 
 # async def transcribe_file_and_update_record(file_id: int, file_name: str, language: str):
