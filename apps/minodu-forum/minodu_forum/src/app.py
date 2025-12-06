@@ -8,14 +8,9 @@ from fastapi.staticfiles import StaticFiles
 from .config import Config
 from .database import get_db_connection
 from .routers import authors, avatars, events, files, login, posts
-from .events import main_loop
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global main_loop
-    main_loop = asyncio.get_running_loop()
-    print(main_loop)
-    
     """Initialize database on startup."""
     get_db_connection().create_tables()
     yield

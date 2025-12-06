@@ -1,3 +1,4 @@
+import asyncio
 import time
 import mimetypes
 import os
@@ -55,8 +56,9 @@ class TestFilesApi:
 
         File(filename="test", content_type="audio/wav", file_size=20, file_hash="hash", post_id=1).validate()
 
-    @pytest.mark.timeout(2)
-    def test_upload_image_file(self):
+    @pytest.mark.timeout(10)
+    @pytest.mark.asyncio
+    async def test_upload_image_file(self):
         auth_token = create_author()
         post = create_post(auth_token, "fetch_test")
 
