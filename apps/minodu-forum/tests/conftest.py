@@ -21,11 +21,7 @@ from minodu_forum.src.utils import get_avatar_file_path, get_upload_file_path
 #     )
 
 @pytest.fixture(autouse=True)
-def set_test_database_url(monkeypatch):
-    # Set a test-specific database URL and create tables
-    monkeypatch.setenv("DATABASE_URL", "sqlite:///./tests/files/test_database.db")
-    monkeypatch.setenv("FILE_DIR", "../tests/tmp")
-
+def set_test_database_url():
     get_db_connection().drop_tables()
     get_db_connection().create_tables()
 
@@ -35,7 +31,10 @@ def set_test_database_url(monkeypatch):
     db = get_db_connection().get_session_direct()
     files = db.query(File).all()
     for file in files:
-        os.remove(get_upload_file_path(file.filename))
+        try:
+            os.remove(get_upload_file_path(file.filename))
+        except Exception:
+            pass
 
 @pytest.fixture
 def client():

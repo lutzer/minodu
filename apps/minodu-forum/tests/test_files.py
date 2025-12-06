@@ -83,6 +83,34 @@ class TestFilesApi:
         # check if file exists
         assert os.path.isfile(get_upload_file_path(data["filename"]))
 
+    @pytest.mark.timeout(10)
+    @pytest.mark.asyncio
+    async def test_upload_image_no_mime_type(self, client):
+        auth_token = create_author(client)
+        post = create_post(client, auth_token, "fetch_test")
+
+        file_path = os.path.join(script_dir, "files/laura.jpeg") 
+        with open(file_path, "rb") as f:
+            response = client.post(
+                "/files/upload",
+                files={"file": (os.path.basename(file_path), f, None)},
+                data={"post_id": post["id"], "language": "en"},
+                headers={"Authorization": f"Bearer {auth_token}"},
+            )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["content_type"].startswith("image")
+
+        # test if file entry is processed
+        while data["processing_state"] == FileProcessingStatus.PROCESSING.value:
+            response = client.get("/files/" + str(data["id"]))
+            data = response.json()
+            # Wait before next attempt
+            time.sleep(0.1)
+        
+        # check if file exists
+        assert os.path.isfile(get_upload_file_path(data["filename"]))
+
     def test_upload_image_png(self, client):
         auth_token = create_author(client)
         post = create_post(client, auth_token, "fetch_test")

@@ -72,6 +72,8 @@ async def upload_file(
         # validate file and get info
         file_info = get_file_info_and_validate(file)
 
+        print(file_info)
+
         tmp_file_path = os.path.join(Config().tmp_dir, file_info.tmp_filename)
         
         # create tmp file dir
