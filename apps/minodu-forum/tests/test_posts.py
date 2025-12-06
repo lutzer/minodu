@@ -12,7 +12,7 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 client = TestClient(app)
 
 
-def create_post(token: str, title: str, parent_id: int = None):
+def create_post(client: TestClient, token: str, title: str, parent_id: int = None):
     post_data = {"title": title, "text": "content", "parent_id": parent_id}
     headers = {"Authorization": f"Bearer {token}"}
     response = client.post(app.root_path + "/posts/", json=post_data, headers=headers)
@@ -20,8 +20,8 @@ def create_post(token: str, title: str, parent_id: int = None):
 
 
 class TestPostsApi:
-    def test_create_post(self):
-        auth_token = create_author()
+    def test_create_post(self, client):
+        auth_token = create_author(client)
 
         post_data = {
             "title": "title",
@@ -35,8 +35,8 @@ class TestPostsApi:
         assert response_data["title"] == post_data["title"]
         assert response_data["text"] == post_data["text"]
 
-    def test_create_post_restricted(self):
-        create_author()
+    def test_create_post_restricted(self, client):
+        create_author(client)
 
         post_data = {
             "title": "title",
@@ -46,9 +46,9 @@ class TestPostsApi:
         response = client.post(app.root_path + "/posts/", json=post_data, headers=headers)
         assert response.status_code == 401
 
-    def test_fetch_posts(self):
-        auth_token = create_author()
-        post = create_post(auth_token, "fetch_test")
+    def test_fetch_posts(self, client):
+        auth_token = create_author(client)
+        post = create_post(client, auth_token, "fetch_test")
 
         response = client.get(app.root_path + "/posts/")
         assert response.status_code == 200
@@ -56,9 +56,9 @@ class TestPostsApi:
         response_data = response.json()
         assert response_data[0]["title"] == post["title"]
 
-    def test_fetch_single_post(self):
-        auth_token = create_author()
-        post = create_post(auth_token, "fetch_test")
+    def test_fetch_single_post(self, client):
+        auth_token = create_author(client)
+        post = create_post(client, auth_token, "fetch_test")
 
         response = client.get(app.root_path + f"/posts/{post['id']}")
         assert response.status_code == 200
@@ -67,8 +67,8 @@ class TestPostsApi:
         assert response_data["title"] == post["title"]
 
     def test_reply_post(self):
-        auth_token = create_author()
-        post = create_post(auth_token, "parent")
+        auth_token = create_author(client)
+        post = create_post(client, auth_token, "parent")
 
         post_data = {"title": "title", "text": "content", "parent_id": post["id"]}
         headers = {"Authorization": f"Bearer {auth_token}"}
@@ -80,13 +80,13 @@ class TestPostsApi:
         response_data = response.json()
         assert response_data[1]["parent_id"] == post["id"]
 
-    def test_get_threads(self):
-        auth_token = create_author()
-        post1 = create_post(auth_token, "parent")
-        post2 = create_post(auth_token, "parent")
-        reply1 = create_post(auth_token, "child1", post2["id"])
-        reply2 = create_post(auth_token, "child2", post2["id"])
-        reply3 = create_post(auth_token, "child3", post1["id"])
+    def test_get_threads(self, client):
+        auth_token = create_author(client)
+        post1 = create_post(client, auth_token, "parent")
+        post2 = create_post(client, auth_token, "parent")
+        reply1 = create_post(client, auth_token, "child1", post2["id"])
+        reply2 = create_post(client, auth_token, "child2", post2["id"])
+        reply3 = create_post(client, auth_token, "child3", post1["id"])
 
         response = client.get(app.root_path + "/posts/threads")
         assert response.status_code == 200
@@ -95,9 +95,9 @@ class TestPostsApi:
         assert len(response_data[0]["children"]) == 1
         assert len(response_data[1]["children"]) == 2
 
-    def test_edit_post_title(self):
-        auth_token = create_author()
-        post = create_post(auth_token, "old")
+    def test_edit_post_title(self, client):
+        auth_token = create_author(client)
+        post = create_post(client, auth_token, "old")
 
         post_id = post["id"]
         post_data = {"title": "updated"}
@@ -108,10 +108,10 @@ class TestPostsApi:
         response_data = response.json()
         assert response_data["title"] == post_data["title"]
 
-    def test_edit_post_title_restricted(self):
-        auth_token1 = create_author()
-        auth_token2 = create_author()
-        post = create_post(auth_token1, "old")
+    def test_edit_post_title_restricted(self, client):
+        auth_token1 = create_author(client)
+        auth_token2 = create_author(client)
+        post = create_post(client, auth_token1, "old")
 
         post_id = post["id"]
         post_data = {"title": "updated"}
@@ -121,8 +121,8 @@ class TestPostsApi:
         assert response.status_code == 401
 
     def test_delete_post(self):
-        auth_token = create_author()
-        post = create_post(auth_token, "test")
+        auth_token = create_author(client)
+        post = create_post(client, auth_token, "test")
 
         response = client.get(app.root_path + "/posts/")
         assert len(response.json()) == 1
@@ -135,20 +135,20 @@ class TestPostsApi:
         response = client.get(app.root_path + "/posts/")
         assert len(response.json()) == 0
 
-    def test_delete_post_restricted(self):
-        auth_token1 = create_author()
-        auth_token2 = create_author()
-        post = create_post(auth_token1, "test")
+    def test_delete_post_restricted(self, client):
+        auth_token1 = create_author(client)
+        auth_token2 = create_author(client)
+        post = create_post(client, auth_token1, "test")
 
         headers = {"Authorization": f"Bearer {auth_token2}"}
         response = client.delete(app.root_path + f"/posts/{post['id']}", headers=headers)
 
         assert response.status_code == 401
 
-    def test_delete_parent_restricted(self):
-        auth_token = create_author()
-        post = create_post(auth_token, "parent")
-        reply = create_post(auth_token, "reply", post["id"])
+    def test_delete_parent_restricted(self, client):
+        auth_token = create_author(client)
+        post = create_post(client, auth_token, "parent")
+        reply = create_post(client, auth_token, "reply", post["id"])
 
         response = client.delete(
             app.root_path + f"/posts/{post['id']}", headers={"Authorization": f"Bearer {auth_token}"}

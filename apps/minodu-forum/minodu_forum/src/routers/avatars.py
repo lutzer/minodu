@@ -12,7 +12,6 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-
 class AvatarResponse(BaseModel):
     id: int
     filename: str
