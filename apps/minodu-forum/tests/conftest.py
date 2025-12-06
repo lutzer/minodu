@@ -1,9 +1,12 @@
 import logging
 import os
 import sys
+from typing import Generator
 
+from fastapi.testclient import TestClient
 import pytest
 
+from minodu_forum.src.app import app
 from minodu_forum.src.database import get_db_connection
 from minodu_forum.src.models.avatar import Avatar
 from minodu_forum.src.models.file import File
@@ -39,3 +42,9 @@ def set_test_database_url(monkeypatch):
     avatars = db.query(Avatar).all()
     for avatar in avatars:
         os.remove(get_avatar_file_path(avatar.filename))
+
+@pytest.fixture
+def client():
+    '''creates fast api testclient'''
+    with TestClient(app) as client:
+        yield client

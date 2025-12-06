@@ -29,29 +29,31 @@ def get_file_info_and_validate(file: UploadFile, allowed_mime_types: list[str] =
     if file.size > Config().max_file_size:
         raise Exception("File size too large. Max size is: " + str(Config().max_file_size))
     
-    file_type_allowed = reduce(lambda acc, val: acc or file.content_type.startswith(val), allowed_mime_types, False)
+    upload_content_type = "audio/webm" if (file.content_type == "video/webm") else file.content_type
+
+    file_type_allowed = reduce(lambda acc, val: acc or upload_content_type.startswith(val), allowed_mime_types, False)
     if not file_type_allowed:
-        raise Exception("Wrong file type")
+        raise Exception("Wrong file type: " + upload_content_type)
     
-    file_extension = ""
-    if file.content_type.startswith("audio"):
-        file_extension = ".mp3"
-    elif file.content_type.startswith("image"):
-        file_extension = ".jpg"
+    convert_file_extension = ""
+    if upload_content_type.startswith("audio"):
+        convert_file_extension = ".mp3"
+    elif upload_content_type.startswith("image"):
+        convert_file_extension = ".jpg"
     else:
-        raise Exception("Cant handle this content type: " + str(file.content_type))
+        raise Exception("Cant handle this content type: " + str(upload_content_type))
 
     tmp_file_extension = os.path.splitext(file.filename)[1].lower()
     if not tmp_file_extension:
-        file_exttmp_file_extensionnsion = mimetypes.guess_extension(file.content_type, strict=True)
+        tmp_file_extension = mimetypes.guess_extension(file.content_type, strict=True)
         if tmp_file_extension == None:
             raise Exception("Cannot guess file extension from content type:" + str(file.content_type))
 
     return UploadFileInfo(
-        filename=f"{uuid.uuid4()}{file_extension}",
+        filename=f"{uuid.uuid4()}{convert_file_extension}",
         tmp_filename=f"{uuid.uuid4()}{tmp_file_extension}",
         file_size=file.size,
-        content_type=file.content_type,
+        content_type=upload_content_type,
         hash=""
     )
 

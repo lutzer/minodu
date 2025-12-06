@@ -15,7 +15,7 @@ ENV APP_HOME=/app
 WORKDIR $APP_HOME
 
 # copy files
-COPY ./minodu-file-converter ./
+COPY ./minodu_file_converter ./
 
 # run app
 CMD python main.py

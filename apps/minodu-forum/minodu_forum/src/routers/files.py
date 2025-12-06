@@ -106,29 +106,8 @@ async def upload_file(
         logger.exception(e)
         raise HTTPException(status_code=422, detail=str(e))
 
-@router.post("/convert_callback", response_model=FileResponse)
-async def create_post(
-    conversionResult: ConversionCallbackRequest, db: Session = Depends(get_db)
-):
-    cleanup_file(conversionResult.input_path)
-
-    db_file = db.get(File, conversionResult.file_id)
-    if not db_file:
-        raise HTTPException(status_code=404, detail="File not found")
-    
-    if db_file.filename != os.path.basename(conversionResult.output_path):
-        raise HTTPException(status_code=404, detail="Converted filename doesnt match the file entry")
-
-    db_file.processing = False
-    db.commit()
-    db.refresh(db_file)
-
-    await broadcast_async("update")
-
-    return db_file
-
 @router.delete("/{file_id}")
-def delete_file(
+async def delete_file(
     file_id: int, db: Session = Depends(get_db), token_author_id: int = Depends(get_author_from_token)
 ):
     file = db.get(File, file_id)
@@ -139,10 +118,12 @@ def delete_file(
 
     db.delete(file)
     db.commit()
-    broadcast("update")
+    await broadcast_async("update")
     return {"message": "File deleted"}
 
 async def save_file_and_convert(file_id: int, input_filepath: str, output_filepath: str):
+    '''Sends file to celery app to queue conversion task'''
+    # run celery task
     result = convert_file.delay(file_id, input_filepath, output_filepath)
 
     while not result.ready():
@@ -152,10 +133,8 @@ async def save_file_and_convert(file_id: int, input_filepath: str, output_filepa
 
     data = result.get()
 
-    print(data)
-
     if data["error"]:
-        logger.error("Conversion Error:" + data["error"])
+        logger.error("Conversion Error: " + data["error"])
         raise Exception(data["error"])
 
     with get_db_session() as db:
