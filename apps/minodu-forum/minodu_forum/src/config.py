@@ -22,10 +22,9 @@ class Config:
         self._database_url = None
         self._jwt_secret = None
         self._jwt_algorithm = None
-        self._upload_dir = None
         self._max_file_size = None
         self._service_url = None
-        self._tmp_dir = None
+        self._data_dir = None
 
     @property
     def port(self):
@@ -44,27 +43,29 @@ class Config:
         if self._service_url is None:
             self._service_url = os.getenv("AI_SERVICE_URL", "http://localhost:3002/api/services")
         return self._service_url
+    
+    @property
+    def data_dir(self):
+        if self._data_dir is None:
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            upload_dir = os.getenv("FILE_DIR", "data/minodu_forum")
+            self._data_dir = os.path.join(script_dir, "..", upload_dir, "uploads")
+        return self._data_dir
 
     @property
     def upload_dir(self):
-        if self._upload_dir is None:
-            script_dir = os.path.dirname(os.path.abspath(__file__))
-            upload_dir = os.getenv("FILE_DIR", "data")
-            self._upload_dir = os.path.join(script_dir, "..", upload_dir, "uploads")
-        return self._upload_dir
+        return os.path.join(self.data_dir, "uploads")
 
     @property
     def avatar_dir(self):
         script_dir = os.path.dirname(os.path.abspath(__file__))
         return os.path.join(script_dir,"assets/avatars")
     
+   
+
     @property
     def tmp_dir(self):
-        if self._tmp_dir is None:
-            script_dir = os.path.dirname(os.path.abspath(__file__))
-            upload_dir = os.getenv("FILE_DIR", "data")
-            self._tmp_dir = os.path.join(script_dir, "..", upload_dir, "tmp")
-        return self._tmp_dir
+        return os.path.join(self.data_dir, "tmp")
 
     @property
     def database_url(self):
