@@ -16,8 +16,6 @@ class ConversionResult:
     error: Optional[str]
 
 def process_file(input_filepath: str, output_path: str, content_type: str = None):
-    logger.info(f"Converting file {input_filepath}")
-
     create_dir_if_not_exists(os.path.dirname(output_path))
 
     if content_type == None:

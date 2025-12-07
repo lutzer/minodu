@@ -1,13 +1,15 @@
+name: minodu-forum-dev
 services:
-  celery:
+  minodu-forum-celery:
     build:
       context: .
       dockerfile: Dockerfile
+    command: poetry run python worker.py
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_BACKEND_URL=redis://redis:6379/1
     volumes:
-      - data:/app/data
+      - ./minodu_forum/data:/app/data
     depends_on:
       redis:
         condition: service_healthy
@@ -17,6 +19,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 5s
+
   redis:
     image: redis:alpine
     command: redis-server --maxmemory 32mb

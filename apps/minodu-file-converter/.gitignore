@@ -1,9 +1,0 @@
-.venv
-*.db
-__pycache__
-.env
-.python-version
-.coverage
-
-tests/tmp
-minodu_forum/data
