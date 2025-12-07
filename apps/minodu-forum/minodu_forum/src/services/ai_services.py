@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 TRANSCRIBE_TIMEOUT = 60.0
 
-async def transcribe_audio(file_path, language: str) -> Optional[str]:
+async def transcribe_audio(file_path: str, language: str) -> Optional[str]:
     content_type = mimetypes.guess_type(file_path)
     async with httpx.AsyncClient() as client:
         with open(file_path, "rb") as f:
