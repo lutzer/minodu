@@ -10,9 +10,6 @@ RUN pip install poetry
 RUN poetry config virtualenvs.create false
 COPY pyproject.toml poetry.lock ./
 
-# Copy dependencies
-COPY --from=file-converter . /minodu-file-converter
-
 # install python packages
 RUN poetry install --no-root --only=main --no-interaction --no-ansi
 

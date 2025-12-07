@@ -2,7 +2,10 @@ import os
 from pathlib import Path
 import random
 import shutil
-from minodu_forum.src.celery.tasks import return_value_task, convert_file_task
+
+import pytest
+from minodu_forum.src.celery.tasks import return_value_task, convert_file_task, transcribe_file_task
+from tests.helpers import is_service_available
 
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -86,3 +89,31 @@ def test_celery_conversion_audio():
             Path(temp_file).unlink()
         if len(converted_file) > 0 and Path(converted_file).exists():
             Path(converted_file).unlink()
+
+def test_celery_transcribe_audio_english():
+    if not is_service_available():
+        pytest.skip("Service are not available")
+
+    # Setup: Define paths
+    source_file = os.path.join(script_dir, "files/english_sample_webm.webm")
+
+    result = transcribe_file_task.delay(0,source_file,"en")
+
+    data = result.get(timeout=5)
+
+    assert len(data['text']) > 0
+    assert data['confidence'] > 0.8
+
+def test_celery_transcribe_audio_french():
+    if not is_service_available():
+        pytest.skip("Service are not available")
+
+    # Setup: Define paths
+    source_file = os.path.join(script_dir, "files/french_sample.mp3")
+
+    result = transcribe_file_task.delay(0,source_file,"fr")
+
+    data = result.get(timeout=5)
+
+    assert len(data['text']) > 0
+    assert data['confidence'] > 0.8

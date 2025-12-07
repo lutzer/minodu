@@ -126,25 +126,27 @@
     "dev": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "poetry run python minodu_forum/main.py",
+        "command": "bash run_dev.sh",
         "cwd": "{projectRoot}",
         "env": {
           "PORT": "3003",
-          "DATABASE_URL": "sqlite:///./dev_database.db"
+          "DATABASE_URL": "sqlite:///./dev_database.db",
+          "CELERY_BROKER_URL" : "redis://localhost:6379/0",
+          "CELERY_BACKEND_URL" : "redis://localhost:6379/1"
         }
       }
     },
-    "redis:start": {
+    "celery:start": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "docker compose -f docker-compose.redis.yml up -d --build",
+        "command": "docker compose -f docker-compose.celery.yml up -d --build",
         "cwd": "{projectRoot}"
       }
     },
-    "redis:stop": {
+    "celery:stop": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "docker compose -f docker-compose.redis.yml down",
+        "command": "docker compose -f docker-compose.celery.yml down",
         "cwd": "{projectRoot}"
       }
     }
