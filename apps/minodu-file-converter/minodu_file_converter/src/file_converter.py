@@ -11,12 +11,15 @@ from pydub import AudioSegment
 
 logger = logging.getLogger(__name__)
 
-def process_file(input_filepath: str, output_path: str):
+def process_file(input_filepath: str, output_path: str, content_type: str = None):
     logger.info(f"Converting file {input_filepath}")
 
     create_dir_if_not_exists(os.path.dirname(output_path))
 
-    content_type, _ = mimetypes.guess_type(input_filepath)
+    if content_type == None:
+        content_type, _ = mimetypes.guess_type(input_filepath)
+
+    print("Cntentype:" + str(content_type))
 
     # if file is image, resize and convert to jpg
     if content_type.startswith("image/"):

@@ -33,9 +33,9 @@ def check_connection(value: int):
     return value
 
 @app.task(name='src.celery_app.convert_file')
-def convert_file(file_id: int, input_filepath: str, output_filepath: str, callback_url: str = None) -> dict:
+def convert_file(file_id: int, input_filepath: str, output_filepath: str, callback_url: str = None, input_type: str = None) -> dict:
     try:
-        process_file(input_filepath, output_filepath)
+        process_file(input_filepath, output_filepath, content_type=input_type)
         result = ConversionResult(
             file_id=file_id,
             input_file=input_filepath,

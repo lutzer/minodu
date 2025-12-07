@@ -63,7 +63,7 @@ async def test_convert_image_to_jpg_and_resize():
 )
 async def test_convert_audio_to_mp3(input):
     source_audio = os.path.join(script_dir, "files/audios/" + input)
-    temp_file = os.path.join(script_dir, "files", "tmp" + input)
+    temp_file = os.path.join(script_dir, "files", "tmp_" + input)
 
     converted_audio = os.path.join(script_dir, "files", "converted.mp3")
 
@@ -104,7 +104,7 @@ def test_convert_image_file():
         result = convert_file(0, temp_file, converted_file)
 
         assert Path(converted_file).exists(), "Converted file should exist"
-        assert result.error == None
+        assert result["error"] == None
     finally:
         # Cleanup: Delete temporary files
         if Path(temp_file).exists():
@@ -112,9 +112,23 @@ def test_convert_image_file():
         if len(converted_file) > 0 and Path(converted_file).exists():
             Path(converted_file).unlink()
 
-def test_convert_audio_file():
-    source_file = os.path.join(script_dir, "files/english_sample_webm.webm")
-    temp_file = os.path.join(script_dir, "files/tmp.webm")
+@pytest.mark.parametrize(
+    "input",
+    [
+        ("ff-16b-2c-44100hz.aac", "audio/aac"),
+        ("ff-16b-2c-44100hz.ac3", "audio/ac3"),
+        ("ff-16b-2c-44100hz.aiff", "audio/aiff"),
+        ("ff-16b-2c-44100hz.flac", "audio/flac"),
+        ("ff-16b-2c-44100hz.mp3", "audio/mp3"),
+        ("ff-16b-2c-44100hz.mp4", "audio/mp4"),
+        ("ff-16b-2c-44100hz.ogg", "audio/ogg"),
+        ("ff-16b-2c-44100hz.opus", "audio/opus"),
+        ("ff-16b-2c-44100hz.wma", "audio/wma")
+    ],
+)
+def test_convert_audio_file(input):
+    source_file = os.path.join(script_dir, "files/audios/" + input[0])
+    temp_file = os.path.join(script_dir, "files", "tmp_" + input[0])
     converted_file = os.path.join(script_dir, "files/output.mp3")
 
     try:
@@ -123,10 +137,10 @@ def test_convert_audio_file():
         assert Path(temp_file).exists(), "Failed to copy source file"
         assert not Path(converted_file).exists(), "Converted file should not exist"
 
-        result = convert_file(0, temp_file, converted_file)
+        result = convert_file(0, temp_file, converted_file, input_type=input[1])
 
         assert Path(converted_file).exists(), "Converted file should exist"
-        assert result.error == None
+        assert result["error"] == None
     finally:
         # Cleanup: Delete temporary files
         if Path(temp_file).exists():
