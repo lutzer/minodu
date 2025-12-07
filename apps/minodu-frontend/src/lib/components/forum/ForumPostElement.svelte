@@ -40,7 +40,7 @@
 					<AudioPlayer audioSource={file.file_urlpath}></AudioPlayer>
 				{:else if file.content_type.startsWith('image')}
 					<div class="image">
-						<img src={file.file_urlpath} alt="forum image" />
+						<img src={file.file_urlpath} alt="no description"/>
 					</div>
 				{:else}
 					{file.id} - {file.filename} : {file.file_urlpath}

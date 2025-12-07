@@ -70,11 +70,11 @@ def calculate_file_hash(file_path: str) -> str:
 
 
 def cleanup_file(file_path: str):
-    """Remove file from disk"""
-    try:
+    os.remove(file_path)
+
+def try_cleanup_file(file_path: str):
+    if os.path.exists(file_path):
         os.remove(file_path)
-    except Exception as e:
-        print(f"Warning: Could not delete file {file_path}: {e}")
 
 def create_dir_if_not_exists(path: str):
     if not os.path.isdir(path):
