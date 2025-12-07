@@ -10,7 +10,6 @@ from minodu_forum.src.app import app
 from minodu_forum.src.models.file import File, FileProcessingStatus
 from minodu_forum.src.utils import get_upload_file_path
 from tests.helpers import is_service_available
-from tests.test_convert import is_celery_available
 
 from .test_authors import create_author
 from .test_posts import create_post
@@ -36,12 +35,6 @@ def upload_file(client: TestClient, post_id: int, file_path: str, auth_token: st
         time.sleep(0.1)
 
     return data
-
-@pytest.fixture(scope="session", autouse=True)
-def check_before_class():
-    """Fixture that runs once before all tests in the class"""
-    if not is_celery_available():
-        pytest.skip("Celery is not running - skipping all tests in class")
 
 class TestFilesApi:
 

@@ -9,7 +9,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, Form, HTTPException, Up
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from minodu_file_converter.src.celery_app import convert_file
+from ..celery.tasks import convert_file_task
 
 from ..config import Config
 from ..database import get_db, get_db_session
@@ -133,7 +133,7 @@ async def delete_file(
 async def save_file_and_convert(file_id: int, input_filepath: str, input_type : str, output_filepath: str):
     '''Sends file to celery app to queue conversion task'''
     # run celery task
-    result = convert_file.delay(file_id, input_filepath, output_filepath, input_type=input_type)
+    result = convert_file_task.delay(file_id, input_filepath, output_filepath, input_type=input_type)
 
     while not result.ready():
         await asyncio.sleep(1.0)
