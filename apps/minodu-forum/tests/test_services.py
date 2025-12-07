@@ -10,21 +10,12 @@ from minodu_forum.src.app import app
 from minodu_forum.src.config import Config
 from minodu_forum.src.utils import get_upload_file_path
 from minodu_forum.src.services.ai_services import transcribe_audio
+from tests.helpers import is_service_available
 from tests.test_authors import create_author
 from tests.test_files import upload_file
 from tests.test_posts import create_post
 
-client = TestClient(app)
-
 script_dir = os.path.dirname(os.path.abspath(__file__))
-
-def is_service_available():
-    try:
-        response = requests.get(Config().service_url, timeout=5)
-        return True
-    except requests.ConnectionError:
-        return False
-
 
 class TestAiServices:
     """These Tests require the api services to run"""
@@ -50,17 +41,16 @@ class TestAiServices:
         assert result != None
         assert len(result) > 0
 
-    @pytest.mark.skip("Some async pytest bug still to figure out.")
     @pytest.mark.timeout(30)
-    def test_audio_file_upload_and_transcription(self):
+    def test_audio_file_upload_and_transcription(self, client):
         if not is_service_available():
             pytest.skip("Service are not available")
 
         file_path = os.path.join(script_dir, "files/french_sample.mp3")
 
-        auth_token = create_author()
-        post = create_post(auth_token, "fetch_test")
-        file = upload_file(post["id"], file_path, auth_token, "fr")
+        auth_token = create_author(client)
+        post = create_post(client, auth_token, "fetch_test")
+        file = upload_file(client, post["id"], file_path, auth_token, "fr")
         file_id = file["id"]
 
         assert os.path.isfile(get_upload_file_path(file["filename"]))

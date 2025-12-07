@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+from pathlib import Path
 import shutil
 from typing import Optional
 
@@ -74,8 +75,6 @@ async def upload_file(
         # validate file and get info
         file_info = get_file_info_and_validate(file)
 
-        print(file_info)
-
         tmp_file_path = os.path.join(Config().tmp_dir, file_info.tmp_filename)
         
         # create tmp file dir
@@ -101,8 +100,12 @@ async def upload_file(
 
         await broadcast_async("update")
 
-        # add file conversion job
-        asyncio.create_task(save_file_and_convert(db_file.id, tmp_file_path, file_info.content_type, get_upload_file_path(db_file.filename)))
+        async def convert_and_transcribe():
+            await save_file_and_convert(db_file.id, tmp_file_path, file_info.content_type, get_upload_file_path(db_file.filename))
+            await transcribe_file_and_update_record(db_file.id, get_upload_file_path(db_file.filename), language)
+
+        # add file conversion job and transcription
+        asyncio.create_task(convert_and_transcribe())
 
         return db_file
         
@@ -142,32 +145,30 @@ async def save_file_and_convert(file_id: int, input_filepath: str, input_type : 
     if data["error"]:
         logger.error("Conversion Error: " + data["error"])
 
-
     with get_db_session() as db:
         db_file = db.get(File, data["file_id"])
         if db_file != None:
             db_file.processing_state = FileProcessingStatus.ERROR if data["error"] else FileProcessingStatus.DONE
             db.commit()
             await broadcast_async("update")
-    
-
 
 
 # def save_file_and_convert(file_id: int, output_filepath: str, tmp_file_path: str):
 #     file_converter.convert(file_id, output_filepath, tmp_file_path)
 
 
-# async def transcribe_file_and_update_record(file_id: int, file_name: str, language: str):
-#     file_path = get_upload_file_path(file_name)
-#     try:
-#         result = await transcribe_audio(file_path, language)
-#         if result != None:
-#             with get_db_session() as db:
-#                 file = db.get(File, file_id)
-#                 if file != None:
-#                     file.text = result
-#                     db.commit()
-#                     await broadcast_async("update")
-#     except Exception as e:
-#         logger.exception(e)
-#         logger.error("Error transcribing file: " + str(e))
+async def transcribe_file_and_update_record(file_id: int, file_path: str, language: str):
+    extension = Path(file_path).suffix
+    if extension != ".mp3" and extension != ".wav":
+        return
+    try:
+        result = await transcribe_audio(file_path, language)
+        if result != None:
+            with get_db_session() as db:
+                file = db.get(File, file_id)
+                if file != None:
+                    file.text = result
+                    db.commit()
+                    await broadcast_async("update")
+    except Exception as e:
+        logger.error("Error transcribing file: " + str(e))

@@ -9,6 +9,7 @@ from fastapi.testclient import TestClient
 from minodu_forum.src.app import app
 from minodu_forum.src.models.file import File, FileProcessingStatus
 from minodu_forum.src.utils import get_upload_file_path
+from tests.helpers import is_service_available
 from tests.test_convert import is_celery_available
 
 from .test_authors import create_author
@@ -251,3 +252,36 @@ class TestFilesApi:
         file = upload_file(client, post["id"], file_path, auth_token)
 
         assert len(file["file_urlpath"]) > 0
+
+    def test_get_file_route(self, client):
+        auth_token = create_author(client)
+        post = create_post(client, auth_token, "fetch_test")
+
+        file_path = os.path.join(script_dir, "files/english_sample_webm.webm")
+        data = upload_file(client, post["id"], file_path, auth_token)
+
+        response = client.get(f"files/{data["id"]}")
+        assert response.status_code == 200
+        response_data = response.json()
+        assert response_data["filename"] == data["filename"]
+
+    @pytest.mark.timeout(10)
+    def test_audio_transcription(self, client):
+        if not is_service_available():
+            pytest.skip("Service are not available")
+            
+        auth_token = create_author(client)
+        post = create_post(client, auth_token, "fetch_test")
+
+        file_path = os.path.join(script_dir, "files/english_sample_webm.webm")
+        data = upload_file(client, post["id"], file_path, auth_token, language="en")
+
+        transcription = ""
+        while len(transcription) == 0:
+            time.sleep(0.2)
+            response = client.get(f"files/{data["id"]}")
+            data = response.json()
+            transcription = data["text"]
+
+        assert True
+        
