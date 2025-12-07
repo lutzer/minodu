@@ -98,4 +98,12 @@ class Config:
     @property
     def static_avatar_url(self):
         return "/static/avatars"
+    
+    @property
+    def celery_broker_url(self):
+        return os.getenv('CELERY_BROKER_URL', 'redis://localhost:6379/0')
+    
+    @property
+    def celery_backend_url(self):
+        return os.getenv('CELERY_BACKEND_URL', 'redis://localhost:6379/1')
 

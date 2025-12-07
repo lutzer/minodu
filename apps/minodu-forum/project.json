@@ -133,6 +133,20 @@
           "DATABASE_URL": "sqlite:///./dev_database.db"
         }
       }
+    },
+    "redis:start": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker compose -f docker-compose.redis.yml up -d --build",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "redis:stop": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker compose -f docker-compose.redis.yml down",
+        "cwd": "{projectRoot}"
+      }
     }
   },
   "tags": [],
