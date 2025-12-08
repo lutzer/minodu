@@ -3,7 +3,7 @@
 cleanup() {
     echo "Task cancelled, running cleanup..."
     # Your cleanup command here
-    nx celery:start minodu-forum
+    nx celery:stop minodu-forum
     exit 0
 }
 

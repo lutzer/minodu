@@ -3,12 +3,12 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "dev:start": "mkdir -p ./data/mysql && docker compose -f docker-compose.dev.yml up -d --build",
-    "dev:stop": "docker compose -f docker-compose.dev.yml down",
-    "dev:logs": "docker compose -f docker-compose.dev.yml logs -f",
-    "dev:clean": "docker compose -f docker-compose.dev.yml down -v --remove-orphans --rmi all && docker volume prune -f && docker network prune -f",
-    "dev:status": "docker compose -f docker-compose.dev.yml ps",
-    "dev:stats": "docker compose -f docker-compose.dev.yml stats"
+    "docker:start": "mkdir -p ./data/mysql && docker compose up -d --build",
+    "docker:stop": "docker compose down",
+    "docker:logs": "docker compose logs -f",
+    "docker:clean": "docker compose down -v --remove-orphans --rmi all && docker volume prune -f && docker network prune -f",
+    "docker:status": "docker compose ps",
+    "docker:stats": "docker compose stats"
   },
   "private": true,
   "devDependencies": {

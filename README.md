@@ -95,7 +95,7 @@ sudo apt install git-lfs
 git lfs pull
 
 # build and start services
-sudo npm run dev:start
+sudo npm run docker:start
 
 ```
 
