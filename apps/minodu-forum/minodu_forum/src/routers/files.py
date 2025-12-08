@@ -19,7 +19,7 @@ from ..models.file import File, FileProcessingStatus
 from ..models.post import Post
 from ..services.ai_services import transcribe_audio
 from .auth import get_author_from_token
-from ..utils import cleanup_file, create_dir_if_not_exists, get_file_info_and_validate, get_tmp_file_path, get_upload_file_path, try_cleanup_file
+from ..utils import cleanup_file, create_dir_if_not_exists, get_absolute_path, get_file_info_and_validate, get_tmp_file_path, get_upload_file_path, try_cleanup_file
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -74,14 +74,12 @@ async def upload_file(
     try:
         # validate file and get info
         file_info = get_file_info_and_validate(file)
-
-        tmp_file_path = get_tmp_file_path(file_info.tmp_filename)
         
         # create tmp file dir
         create_dir_if_not_exists(Config().get_tmp_dir())
 
         # copy file to temp folder
-        with open(tmp_file_path,"wb") as buffer:
+        with open(get_tmp_file_path(file_info.tmp_filename),"wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
         # create record
@@ -101,8 +99,8 @@ async def upload_file(
         await broadcast_async("update")
 
         async def convert_and_transcribe():
-            await save_file_and_convert(db_file.id, tmp_file_path, file_info.content_type, get_upload_file_path(db_file.filename))
-            await transcribe_file_and_update_record(db_file.id, get_upload_file_path(db_file.filename), language)
+            await save_file_and_convert(db_file.id, get_tmp_file_path(file_info.tmp_filename, absolute=False), file_info.content_type, get_upload_file_path(db_file.filename, absolute=False))
+            await transcribe_file_and_update_record(db_file.id, get_upload_file_path(db_file.filename, absolute=False), language)
 
         # add file conversion job and transcription
         asyncio.create_task(convert_and_transcribe())
@@ -138,7 +136,7 @@ async def save_file_and_convert(file_id: int, input_filepath: str, input_type : 
     while not result.ready():
         await asyncio.sleep(1.0)
 
-    try_cleanup_file(input_filepath)
+    try_cleanup_file(get_absolute_path(input_filepath))
 
     data = result.get()
 
