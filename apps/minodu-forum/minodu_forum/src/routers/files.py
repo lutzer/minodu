@@ -9,7 +9,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, Form, HTTPException, Up
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from ..celery.tasks import convert_file_task
+from ..celery.tasks import convert_file_task, transcribe_file_task
 
 from ..config import Config
 from ..database import get_db, get_db_session
@@ -17,7 +17,6 @@ from ..events import broadcast, broadcast_async
 from ..models.author import Author
 from ..models.file import File, FileProcessingStatus
 from ..models.post import Post
-from ..services.ai_services import transcribe_audio
 from .auth import get_author_from_token
 from ..utils import cleanup_file, create_dir_if_not_exists, get_absolute_path, get_file_info_and_validate, get_tmp_file_path, get_upload_file_path, try_cleanup_file
 
@@ -100,7 +99,7 @@ async def upload_file(
 
         async def convert_and_transcribe():
             await save_file_and_convert(db_file.id, get_tmp_file_path(file_info.tmp_filename, absolute=False), file_info.content_type, get_upload_file_path(db_file.filename, absolute=False))
-            await transcribe_file_and_update_record(db_file.id, get_upload_file_path(db_file.filename, absolute=False), language)
+            await transcribe_file(db_file.id, get_upload_file_path(db_file.filename, absolute=False), language)
 
         # add file conversion job and transcription
         asyncio.create_task(convert_and_transcribe())
@@ -150,23 +149,26 @@ async def save_file_and_convert(file_id: int, input_filepath: str, input_type : 
             db.commit()
             await broadcast_async("update")
 
-
-# def save_file_and_convert(file_id: int, output_filepath: str, tmp_file_path: str):
-#     file_converter.convert(file_id, output_filepath, tmp_file_path)
-
-
-async def transcribe_file_and_update_record(file_id: int, file_path: str, language: str):
+async def transcribe_file(file_id: int, file_path: str, language: str):
     extension = Path(file_path).suffix
     if extension != ".mp3" and extension != ".wav":
         return
-    try:
-        result = await transcribe_audio(file_path, language)
-        if result != None:
-            with get_db_session() as db:
-                file = db.get(File, file_id)
-                if file != None:
-                    file.text = result
-                    db.commit()
-                    await broadcast_async("update")
-    except Exception as e:
-        logger.error("Error transcribing file: " + str(e))
+    
+    result = transcribe_file_task.delay(file_id, file_path, language)
+
+    while not result.ready():
+        await asyncio.sleep(1.0)
+
+    data = result.get()
+    
+    if data["confidence"] < 0.8:
+        logger.warning("Transcription confidence too low: " + str(data))
+    elif data["error"]:
+        logger.error("Conversion Error: " + data["error"])
+    else:
+        with get_db_session() as db:
+            file = db.get(File, file_id)
+            if file != None:
+                file.text = data["text"]
+                db.commit()
+                await broadcast_async("update")
