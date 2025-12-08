@@ -80,11 +80,11 @@ def create_dir_if_not_exists(path: str):
     if not os.path.isdir(path):
         os.makedirs(path)
 
-def get_upload_file_path(filename: str):
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.normpath(os.path.join(script_dir, "../..", Config().upload_dir, filename))
+def get_upload_file_path(filename: str, absolute : bool = True) -> str:
+    return str((Config().get_upload_dir(absolute) / filename).resolve())
 
+def get_avatar_file_path(filename: str, absolute : bool = True) -> str:
+    return str((Config().get_avatar_dir(absolute) / filename).resolve())
 
-def get_avatar_file_path(filename: str):
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.normpath(os.path.join(script_dir, "../..", Config().avatar_dir, filename))
+def get_tmp_file_path(filename: str, absolute : bool = True) -> str:
+    return str((Config().get_tmp_dir(absolute) / filename).resolve())

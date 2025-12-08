@@ -19,7 +19,7 @@ from ..models.file import File, FileProcessingStatus
 from ..models.post import Post
 from ..services.ai_services import transcribe_audio
 from .auth import get_author_from_token
-from ..utils import cleanup_file, create_dir_if_not_exists, get_file_info_and_validate, get_upload_file_path, try_cleanup_file
+from ..utils import cleanup_file, create_dir_if_not_exists, get_file_info_and_validate, get_tmp_file_path, get_upload_file_path, try_cleanup_file
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -75,10 +75,10 @@ async def upload_file(
         # validate file and get info
         file_info = get_file_info_and_validate(file)
 
-        tmp_file_path = os.path.join(Config().tmp_dir, file_info.tmp_filename)
+        tmp_file_path = get_tmp_file_path(file_info.tmp_filename)
         
         # create tmp file dir
-        create_dir_if_not_exists(Config().tmp_dir)
+        create_dir_if_not_exists(Config().get_tmp_dir())
 
         # copy file to temp folder
         with open(tmp_file_path,"wb") as buffer:

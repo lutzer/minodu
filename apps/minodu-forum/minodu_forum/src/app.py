@@ -30,12 +30,11 @@ app.include_router(login.router, prefix="/login", tags=["login"])
 app.include_router(events.router, prefix="/events", tags=["events"])
 
 # create static dirs
-os.makedirs(Config().upload_dir, exist_ok=True)
-os.makedirs(Config().avatar_dir, exist_ok=True)
+Config().get_upload_dir().mkdir(parents=True, exist_ok=True)
 
 # mount static dirs
-app.mount(Config().static_upload_url, StaticFiles(directory=Config().upload_dir), name="files")
-app.mount(Config().static_avatar_url, StaticFiles(directory=Config().avatar_dir), name="avatars")
+app.mount(Config().static_upload_url, StaticFiles(directory=Config().get_upload_dir()), name="files")
+app.mount(Config().static_avatar_url, StaticFiles(directory=Config().get_avatar_dir()), name="avatars")
 
 
 @app.get("/")

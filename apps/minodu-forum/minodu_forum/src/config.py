@@ -1,11 +1,11 @@
 import os
 
 from dotenv import load_dotenv
+from pathlib import Path
 
 load_dotenv()
 
 config = None
-
 
 class Config:
     _instance = None
@@ -44,28 +44,21 @@ class Config:
             self._service_url = os.getenv("AI_SERVICE_URL", "http://localhost:3002/api/services")
         return self._service_url
     
-    @property
-    def data_dir(self):
+    def get_data_dir(self, absolute : bool = True):
         if self._data_dir is None:
-            script_dir = os.path.dirname(os.path.abspath(__file__))
-            file_dir = os.getenv("FILE_DIR", "data/minodu_forum")
-            self._data_dir = os.path.join(script_dir, "..", file_dir)
-        return self._data_dir
+            self._data_dir = Path(os.getenv("FILE_DIR", "data/minodu_forum"))
+        return self.app_dir / self._data_dir if absolute else self._data_dir
 
-    @property
-    def upload_dir(self):
-        return os.path.join(self.data_dir, "uploads")
 
-    @property
-    def avatar_dir(self):
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        return os.path.join(script_dir,"assets/avatars")
-    
-   
+    def get_avatar_dir(self, absolute : bool = True) -> Path:
+        avatar_dir = Path("assets/avatars")
+        return self.app_dir / avatar_dir if absolute else avatar_dir
 
-    @property
-    def tmp_dir(self):
-        return os.path.join(self.data_dir, "tmp")
+    def get_upload_dir(self, absolute : bool = True) -> Path:
+        return self.get_data_dir(absolute) / "uploads"
+
+    def get_tmp_dir(self, absolute : bool = True) -> Path:
+        return self.get_data_dir(absolute) / "tmp"
 
     @property
     def database_url(self):
@@ -106,4 +99,7 @@ class Config:
     @property
     def celery_backend_url(self):
         return os.getenv('CELERY_BACKEND_URL', 'redis://localhost:6379/1')
-
+    
+    @property
+    def app_dir(self) -> Path:
+        return Path(__file__).parent / '..'
