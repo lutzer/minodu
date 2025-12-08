@@ -36,9 +36,9 @@ class Avatar(Base):
 
 def create_avatar_table():
     avatar_images = [
-        *glob(f"{Config().avatar_dir}/*.jpg"),
-        *glob(f"{Config().avatar_dir}/*.jpeg"),
-        *glob(f"{Config().avatar_dir}/*.png")
+        *glob(f"{Config().get_avatar_dir()}/*.jpg"),
+        *glob(f"{Config().get_avatar_dir()}/*.jpeg"),
+        *glob(f"{Config().get_avatar_dir()}/*.png")
     ]
 
     with get_db_session() as db:
