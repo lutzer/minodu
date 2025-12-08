@@ -81,10 +81,16 @@ def create_dir_if_not_exists(path: str):
         os.makedirs(path)
 
 def get_upload_file_path(filename: str, absolute : bool = True) -> str:
-    return str((Config().get_upload_dir(absolute) / filename).resolve())
+    path = Config().get_upload_dir(absolute) / filename
+    return str(path.resolve() if absolute else path)
 
 def get_avatar_file_path(filename: str, absolute : bool = True) -> str:
-    return str((Config().get_avatar_dir(absolute) / filename).resolve())
+    path = Config().get_avatar_dir(absolute) / filename
+    return str(path.resolve() if absolute else path)
 
 def get_tmp_file_path(filename: str, absolute : bool = True) -> str:
-    return str((Config().get_tmp_dir(absolute) / filename).resolve())
+    path = Config().get_tmp_dir(absolute) / filename
+    return str(path.resolve() if absolute else path)
+
+def get_absolute_path(relative_path: str) -> str:
+    return str((Config().app_dir / relative_path).resolve())

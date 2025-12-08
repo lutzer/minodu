@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 
 from minodu_forum.src.app import app
 from minodu_forum.src.models.file import File, FileProcessingStatus
-from minodu_forum.src.utils import get_upload_file_path
+from minodu_forum.src.utils import get_absolute_path, get_avatar_file_path, get_tmp_file_path, get_upload_file_path
 from tests.helpers import is_service_available
 
 from .test_authors import create_author
@@ -37,6 +37,18 @@ def upload_file(client: TestClient, post_id: int, file_path: str, auth_token: st
     return data
 
 class TestFilesApi:
+
+    def test_utility_path_functions(self):
+        assert get_upload_file_path("test", absolute=False) == "../tests/testdata/uploads/test"
+        assert get_upload_file_path("test", absolute=True).startswith("/")
+
+        assert get_tmp_file_path("test", absolute=False) == "../tests/testdata/tmp/test"
+        assert get_tmp_file_path("test", absolute=True).startswith("/")
+
+        assert get_avatar_file_path("test", absolute=False) == "assets/avatars/test"
+        assert get_avatar_file_path("test", absolute=True).startswith("/")
+
+        assert get_absolute_path("test").startswith("/")
 
     def test_validate_file(self):
         with pytest.raises(Exception):

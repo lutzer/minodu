@@ -6,6 +6,8 @@ import os
 
 import requests
 
+from ..utils import get_absolute_path
+
 
 from ..config import Config
 
@@ -24,8 +26,10 @@ def return_value_task(value: int):
 @app.task()
 def convert_file_task(file_id: int, input_filepath: str, output_filepath: str, callback_url: str = None, input_type: str = None) -> dict:
     logger.info(f"Converting file {input_filepath}")
+    print("input:" + input_filepath)
+    print("output:" + output_filepath)
     try:
-        process_file(input_filepath, output_filepath, content_type=input_type)
+        process_file(get_absolute_path(input_filepath), get_absolute_path(output_filepath), content_type=input_type)
         result = ConversionResult(
             file_id=file_id,
             input_file=input_filepath,
@@ -57,7 +61,7 @@ def convert_file_task(file_id: int, input_filepath: str, output_filepath: str, c
 def transcribe_file_task(file_id: int, input_filepath: str, language: str) -> dict:
     logger.info(f"Transcribing file {input_filepath}")
     try:
-        text, confidence = transcribe_audio(input_filepath, language)
+        text, confidence = transcribe_audio(get_absolute_path(input_filepath), language)
         result = TranscriptionResult(
             file_id=file_id,
             input_file=input_filepath,
