@@ -8,7 +8,7 @@ services:
       - "3306:3306"
     environment:
       - MYSQL_DATABASE=minodu
-      - MYSQL_USER=minodu_user
+      - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
     volumes:
@@ -50,7 +50,7 @@ services:
       - "3003:3003"
     environment:
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
-      - DATABASE_URL=mysql+pymysql://minodu_user:${MYSQL_PASSWORD}@minodu-database:3306/minodu
+      - DATABASE_URL=mysql+pymysql://${MYSQL_USER}:${MYSQL_PASSWORD}@minodu-database:3306/minodu
       - PORT=3003
       - AI_SERVICE_URL=http://minodu-ai-services:3002/api/services
       - CELERY_BROKER_URL=redis://redis:6379/0
