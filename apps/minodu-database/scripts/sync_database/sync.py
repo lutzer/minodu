@@ -6,41 +6,37 @@ Supports MySQL, PostgreSQL, and SQLite databases.
 
 import os
 import sys
-import zipfile
-import requests
 import subprocess
 import argparse
 import pymysql
 import shutil
 from pathlib import Path
 
-def download_file(url, destination):
-    """Download file from URL to destination path."""
-    print(f"Downloading from {url}...")
+def download_and_extract(url, extract_to='.', temp_file='./download.zip'):
+    """Download to temp file, then extract and delete"""
+    print(f"Downloading file from {url} to {temp_file}...")
     try:
-        response = requests.get(url, stream=True)
-        response.raise_for_status()
+        # Download with curl (fast)
+        subprocess.run(
+            ['curl', '-L', '--progress-bar', '-o', temp_file, url],
+            check=True
+        )
         
-        with open(destination, 'wb') as f:
-            for chunk in response.iter_content(chunk_size=8192):
-                f.write(chunk)
+        # Extract
+        subprocess.run(
+            ['unzip', '-q', temp_file, '-d', extract_to],
+            check=True
+        )
         
-        print(f"Downloaded to {destination}")
+        # Clean up
+        os.remove(temp_file)
+        
+        print(f"Downloaded and extracted to {extract_to}")
         return True
-    except Exception as e:
-        print(f"Error downloading file: {e}")
-        return False
-
-def unzip_file(zip_path, extract_to):
-    """Extract zip file to specified directory."""
-    print(f"Extracting {zip_path}...")
-    try:
-        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-            zip_ref.extractall(extract_to)
-        print(f"Extracted to {extract_to}")
-        return True
-    except Exception as e:
-        print(f"Error extracting zip: {e}")
+    except subprocess.CalledProcessError as e:
+        print(f"Error: {e}")
+        if os.path.exists(temp_file):
+            os.remove(temp_file)
         return False
 
 def import_mysql(sql_file, host, database, user, password, port=3306):
@@ -95,12 +91,12 @@ def copy_files(source_dir, destination_dir):
         print(f"Error copying files: {e}")
         return False
 
-def cleanup(download_dir):
+def cleanup(dir):
     """Clean up downloaded and extracted files."""
     print("Cleaning up temporary files...")
     try:
-        if os.path.exists(download_dir):
-            shutil.rmtree(download_dir)
+        if os.path.exists(dir):
+            shutil.rmtree(dir)
         print("Cleanup complete!")
     except Exception as e:
         print(f"Error during cleanup: {e}")
@@ -118,42 +114,34 @@ def main():
     args = parser.parse_args()
     
     # Create download directory
-    download_dir = Path.cwd() / "tmp"
-    download_dir.mkdir(parents=True, exist_ok=True)
+    extract_dir = Path.cwd() / "extracted/"
+    extract_dir.mkdir(parents=True, exist_ok=True)
     
-    zip_path = download_dir / "download.zip"
-    extract_dir = download_dir / "extracted"
-    
-    # Download zip file
-    if not download_file(args.url, zip_path):
-        return 1
-    
-    # Extract zip file
-    if not unzip_file(zip_path, extract_dir):
-        cleanup(download_dir)
+    # Download zip file and extract
+    if not download_and_extract(args.url, extract_dir):
         return 1
     
     # Find SQL file
     sql_file = extract_dir / "db_dump.sql"
     if not sql_file:
         print("Error: No SQL file found in extracted contents")
-        cleanup(download_dir)
+        cleanup(extract_dir)
         return 1
     
     # import sql dump
     if not import_mysql(sql_file, args.host, args.database, args.user, args.password, args.port):
-        cleanup(download_dir)
+        cleanup(extract_dir)
         return 1
 
     # copy files
     destination_path = Path(args.destination_path)
     destination_path = destination_path if destination_path.is_absolute() else Path.cwd() / destination_path
     if not copy_files(extract_dir.resolve(), destination_path.resolve()):
-        cleanup(download_dir)
+        cleanup(extract_dir)
         return 1
         
     # Cleanup
-    cleanup(download_dir)
+    cleanup(extract_dir)
 
     return 0
 
