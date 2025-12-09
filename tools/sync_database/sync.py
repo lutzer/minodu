@@ -104,12 +104,12 @@ def cleanup(dir):
 def main():
     parser = argparse.ArgumentParser(description='Download, extract, and import SQL database dump')
     parser.add_argument('url', help='URL of the zip file to download')
-    parser.add_argument('destination_path', help='Path where the content of the archive should be extracted to.')
+    parser.add_argument('--destination', required=True, help='Path where the content of the archive should be extracted to.')
     parser.add_argument('--host', default='localhost', help='Database host (default: localhost)')
     parser.add_argument('--port', default=3306, type=int, help='Database port')
     parser.add_argument('--database', default="minodu", help='Database name')
-    parser.add_argument('--user', help='Database user')
-    parser.add_argument('--password', help='Database password')
+    parser.add_argument('--user', required=True, help='Database user')
+    parser.add_argument('--password', required=True, help='Database password')
     
     args = parser.parse_args()
     
@@ -134,8 +134,8 @@ def main():
         return 1
 
     # copy files
-    destination_path = Path(args.destination_path)
-    destination_path = destination_path if destination_path.is_absolute() else Path.cwd() / destination_path
+    destination = Path(args.destination)
+    destination_path = destination if destination.is_absolute() else Path.cwd() / destination
     if not copy_files(extract_dir.resolve(), destination_path.resolve()):
         cleanup(extract_dir)
         return 1
