@@ -2,7 +2,6 @@
 
 Monorepo containing all the minodu apps and services
 
-
 ## Development
 
 ### Prerequesites
@@ -97,6 +96,8 @@ git lfs pull
 # build and start services
 sudo npm run docker:start
 
+# once the database is running, sync online database to local one with
+npm run database:sync
 ```
 
 ## TODO
