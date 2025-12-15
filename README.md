@@ -21,8 +21,17 @@ Monorepo containing all the minodu apps and services
 
 ### Setup
 
+
+* create `.env` file in root folder and set these credentials:
+    ```
+    MYSQL_USER=minodu_user
+    MYSQL_PASSWORD=password
+    MYSQL_ROOT_PASSWORD=rootpassword
+    JWT_SECRET_KEY=secret
+    ENVIRONMENT=production
+    ```
 * run `npm install`
-* run development docker container with `npm run dev:start` and stop with `npm run dev:stop`
+* run development docker container with `npm run docker:start` and stop with `npm run docker:stop`
 
 ### Run apps with
 
