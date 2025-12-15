@@ -101,24 +101,36 @@ services:
       timeout: 10s
       retries: 3
 
-  # Frontend Service
-  minodu-frontend:
+  # Frontend builder Service
+  frontend-builder:
     build:
       context: ./apps/minodu-frontend
       dockerfile: Dockerfile
-    ports:
-      - "3000:80"
-    depends_on:
-      - minodu-forum
-      - minodu-ai-services
-    restart: unless-stopped
+    image: minodu-frontend:latest
+    restart: no
 
-  # Backoffice Service
-  minodu-backoffice:
+  # Backoffice builder Service
+  backoffice-builder:
     build:
       context: ./apps/minodu-backoffice
       dockerfile: Dockerfile
+    image: minodu-backoffice:latest
+    restart: no
+  
+  # Web Service [Frontend + Backoffice]
+  minodu-web:
+    container_name: minodu-web
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+    image: minodu-web:latest
     ports:
-      - "3000:8080"
+      - "80:80"      # Frontend (80 on RPI/8088 on local)
+      - "8080:8080"  # Backoffice
     depends_on:
+      - frontend-builder
+      - backoffice-builder
+      - minodu-forum
+      - minodu-ai-services
       - minodu-backend
+    restart: unless-stopped

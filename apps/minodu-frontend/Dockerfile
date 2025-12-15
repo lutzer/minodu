@@ -1,6 +1,5 @@
 # Build stage
-FROM node:18-alpine AS builder
-
+FROM node:18-alpine
 WORKDIR /app
 
 # Copy package files
@@ -15,16 +14,4 @@ COPY . .
 # Build the app
 RUN npm run build
 
-# Production stage
-FROM nginx:alpine
-
-# Copy built assets from builder
-COPY --from=builder /app/build /usr/share/nginx/html
-
-# Copy nginx configuration
-COPY nginx.conf /etc/nginx/nginx.conf
-
-# Expose port 80
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["echo", "Frontent build completed"]

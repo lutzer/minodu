@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Put } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AdminGuard } from 'src/auth/guards/admin.guard';
 import { Public } from 'src/auth/decorators/public.decorator';
@@ -32,6 +32,13 @@ export class ProductOfferController {
   }
 
   @Public()
+  @ApiOperation({ summary: "Archived ProductOffer list", description: "All archived ProductOffer list" })
+  @Get('archived')
+  findAllArchived() {
+    return this.productOfferService.findAllArchived();
+  }
+
+  @Public()
   @ApiOperation({ summary: "Search farmer productOffer list", description: "All ProductOffer list filtered by farmer" })
   @Get('farmer/:id')
   findAllByFarmer(@Param('id') id: string) {
@@ -50,6 +57,20 @@ export class ProductOfferController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.productOfferService.findOne(+id);
+  }
+
+  @Public()
+  @ApiOperation({ summary: "Archive productOffer", description: "Archive the given productOffer" })
+  @Put('archive/:id')
+  archive(@Param('id') id: string) {
+    return this.productOfferService.archive(+id);
+  }
+
+  @Public()
+  @ApiOperation({ summary: "Unarchive productOffer", description: "Unarchive the given productOffer" })
+  @Put('unarchive/:id')
+  unarchive(@Param('id') id: string) {
+    return this.productOfferService.unarchive(+id);
   }
 
   @ApiOperation({ summary: "Update productOffer", description: "Update given productOffer infos" })

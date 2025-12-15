@@ -19,6 +19,12 @@ export class ProductOffer extends BaseEntity {
   @Column({ nullable: false })
   quantity: number;
 
+  @Column({ type: 'boolean', default: false })
+  isArchived: boolean;
+
+  @Column({ type: 'timestamp', nullable: true })
+  archivedAt: Date;
+
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 

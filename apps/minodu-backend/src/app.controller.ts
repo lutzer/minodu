@@ -30,11 +30,6 @@ export class AppController {
     this.configurationService.createDefaultConfiguration();
   }
 
-  // @Get()
-  // getHello() {
-  //   return this.appService.getHello();
-  // }
-
   /**
    * 
    * Downloads a file specified by its name in the URL.

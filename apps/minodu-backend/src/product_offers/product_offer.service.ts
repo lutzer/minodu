@@ -49,6 +49,7 @@ export class ProductOfferService {
   async findAll() {
     try {
       const data = await this.productOfferRepository.find({
+        where: { isArchived: false },
         relations:{
           product:true,
           user: true
@@ -60,6 +61,25 @@ export class ProductOfferService {
       });
     } catch (error) {
       console.log('ProductOffer.all.error', error);
+      throw error;
+    }
+  }
+
+  async findAllArchived() {
+    try {
+      const data = await this.productOfferRepository.find({
+        where: { isArchived: true },
+        relations:{
+          product:true,
+          user: true
+      }
+      });
+
+      return data.map((productOffer) => {
+        return { ...DataFormater.getProductOffer(productOffer) };
+      });
+    } catch (error) {
+      console.log('ProductOffer.allArchived.error', error);
       throw error;
     }
   }
@@ -148,6 +168,47 @@ export class ProductOfferService {
       throw error;
     }
   }
+
+  async archive(id: number){
+    try{
+      const one =  await this._findOne(id);
+
+      if (one.isArchived){
+        throw new Error('Offre déjà archivée');
+      }
+
+      one.isArchived = true;
+      one.archivedAt = new Date();
+
+      return one.save().then((saved)=>{
+        return DataFormater.getProductOffer (saved);
+      });
+    } catch (error){
+      console.log('ProductOffer.archive.error', error);
+      throw error;
+    }
+  }
+
+   async unarchive(id: number) {
+    try {
+      const one = await this._findOne(id);
+      
+      if (!one.isArchived) {
+        throw new Error('Cet offre n\'est pas archivée');
+      }
+
+      one.isArchived = false;
+      one.archivedAt = null;
+
+      return one.save().then((saved) => {
+        return DataFormater.getProductOffer(saved);
+      });
+    } catch (error) {
+      console.log('ProductOffer.unarchive.error', error);
+      throw error;
+    }
+  }
+  
 
   async update(id: number, updateProductOfferDto: UpdateProductOfferDto) {
     try {
