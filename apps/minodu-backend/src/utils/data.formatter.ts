@@ -108,6 +108,8 @@ export abstract class DataFormater {
       return {
         id: productOffer.id,
         quantity: productOffer.quantity,
+        isArchived: productOffer.isArchived,
+        archivedAt: productOffer.archivedAt,
         user: this.getUser(productOffer.user),
         product: this.getProduct(productOffer.product),
       }
@@ -119,6 +121,8 @@ export abstract class DataFormater {
       return {
         id: productDemand.id,
         quantity: productDemand.quantity,
+        isArchived: productDemand.isArchived,
+        archivedAt: productDemand.archivedAt,
         partner: this.getPartner(productDemand.partner),
         product: this.getProduct(productDemand.product),
         deadline: productDemand.deadline

@@ -22,6 +22,8 @@ import { Partner } from './partners/entities/partner.entity';
 import { ProductDemandModule } from './product_demands/demand.module';
 import { ProductOfferModule } from './product_offers/product_offer.module';
 import { PartnerModule } from './partners/partner.module';
+import { BackupService } from './backup/backup.service';
+import { BackupModule } from './backup/backup.module';
 
 @Module({
   imports: [
@@ -67,7 +69,8 @@ import { PartnerModule } from './partners/partner.module';
     LoggerModule,
     PartnerModule,
     ProductDemandModule,
-    ProductOfferModule
+    ProductOfferModule,
+    BackupModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -37,6 +37,7 @@ export class ProductDemandService {
       productDemand.product = product;
       productDemand.quantity = createProductDemandDto.quantity;
       productDemand.deadline = new Date(createProductDemandDto.deadline);
+      productDemand.isArchived = false;
 
       return productDemand.save().then((saved) => {
         return DataFormater.getProductDemand(saved);
@@ -50,10 +51,11 @@ export class ProductDemandService {
   async findAll() {
     try {
       const data = await this.productDemandRepository.find({
-        relations:{
-          product:true,
+        where: { isArchived: false },
+        relations: {
+          product: true,
           partner: true
-      }
+        }
       });
 
       return data.map((productDemand) => {
@@ -65,19 +67,41 @@ export class ProductDemandService {
     }
   }
 
+  async findAllArchived() {
+    try {
+      const data = await this.productDemandRepository.find({
+        where: { isArchived: true },
+        relations: {
+          product: true,
+          partner: true
+        },
+        order: {
+          archivedAt: 'DESC'
+        }
+      });
+
+      return data.map((productDemand) => {
+        return { ...DataFormater.getProductDemand(productDemand) };
+      });
+    } catch (error) {
+      console.log('ProductDemand.archived.error', error);
+      throw error;
+    }
+  }
+
   async findOne(id: number) {
     try {
       const one = await this.productDemandRepository.findOne({ 
         where: { id },
-      relations:{
-          product:true,
-          partner:true
-      }
-    });
+        relations: {
+          product: true,
+          partner: true
+        }
+      });
       if (!one) {
         throw new NotFoundException();
       }
-      return DataFormater.getProductDemand(one);;
+      return DataFormater.getProductDemand(one);
     } catch (error) {
       console.log('ProductDemand.one.error', error);
       throw error;
@@ -88,11 +112,11 @@ export class ProductDemandService {
     try {
       const one = await this.productDemandRepository.findOne({ 
         where: { id },
-      relations:{
-          product:true,
+        relations: {
+          product: true,
           partner: true
-      }
-    });
+        }
+      });
       if (!one) {
         throw new NotFoundException();
       }
@@ -107,18 +131,19 @@ export class ProductDemandService {
     try {
       const data = await this.productDemandRepository.find({ 
         where: { 
-          product:{id:productId} 
+          product: { id: productId },
+          isArchived: false
         },
-        relations:{
-          product:true,
-          partner:true
-      } 
+        relations: {
+          product: true,
+          partner: true
+        } 
       });
       if (!data) {
         throw new NotFoundException();
       }
       
-       return data.map((productDemand) => {
+      return data.map((productDemand) => {
         return { ...DataFormater.getProductDemand(productDemand) };
       });
     } catch (error) {
@@ -131,12 +156,13 @@ export class ProductDemandService {
     try {
       const data = await this.productDemandRepository.find({ 
         where: { 
-          partner:{id:partnerId} 
+          partner: { id: partnerId },
+          isArchived: false
         },
-        relations:{
-          product:true,
+        relations: {
+          product: true,
           partner: true
-      }
+        }
       });
       if (!data) {
         throw new NotFoundException();
@@ -150,13 +176,52 @@ export class ProductDemandService {
     }
   }
 
+  async archive(id: number) {
+    try {
+      const one = await this._findOne(id);
+      
+      if (one.isArchived) {
+        throw new Error('Cette demande est déjà archivée');
+      }
+
+      one.isArchived = true;
+      one.archivedAt = new Date();
+
+      return one.save().then((saved) => {
+        return DataFormater.getProductDemand(saved);
+      });
+    } catch (error) {
+      console.log('ProductDemand.archive.error', error);
+      throw error;
+    }
+  }
+
+  async unarchive(id: number) {
+    try {
+      const one = await this._findOne(id);
+      
+      if (!one.isArchived) {
+        throw new Error('Cette demande n\'est pas archivée');
+      }
+
+      one.isArchived = false;
+      one.archivedAt = null;
+
+      return one.save().then((saved) => {
+        return DataFormater.getProductDemand(saved);
+      });
+    } catch (error) {
+      console.log('ProductDemand.unarchive.error', error);
+      throw error;
+    }
+  }
+
   async update(id: number, updateProductDemandDto: UpdateProductDemandDto) {
     try {
       const one = await this._findOne(id);
       one.quantity = updateProductDemandDto.quantity;
       one.deadline = new Date(updateProductDemandDto.deadline);
 
-      
       return one.save().then((saved) => {
         return DataFormater.getProductDemand(saved);
       });
@@ -175,5 +240,4 @@ export class ProductDemandService {
       throw error;
     }
   }
-
 }

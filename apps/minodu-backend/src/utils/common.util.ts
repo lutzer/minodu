@@ -78,6 +78,7 @@ export abstract class BaseConfig {
       if (filename.match(/\.(jpg|jpeg|png|gif|jfif|webp)$/)) return './temp/images';
       if (filename.match(/\.(avi|mp4|mkv|mov|flv)$/)) return './temp/videos';
       if (filename.match(/\.(mp3|wav|bwf|ogg|flac)$/)) return './temp/audios';
+      if (filename.match(/\.(zip)$/)) return './temp';
     }
   }
 
