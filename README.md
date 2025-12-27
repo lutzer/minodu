@@ -20,16 +20,14 @@ Monorepo containing all the minodu apps and services
     * unzip vosk models with `(cd models/stt_models && unzip -o vosk-model-small-fr-0.22.zip && unzip -o vosk-model-small-en-us-0.15.zip)`in folder *apps/minodu-ai-services/minodu_ai_services*
 
 ### Setup
-
-
 * create `.env` file in root folder and set these credentials:
-    ```
-    MYSQL_USER=minodu_user
-    MYSQL_PASSWORD=password
-    MYSQL_ROOT_PASSWORD=rootpassword
-    JWT_SECRET_KEY=secret
-    ENVIRONMENT=production
-    ```
+```
+MYSQL_USER=minodu_user
+MYSQL_PASSWORD=password
+MYSQL_ROOT_PASSWORD=rootpassword
+JWT_SECRET_KEY=secret
+ENVIRONMENT=development
+```
 * run `npm install`
 * run development docker container with `npm run docker:start` and stop with `npm run docker:stop`
 
@@ -70,7 +68,14 @@ nx g @nx/node:application <name> --directory=apps/<name>
 ## Deployment on raspberry pi
 
 * install base image rasp pi os 64 bit lite
-
+* create `.env` file in root folder and set password, rootpassword and secret key:
+```
+MYSQL_USER=minodu_user
+MYSQL_PASSWORD=<password>
+MYSQL_ROOT_PASSWORD=<rootpassword>
+JWT_SECRET_KEY=secret
+ENVIRONMENT=production
+```
 * setup ollama
 ```
 # install ollama
