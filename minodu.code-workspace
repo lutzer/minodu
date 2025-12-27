@@ -1,0 +1,26 @@
+{
+  "folders": [
+    {
+      "name": "root",
+      "path": "."
+    },
+    {
+      "path": "apps/minodu-forum"
+    },
+    {
+      "path": "apps/minodu-ai-services"
+    },
+    {
+      "path": "apps/minodu-frontend"
+    },
+    {
+      "path": "apps/minodu-database"
+    },
+    {
+      "path": "apps/minodu-backend"
+    },
+    {
+      "path": "apps/minodu-backoffice"
+    }
+  ]
+}

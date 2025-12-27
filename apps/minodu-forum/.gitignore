@@ -4,5 +4,5 @@ __pycache__
 .env
 .python-version
 
-tests/tmp
-minodu_forum/static
+tests/testdata
+minodu_forum/data

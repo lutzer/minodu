@@ -1,28 +1,23 @@
+import asyncio
 import os
-from fastapi import FastAPI, UploadFile, HTTPException
-from pydantic import BaseModel
-from fastapi.responses import StreamingResponse
-from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 
-from .config import Config
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 
+from .models.avatar import create_avatar_table
+
+from .config import Config
 from .database import get_db_connection
-
-from .routers import posts
-from .routers import authors
-from .routers import files
-from .routers import avatars
-from .routers import login
-from .routers import events
-
-from .config import Config
+from .routers import authors, avatars, events, files, login, posts
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Initialize database on startup."""
     get_db_connection().create_tables()
+    create_avatar_table()
     yield
+
 
 # Initialize FastAPI app with root_path prefix
 app = FastAPI(root_path=Config().api_prefix, lifespan=lifespan)
@@ -35,12 +30,12 @@ app.include_router(login.router, prefix="/login", tags=["login"])
 app.include_router(events.router, prefix="/events", tags=["events"])
 
 # create static dirs
-os.makedirs(Config().upload_dir, exist_ok=True)
-os.makedirs(Config().avatar_dir, exist_ok=True)
+Config().get_upload_dir().mkdir(parents=True, exist_ok=True)
 
 # mount static dirs
-app.mount(Config().static_upload_path, StaticFiles(directory=Config().upload_dir), name="files")
-app.mount(Config().static_avatar_path, StaticFiles(directory=Config().avatar_dir), name="avatars")
+app.mount(Config().static_upload_url, StaticFiles(directory=Config().get_upload_dir()), name="files")
+app.mount(Config().static_avatar_url, StaticFiles(directory=Config().get_avatar_dir()), name="avatars")
+
 
 @app.get("/")
 async def root():

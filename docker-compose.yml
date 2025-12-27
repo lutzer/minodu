@@ -8,18 +8,18 @@ services:
       - "3306:3306"
     environment:
       - MYSQL_DATABASE=minodu
-      - MYSQL_USER=user
-      - MYSQL_PASSWORD=password
-      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
     volumes:
-      - ./data/database:/var/lib/mysql
+      - mysql-data:/var/lib/mysql
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
       retries: 10
-
-  # Backend Service
+      
+   # Backend Service
   minodu-backend:
     build:
       context: ./apps/minodu-backend
@@ -29,13 +29,13 @@ services:
     environment:
       - DB_HOST=db
       - DB_PORT=3306
-      - DB_USERNAME=user
-      - DB_PASSWORD=password
+      - DB_USERNAME=${MYSQL_USER}
+      - DB_PASSWORD=${MYSQL_PASSWORD}
       - DB_NAME=minodu
       - APP_PORT=3000
       - APP_HOST=http://localhost:3000
       - APP_FRONT=http://localhost
-      - JWT_SECRET_KEY=dev_secret_key_1234
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - AI_SERVICE_URL=http://minodu-ai-services:3002/services
     volumes:
       - ./data/minodu-backend/audios:/app/static/audios
@@ -51,7 +51,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      
+
   # AI Services
   minodu-ai-services:
     build:
@@ -64,9 +64,9 @@ services:
     environment:
       - OLLAMA_HOST=host.docker.internal:11434
       - PORT=3002
+      - ENVIRONMENT=${ENVIRONMENT}
     volumes:
-      - ./data/ai-services/documents:/app/documents
-      - ./data/ai-services/database:/app/database
+      - shared-data:/app/data
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3002/api/services/"]
@@ -82,17 +82,21 @@ services:
     ports:
       - "3003:3003"
     environment:
-      - JWT_SECRET_KEY=dev_secret_key_1234
-      - DATABASE_URL=mysql+pymysql://user:password@minodu-database:3306/minodu
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - DATABASE_URL=mysql+pymysql://${MYSQL_USER}:${MYSQL_PASSWORD}@minodu-database:3306/minodu
       - PORT=3003
       - AI_SERVICE_URL=http://minodu-ai-services:3002/api/services
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_BACKEND_URL=redis://redis:6379/1
+      - ENVIRONMENT=${ENVIRONMENT}
     volumes:
-      - ./data/minodu-forum/uploads:/app/static/uploads
-      - ./data/minodu-forum/avatars:/app/static/avatars
+      - shared-data:/app/data
     depends_on:
       minodu-database:
         condition: service_healthy
       minodu-ai-services:
+        condition: service_healthy
+      minodu-forum-celery:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:
@@ -100,8 +104,41 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-  
-  # Web Service [Frontend + Backoffice]
+
+  minodu-forum-celery:
+    build:
+      context: ./apps/minodu-forum
+      dockerfile: Dockerfile
+    command: poetry run python worker.py
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_BACKEND_URL=redis://redis:6379/1
+      - AI_SERVICE_URL=http://minodu-ai-services:3002/api/services
+      - ENVIRONMENT=${ENVIRONMENT}
+    volumes:
+      - shared-data:/app/data
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "celery inspect ping --destination celery@$$HOSTNAME"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  redis:
+    image: redis:alpine
+    command: redis-server --maxmemory 32mb
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      interval: 30s
+      timeout: 15s
+      retries: 3
+
+   # Web Service [Frontend + Backoffice]
   minodu-web:
     container_name: minodu-web
     build:
@@ -116,3 +153,23 @@ services:
       - minodu-ai-services
       - minodu-backend
     restart: unless-stopped
+
+volumes:
+  shared-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./data
+      o: bind
+  mysql-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./data/mysql
+      o: bind
+  log-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./data/logs
+      o: bind  

@@ -1,131 +1,137 @@
 <script lang="ts">
 	import type { Optional } from '$lib/types';
-    import { onMount } from 'svelte'
+	import { onMount } from 'svelte';
 
-    export let blob : Optional<Blob>
+	export let blob: Optional<Blob>;
+	export let recording: boolean = false;
 
-    let mediaDeviveAvailable : boolean = true
-    let fileInput : HTMLInputElement
+	let mediaDeviveAvailable: boolean = true;
+	let fileInput: HTMLInputElement;
 
-    onMount(async () => {
-        mediaDeviveAvailable = navigator.mediaDevices?.getUserMedia !== undefined
-    })
+	let mediaChunks: Blob[] = [];
+	let mediaRecorder: Optional<MediaRecorder>;
+	let audioElement: HTMLAudioElement;
 
-    $: {
-        if (!blob) {
-            reset()
-        }
-    }
+	onMount(async () => {
+		// mediaDeviveAvailable = navigator.mediaDevices?.getUserMedia !== undefined;
+		mediaDeviveAvailable = false
+	});
 
-    let media : Blob[] = [];
-    let mediaRecorder : MediaRecorder;
-    let audioElement : HTMLAudioElement;
+	$: {
+		blob;
+		if (!blob) {
+			reset();
+		}
+	}
 
-    let recording : boolean = false;
-    let prepared : boolean = false;
+	async function prepareRecorder() {
+		const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+		mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+		mediaRecorder.ondataavailable = (e) => mediaChunks.push(e.data);
 
-    function isPlaying() : boolean {
-        return !audioElement?.paused || false
-    }
+		mediaRecorder.onstop = () => {
+			recording = false;
 
-    async function prepareRecorder() {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-        mediaRecorder.ondataavailable = (e) => media.push(e.data)
+			// create playable audio
+			blob = new Blob(mediaChunks, { type: mediaRecorder?.mimeType });
+			audioElement.src = URL.createObjectURL(blob);
+			mediaChunks = [];
 
-        mediaRecorder.onstop = () => {
-            recording = false;
-            blob = new Blob(media, {'type' : mediaRecorder.mimeType });
-            audioElement.src = URL.createObjectURL(blob);
-            media = []
-        }
+			// cleanup tracks
+			stream.getAudioTracks().forEach((t) => {
+				t.stop();
+				stream.removeTrack(t);
+			});
+			mediaRecorder = undefined;
+		};
 
-        mediaRecorder.onerror = (err) => {
-            console.error(err)
-        }
+		mediaRecorder.onerror = (err) => {
+			console.error(err);
+		};
 
-        mediaRecorder.onstart = () => {
-            recording = true
-        }
+		mediaRecorder.onstart = () => {
+			recording = true;
+		};
+	}
 
-        prepared = true;
-    }
+	export async function startRecording() {
+		reset();
+		if (mediaDeviveAvailable) {
+			if (!mediaRecorder) {
+				await prepareRecorder();
+			}
+			mediaRecorder?.start();
+		} else {
+			fileInput.click();
+		}
+	}
 
-    async function startRecording() {
-        reset()
-        if (!prepared) {
-            await prepareRecorder()
-        }
-        mediaRecorder?.start()
-    }
+	export function stopRecording() {
+		mediaRecorder?.stop();
+	}
 
-    function stopRecording() {
-        mediaRecorder?.stop()
-    }
+	export function reset() {
+		mediaRecorder?.stop();
+		blob = undefined;
+		mediaChunks = [];
+		if (audioElement) {
+			audioElement.src = '';
+		}
+	}
 
-    function reset() {
-        mediaRecorder?.stop()
-        blob = undefined
-        media = []
-        if (audioElement) {
-            audioElement.src = ""
-        }
-    }
+	export function startPlayback() {
+		audioElement?.play();
+	}
 
-    function startPlayback() {
-        audioElement?.play()
-    }
+	export function pausePlayback() {
+		audioElement?.pause();
+	}
 
-    function pausePlayback() {
-        audioElement?.pause()
-    }
+	export function resetPlayback() {
+		if (audioElement) {
+			audioElement.currentTime = 0;
+			audioElement.pause();
+		}
+	}
 
-    function stopPlayback() {
-        if (audioElement) {
-            audioElement.currentTime = 0;
-            audioElement.pause()
-        }
-    }
+	export function isPlaying(): boolean {
+		return !audioElement?.paused || false;
+	}
 
-    function handleCapture(e : Event) {
-        const target = e.target as HTMLInputElement
-        const file = target.files?.[0]
-        if (file && file.type.startsWith('audio/')) {
-            audioElement.src = URL.createObjectURL(file)
-            blob = file
-        }
-    }
-
+	function handleCapture(e: Event) {
+		const target = e.target as HTMLInputElement;
+		const file = target.files?.[0];
+		if (file && file.type.startsWith('audio/')) {
+			audioElement.src = URL.createObjectURL(file);
+			blob = file;
+		}
+	}
 </script>
 
-<style>
-    .audio-recorder {
-        text-align: center;
-    }
-    audio {
-        display: block;
-        padding-bottom: 10px;
-    }
-</style>
-
 <div class="audio-recorder">
-    <audio bind:this={audioElement} controls></audio>
-{#if mediaDeviveAvailable}
-    {#if !recording}
-        <button onclick={startRecording} disabled={blob !== undefined}>Record</button>
-    {:else}
-        <button onclick={stopRecording}>Stop</button>
-    {/if}
-    <button onclick={reset} disabled={blob === undefined}>Reset</button>
-    <button onclick={startPlayback} disabled={blob === undefined}>Play</button>
-{:else}
-    <input 
-        bind:this={fileInput}
-        type="file" 
-        accept="audio/*" 
-        capture="environment"
-        onchange={(e) => handleCapture(e)}
-        style="display: none;">
-    <button onclick={() => fileInput.click()}>Record Audio</button>
-{/if}
+	<audio bind:this={audioElement} controls class={blob !== undefined ? '' : 'hidden'}></audio>
+	{#if !mediaDeviveAvailable}
+		<input
+			bind:this={fileInput}
+			type="file"
+			accept="audio/*"
+			capture="environment"
+			onchange={(e) => handleCapture(e)}
+			style="display: none;"
+		/>
+	{/if}
 </div>
+
+<style>
+	.audio-recorder {
+		text-align: center;
+	}
+	audio {
+		display: block;
+		padding-bottom: 10px;
+	}
+
+	.hidden {
+		display: none;
+	}
+</style>

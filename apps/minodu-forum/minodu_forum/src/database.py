@@ -1,12 +1,9 @@
-import os
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session, declarative_base
-
-from contextlib import contextmanager
-from typing import Generator
 import logging
+from collections.abc import Generator
+from contextlib import contextmanager
 
-
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session, declarative_base, sessionmaker
 
 from .config import Config
 
@@ -14,49 +11,50 @@ logger = logging.getLogger(__name__)
 
 PREFIX = "forum_"
 
+
 def get_prefixed_key(key: str) -> str:
     return PREFIX + key
 
+
 Base = declarative_base()
+
 
 class DatabaseConnection:
     _instance = None
-    
+
     @classmethod
     def get_instance(cls, database_url: str):
         if cls._instance is None:
             cls._instance = cls(database_url)
         return cls._instance
-    
-    def __init__(self, database_url : str):
+
+    def __init__(self, database_url: str):
         self.engine = create_engine(database_url)
-        self.SessionLocal = sessionmaker(
-            autocommit=False,
-            autoflush=False,
-            bind=self.engine
-        )
+        self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
 
     def create_tables(self):
         """Create all tables defined in Base metadata."""
         Base.metadata.create_all(bind=self.engine)
-    
+
     def drop_tables(self):
         """Drop all tables defined in Base metadata."""
         Base.metadata.drop_all(bind=self.engine)
-    
+
     def get_session_direct(self) -> Session:
         """
         Get a session directly (caller responsible for closing).
         Use get_session() context manager instead when possible.
         """
         return self.SessionLocal()
-    
+
     def close(self):
         """Close the engine and all connections."""
         self.engine.dispose()
 
+
 def get_db_connection():
     return DatabaseConnection.get_instance(Config().database_url)
+
 
 # Dependency function for FastAPI
 def get_db() -> Generator[Session, None, None]:
@@ -64,12 +62,13 @@ def get_db() -> Generator[Session, None, None]:
     Database dependency for FastAPI routes.
     This function will be used with Depends() to inject database sessions.
     """
-    
+
     session = get_db_connection().get_session_direct()
     try:
         yield session
     finally:
         session.close()
+
 
 @contextmanager
 def get_db_session():
@@ -80,6 +79,7 @@ def get_db_session():
         yield session
     finally:
         db_gen.close()
+
 
 def get_db_transaction() -> Generator[Session, None, None]:
     """

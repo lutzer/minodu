@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import os
 import json
+from typing import Generator
 import wave
 import vosk
 import json
@@ -40,34 +41,20 @@ class SttTranscriber:
         self.model = vosk.Model(model_path)
 
 
-    def transcribe_stream(self):
-        print("Not implemented")
-        # # Settings for PyAudio
-        # sample_rate = 16000
-        # chunk_size = 8192
-        # format = pyaudio.paInt16
-        # channels = 1
+    def transcribe_stream(self, stream : Generator[bytes, None, None], sample_rate : int = 16000) -> Generator[str, None, None]:
+        recognizer = vosk.KaldiRecognizer(self.model, sample_rate)  # 16000 Hz sample rate
 
-        # # Initialization of PyAudio and speech recognition
-        # p = pyaudio.PyAudio()
-        # stream = p.open(format=format, channels=channels, rate=sample_rate, input=True, frames_per_buffer=chunk_size)
-        # recognizer = vosk.KaldiRecognizer(self.model, sample_rate)
+        for chunk in stream:
+            if not chunk:
+                continue
 
-        # os.system('clear')
-        # print("\nSpeak now...")
+            if recognizer.AcceptWaveform(chunk):
+                # Final result for this utterance
+                result = json.loads(recognizer.Result())
+                yield result.get('text', '')
 
-        # while True:
-        #     data = stream.read(chunk_size)
-        #     if recognizer.AcceptWaveform(data):
-        #         result_json = json.loads(recognizer.Result())
-        #         text = result_json.get('text', '')
-        #         if text:
-        #             print("\r" + text, end='\n')
-        #     else:
-        #         partial_json = json.loads(recognizer.PartialResult())
-        #         partial = partial_json.get('partial', '')
-        #         sys.stdout.write('\r' + partial)
-        #         sys.stdout.flush()
+        result = json.loads(recognizer.FinalResult())
+        yield result.get('text', '')
 
     def transcribe_raw(self, wav_buffer: io.BytesIO) -> SttResult:
         """method to process raw wav data with Vosk"""
@@ -87,15 +74,20 @@ class SttTranscriber:
                 recognizer.AcceptWaveform(data)
             
             result = json.loads(recognizer.FinalResult())
-            confidenceLen = len(result["result"])
-            confidenceSum = reduce(lambda acc, curr: acc + curr["conf"], result["result"], 0.0)
-            return SttResult(
-                text = result["text"],
-                confidence = confidenceSum / confidenceLen
-            )
+            if not "result" in result:
+                return SttResult(
+                    text = result["text"],
+                    confidence = 0
+                ) 
+            else:
+                confidenceLen = len(result["result"])
+                confidenceSum = reduce(lambda acc, curr: acc + curr["conf"], result["result"], 0.0)
+                return SttResult(
+                    text = result["text"],
+                    confidence = confidenceSum / confidenceLen if (confidenceLen > 0 ) else 0
+                )
     
     def transcribe_file_buffer(self, file_buffer, filename) -> SttResult:
-
         if filename.lower().endswith(".mp3"):
             audio = AudioSegment.from_mp3(file_buffer)
             audio = audio.set_channels(1).set_sample_width(2)

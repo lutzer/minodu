@@ -56,3 +56,6 @@ vitest.config.*.timestamp*
 
 data/*
 !data/.keep
+!data/mysql/.keep
+
+.env
