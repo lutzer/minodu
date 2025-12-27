@@ -100,22 +100,6 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-
-  # Frontend builder Service
-  frontend-builder:
-    build:
-      context: ./apps/minodu-frontend
-      dockerfile: Dockerfile
-    image: minodu-frontend:latest
-    restart: no
-
-  # Backoffice builder Service
-  backoffice-builder:
-    build:
-      context: ./apps/minodu-backoffice
-      dockerfile: Dockerfile
-    image: minodu-backoffice:latest
-    restart: no
   
   # Web Service [Frontend + Backoffice]
   minodu-web:
@@ -128,8 +112,6 @@ services:
       - "80:80"      # Frontend (80 on RPI/8088 on local)
       - "8080:8080"  # Backoffice
     depends_on:
-      - frontend-builder
-      - backoffice-builder
       - minodu-forum
       - minodu-ai-services
       - minodu-backend
