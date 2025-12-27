@@ -1,5 +1,5 @@
 ### Build stage Frontend ###
-FROM node:18-alpine as frontend-builder
+FROM node:18-alpine AS frontend-builder
 WORKDIR /app
 # Copy package files
 COPY apps/minodu-frontend/package*.json ./
@@ -12,7 +12,7 @@ RUN npm run build
 CMD ["echo", "Frontent build completed"]
 
 ### Build stage Backoffice ###
-FROM node:18-alpine as backoffice-builder
+FROM node:18-alpine AS backoffice-builder
 WORKDIR /app
 # Copy package files
 COPY apps/minodu-backoffice/package*.json ./

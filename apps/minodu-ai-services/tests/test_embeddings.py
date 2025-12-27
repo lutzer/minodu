@@ -6,8 +6,6 @@ import time
 from minodu_ai_services.src.rag.document_store import DocumentStore
 from minodu_ai_services.src.rag.rag import RAG
 
-from .conftest import database_path
-
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
 @pytest.fixture(scope="module", autouse=True)

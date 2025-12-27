@@ -1,28 +1,30 @@
 import os
+
 from dotenv import load_dotenv
+from pathlib import Path
 
 load_dotenv()
 
 config = None
+
 class Config:
     _instance = None
-    
+
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
             cls._instance._setup()
         return cls._instance
-    
+
     def _setup(self):
         self._port = None
         self._api_prefix = None
         self._database_url = None
         self._jwt_secret = None
         self._jwt_algorithm = None
-        self._upload_dir = None
         self._max_file_size = None
         self._service_url = None
-        self._avatar_dir = None
+        self._data_dir = None
 
     @property
     def port(self):
@@ -35,28 +37,28 @@ class Config:
         if self._api_prefix is None:
             self._api_prefix = os.getenv("API_PREFIX", "/api/forum")
         return self._api_prefix
-    
+
     @property
     def service_url(self):
         if self._service_url is None:
             self._service_url = os.getenv("AI_SERVICE_URL", "http://localhost:3002/api/services")
         return self._service_url
     
-    @property
-    def upload_dir(self):
-        if self._upload_dir is None:
-            script_dir = os.path.dirname(os.path.abspath(__file__))
-            upload_dir = os.getenv("UPLOAD_DIR", "static/uploads")
-            self._upload_dir = os.path.join(script_dir, "..", upload_dir)
-        return self._upload_dir
-    
-    @property
-    def avatar_dir(self):
-        if self._avatar_dir is None:
-            script_dir = os.path.dirname(os.path.abspath(__file__))
-            upload_dir = os.getenv("AVATAR_UPLOAD_DIR", "static/avatars")
-            self._avatar_dir = os.path.join(script_dir, "..", upload_dir)
-        return self._avatar_dir
+    def get_data_dir(self, absolute : bool = True):
+        if self._data_dir is None:
+            self._data_dir = Path(os.getenv("FILE_DIR", "data/minodu_forum"))
+        return self.app_dir / self._data_dir if absolute else self._data_dir
+
+
+    def get_avatar_dir(self, absolute : bool = True) -> Path:
+        avatar_dir = Path("assets/avatars")
+        return self.app_dir / avatar_dir if absolute else avatar_dir
+
+    def get_upload_dir(self, absolute : bool = True) -> Path:
+        return self.get_data_dir(absolute) / "uploads"
+
+    def get_tmp_dir(self, absolute : bool = True) -> Path:
+        return self.get_data_dir(absolute) / "tmp"
 
     @property
     def database_url(self):
@@ -83,9 +85,21 @@ class Config:
         return self._max_file_size
 
     @property
-    def static_upload_path(self):
+    def static_upload_url(self):
         return "/static/files"
+
+    @property
+    def static_avatar_url(self):
+        return "/static/avatars"
     
     @property
-    def static_avatar_path(self):
-        return "/static/avatars"  
+    def celery_broker_url(self):
+        return os.getenv('CELERY_BROKER_URL', 'redis://localhost:6379/0')
+    
+    @property
+    def celery_backend_url(self):
+        return os.getenv('CELERY_BACKEND_URL', 'redis://localhost:6379/1')
+    
+    @property
+    def app_dir(self) -> Path:
+        return Path(__file__).parent / '..'

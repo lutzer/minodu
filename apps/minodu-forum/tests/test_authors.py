@@ -1,181 +1,135 @@
-import pytest
 import os
+
+import pytest
 from fastapi.testclient import TestClient
 
 from minodu_forum.src.app import app
-from minodu_forum.src.database import get_db_connection
-from tests.test_avatars import create_avatar
 from minodu_forum.src.models.author import Author
+from tests.test_avatars import list_avatars
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Create test client
 client = TestClient(app)
 
-def create_author(name: str = "test"):
-    author_data = {
-        "name": name,
-        "avatar": None
-    }
+
+def create_author(client: TestClient, name: str = "test"):
+    author_data = {"name": name, "avatar": None}
     response = client.post(app.root_path + "/authors/create", json=author_data)
     return response.json()["token"]
 
 class TestAuthorsApi:
 
-    def test_create_author_without_avatar(self):
-        author_data = {
-            "name": "Author1",
-            "avatar": None
-        }
-        response = client.post(app.root_path + "/authors/create", json=author_data)        
+    def test_create_author_without_avatar(self, client):
+        author_data = {"name": "Author1", "avatar": None}
+        response = client.post(app.root_path + "/authors/create", json=author_data)
         assert response.status_code == 200
 
         response_data = response.json()
         assert len(response_data["token"]) > 0
         assert response_data["id"] >= 0
 
-    def test_validate_author(self):
-
+    def test_validate_author(self, client):
         with pytest.raises(Exception):
-            author = Author(
-                name="12",
-                avatar_id=None
-            ).validate()
+            author = Author(name="12", avatar_id=None).validate()
 
-        author = Author(
-            name="123",
-            avatar_id=None
-        ).validate()
+        author = Author(name="123", avatar_id=None).validate()
 
-    def test_create_author_throws_exception(self):
-
-        author_data = {
-            "name": "12",
-            "avatar": None
-        }
-        response = client.post(app.root_path + "/authors/create", json=author_data)        
+    def test_create_author_throws_exception(self, client):
+        author_data = {"name": "12", "avatar": None}
+        response = client.post(app.root_path + "/authors/create", json=author_data)
         assert response.status_code == 422
         print(response)
 
-    def test_fetch_authors(self):
-        author_data = {
-            "name": "test",
-            "avatar": None
-        }
+    def test_fetch_authors(self, client):
+        author_data = {"name": "test", "avatar": None}
         response1 = client.post(app.root_path + "/authors/create", json=author_data)
 
         response2 = client.get(app.root_path + "/authors/")
         response2_data = response2.json()
         assert response2_data[0]["id"] == response1.json()["id"]
 
-    def test_edit_author_name(self):
-        old_data = {
-            "name": "old_name"
-        }
+    def test_edit_author_name(self, client):
+        old_data = {"name": "old_name"}
 
         response = client.post(app.root_path + "/authors/create", json=old_data)
-        token = response.json()['token']
-        author_id = response.json()['id']
+        token = response.json()["token"]
+        author_id = response.json()["id"]
 
-        new_data = {
-            "name": "new_name"
-        }
+        new_data = {"name": "new_name"}
 
         response = client.put(
-            app.root_path + f"/authors/{author_id}", 
-            json=new_data,
-            headers={"Authorization": f"Bearer {token}"})
+            app.root_path + f"/authors/{author_id}", json=new_data, headers={"Authorization": f"Bearer {token}"}
+        )
 
         assert response.status_code == 200
-        assert response.json()['name'] == new_data['name']
+        assert response.json()["name"] == new_data["name"]
 
-    def test_create_author_with_avatar(self):
-        file_path = os.path.join(script_dir, "files/laura.jpeg")
-        avatar = create_avatar(file_path)
+    def test_create_author_with_avatar(self, client):
+        avatar = list_avatars(client)[0]
 
-        author_data = {
-            "name": "Author1",
-            "avatar": avatar["id"]
-        }
-        response = client.post(app.root_path + "/authors/create", json=author_data)        
+        author_data = {"name": "Author1", "avatar": avatar["id"]}
+        response = client.post(app.root_path + "/authors/create", json=author_data)
         assert response.status_code == 200
         author_id = response.json()["id"]
 
         response = client.get(app.root_path + f"/authors/{author_id}")
         assert response.status_code == 200
         assert response.json()["avatar"] != None
-        
 
-    def test_edit_author_avatar(self):
-        file_path = os.path.join(script_dir, "files/laura.jpeg")
-        avatar = create_avatar(file_path)
+    def test_edit_author_avatar(self, client):
+        avatar = list_avatars(client)[0]
 
-        old_data = {
-            "name": "test"
-        }
+        old_data = {"name": "test"}
 
         response = client.post(app.root_path + "/authors/create", json=old_data)
         assert response.status_code == 200
 
-        token = response.json()['token']
-        author_id = response.json()['id']
+        token = response.json()["token"]
+        author_id = response.json()["id"]
 
-        new_data = {
-            "avatar": avatar["id"]
-        }
+        new_data = {"avatar": avatar["id"]}
 
         response = client.put(
-            app.root_path + f"/authors/{author_id}", 
-            json=new_data,
-            headers={"Authorization": f"Bearer {token}"})
+            app.root_path + f"/authors/{author_id}", json=new_data, headers={"Authorization": f"Bearer {token}"}
+        )
 
         assert response.status_code == 200
 
         response = client.get(app.root_path + f"/authors/{author_id}")
         assert response.status_code == 200
-        assert response.json()['avatar']["id"] == new_data['avatar']
+        assert response.json()["avatar"]["id"] == new_data["avatar"]
 
-    def test_edit_author_avatar_error(self):
-        file_path = os.path.join(script_dir, "files/laura.jpeg")
-
-        old_data = {
-            "name": "test"
-        }
+    def test_edit_author_avatar_error(self, client):
+        old_data = {"name": "test"}
 
         response = client.post(app.root_path + "/authors/create", json=old_data)
         assert response.status_code == 200
 
-        token = response.json()['token']
-        author_id = response.json()['id']
+        token = response.json()["token"]
+        author_id = response.json()["id"]
 
-        new_data = {
-            "avatar": 10
-        }
+        new_data = {"avatar": 99}
 
         response = client.put(
-            app.root_path + f"/authors/{author_id}", 
-            json=new_data,
-            headers={"Authorization": f"Bearer {token}"})
+            app.root_path + f"/authors/{author_id}", json=new_data, headers={"Authorization": f"Bearer {token}"}
+        )
 
         assert response.status_code != 200
 
-    def test_check_login(self):
+    def test_check_login(self, client):
         authorName = "somerandomusernamel30984"
-        token = create_author(authorName)
+        token = create_author(client, authorName)
 
-        response = client.get(
-            app.root_path + f"/login", 
-            headers={"Authorization": f"Bearer {token}"})
+        response = client.get(app.root_path + "/login", headers={"Authorization": f"Bearer {token}"})
 
         assert response.status_code == 200
-        assert response.json()['name'] == authorName
+        assert response.json()["name"] == authorName
 
-    def test_check_login_fail(self):
+    def test_check_login_fail(self, client):
         authorName = "somerandomusernamel30984"
-        token = create_author(authorName)
+        token = create_author(client, authorName)
 
-        response = client.get(
-            app.root_path + f"/login", 
-            headers={"Authorization": f"Bearer {token}dsfdsfsdf"})
-        
+        response = client.get(app.root_path + "/login", headers={"Authorization": f"Bearer {token}dsfdsfsdf"})
+
         assert response.status_code == 401

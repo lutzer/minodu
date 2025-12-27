@@ -34,3 +34,8 @@ npm run build
 ```
 
 You can preview the production build with `npm run preview`.
+
+## Linting and Formatting
+
+* run `nx run minodu-frontend:format` to format code propperly
+* run `nx run minodu-frontend:lint` to check code with eslint

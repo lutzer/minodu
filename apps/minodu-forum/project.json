@@ -49,6 +49,44 @@
       },
       "cache": true
     },
+    "lint:ruff": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "poetry run ruff check .",
+        "cwd": "{projectRoot}"
+      },
+      "cache": true
+    },
+    "lint:ruff:fix": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "poetry run ruff check . --fix",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "format": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "poetry run black .",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "format:check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "poetry run black --check .",
+        "cwd": "{projectRoot}"
+      },
+      "cache": true
+    },
+    "type-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "poetry run mypy .",
+        "cwd": "{projectRoot}"
+      },
+      "cache": true
+    },
     "test": {
       "executor": "@nxlv/python:run-commands",
       "outputs": [
@@ -58,9 +96,10 @@
       "options": {
         "command": "poetry run pytest tests/",
         "cwd": "{projectRoot}",
-        "env" : {
-          "AI_SERVICE_URL" : "http://localost:3002/api/services"
-        } 
+        "env": {
+          "DATABASE_URL" : "sqlite:///./tests/files/test_database.db",
+          "FILE_DIR" :"../tests/testdata"
+        }
       },
       "cache": true
     },
@@ -87,12 +126,28 @@
     "dev": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "poetry run python minodu_forum/main.py",
+        "command": "bash run_dev.sh",
         "cwd": "{projectRoot}",
         "env": {
           "PORT": "3003",
-          "DATABASE_URL": "sqlite:///./dev_database.db"
+          "DATABASE_URL": "sqlite:///./dev_database.db",
+          "CELERY_BROKER_URL" : "redis://localhost:6379/0",
+          "CELERY_BACKEND_URL" : "redis://localhost:6379/1"
         }
+      }
+    },
+    "celery:start": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker compose -f docker-compose.celery.yml up -d --build",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "celery:stop": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker compose -f docker-compose.celery.yml down",
+        "cwd": "{projectRoot}"
       }
     }
   },
