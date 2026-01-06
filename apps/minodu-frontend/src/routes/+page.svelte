@@ -1,6 +1,9 @@
 <script lang="ts">
 	import tileImageMobile from '$lib/assets/startscreen_background_mobile.png';
 	import tileImageTablet from '$lib/assets/startscreen_background_tablet.png';
+	import baobapImage from '$lib/assets/baobap.png';
+	import chatImage from '$lib/assets/startscreen_chat.png';
+	import cloudImage from '$lib/assets/startscreen_cloud.png';
 
 	let { children } = $props();
 </script>
@@ -17,7 +20,6 @@
 	#tile-image-container img {
 		width: 100%;
 		height: 100%;
-		max-width: 1000px;
 		object-fit: cover;
 		display: none;
 		margin: 0 auto;
@@ -55,10 +57,50 @@
 		opacity: 0;
     }
 
+	#tree {
+		position: absolute;
+		top: 44%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+	}
+
+	#tree img {
+		width: 50vw;
+		height: 30vh;
+		min-width: 300px;
+		object-fit: contain;
+	}
+
+	#cloud {
+		position: absolute;
+		top: 5%;
+    	right: 10%;
+	}
+
+	#cloud img {
+		width: 25vw;
+		height: 20vh;
+		min-width: 130px;
+		object-fit: contain;
+	}
+
+	#chat {
+		position: absolute;
+		top: 9%;
+    	left: 12%;
+	}
+
+	#chat img {
+		width: 25vw;
+		height: 20vh;
+		min-width: 130px;
+		object-fit: contain;
+	}
+
 </style>
 
 <div>
-	<div id="tile-image-container">
+	<div id="tile-image-container" class="content-width">
 		<img 
 			src={tileImageMobile} 
 			alt="4 minodu tiles showing different apps"
@@ -67,6 +109,21 @@
 			src={tileImageTablet} 
 			alt="4 minodu tiles showing different apps"
 			class="responsive-image tablet"/>
+	</div>
+	<div id="cloud">
+		<img
+			src={cloudImage}
+			alt="a rainy cloud in the sky"/>
+	</div>
+	<div id="chat">
+		<img
+			src={chatImage}
+			alt="two people and a speech bubble in the sky"/>
+	</div>
+	<div id="tree">
+		<img
+			src={baobapImage}
+			alt="a baobap tree"/>
 	</div>
 	<div class="grid-link-container">
 		<a href="/forum" class="grid-link">Forum</a>
