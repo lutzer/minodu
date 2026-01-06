@@ -27,7 +27,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - DB_HOST=db
+      - DB_HOST=minodu-database
       - DB_PORT=3306
       - DB_USERNAME=${MYSQL_USER}
       - DB_PASSWORD=${MYSQL_PASSWORD}
