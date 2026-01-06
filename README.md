@@ -113,8 +113,8 @@ npm install
 # build and start services
 sudo npm run docker:start
 
-# once the database is running, sync online database to local one with
-npm run database:sync
+# once the database is running, sync online database to local one and update embeddings
+npm run sync:database && npm run sync:rag
 ```
 
 ## TODO
