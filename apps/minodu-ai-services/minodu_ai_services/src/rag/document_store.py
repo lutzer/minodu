@@ -102,9 +102,11 @@ class DocumentStore:
             )
 
         if not results['ids']:
-            raise DocumentStoreException(f"No documents found with ud: {id}")
+            raise DocumentStoreException(f"No documents found with source_id: {id}")
         
         collection.delete(where={"source_id": id})
+
+        print(f"Deleted {len(results['ids'])} chunks for source_id:{id}")
     
     def delete_document(self, document_name: str):
         """Delete all documents from a specific source"""
@@ -128,3 +130,4 @@ class DocumentStore:
 
     def delete_all_documents(self):
         self.chroma_client.delete_collection(name=self.collection_name)
+        print("Deleted all documents")
