@@ -107,6 +107,9 @@ sudo systemctl enable docker
 sudo apt install git-lfs
 git lfs pull
 
+# install dependencies
+npm install
+
 # build and start services
 sudo npm run docker:start
 
