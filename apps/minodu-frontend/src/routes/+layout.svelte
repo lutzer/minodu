@@ -16,7 +16,7 @@
 </svelte:head>
 
 <div class="app-container">
-	<div id="content">
+	<div id="content" class="content-width">
 		{@render children?.()}
 	</div>
 	<div id="footer">
@@ -39,10 +39,13 @@
 		height: 100px;
 	}
 
+	#content {
+		max-width: 1100px;
+	}
+
 	.menu-bar {
 		display: flex;
 		height: 100%;
-		max-width: 600px;
 		background-color: var(--bg-color-light);
 		margin: 0 auto;
 		flex-direction: row;
@@ -52,16 +55,17 @@
 		padding: 0 var(--small-padding);
 	}
 
-	@media screen and (min-width: 600px) {
+	@media screen and (min-width: 550px) {
 		.menu-bar {
 			border-radius: var(--border-radius) var(--border-radius);
 			margin-top: -20px;
+			max-width: 450px;
 		}
 	}
 
 	:global(:root) {
 		--small-padding: 10px;
-		--bg-color-light: #C2B4B0;
+		--bg-color-light: #E2E2E2;
 		--border-radius: 20px;
 	}
 
@@ -107,5 +111,10 @@
 
 	:global(.paragraph:not(:first-of-type)) {
 		margin-top: 10px;
+	}
+
+	:global(.content-width) {
+		max-width: 1100px;
+		margin: 0 auto;
 	}
 </style>
