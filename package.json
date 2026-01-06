@@ -3,13 +3,14 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
+    "postinstall": "poetry install --directory tools/sync --no-root",
     "docker:start": "mkdir -p ./data/mysql && mkdir -p ./data/logs && docker compose up -d --build",
     "docker:stop": "docker compose down",
     "docker:logs": "docker compose logs -f",
     "docker:clean": "docker compose down -v --remove-orphans --rmi all && docker volume prune -f && docker network prune -f",
     "docker:status": "docker compose ps",
     "docker:stats": "docker compose stats",
-    "database:sync": "dotenv run sh -c 'poetry --directory tools/sync_database run python sync.py http://minodu.chickenkiller.com:3000/v1/files/minodu_backend_backup.zip --destination=../../data/sync --user=$MYSQL_USER --password=$MYSQL_PASSWORD'"
+    "database:sync": "dotenv run sh -c 'poetry --directory tools/sync run python sync_database.py http://minodu.chickenkiller.com:3000/v1/files/minodu_backend_backup.zip --destination=../../data/sync --user=$MYSQL_USER --password=$MYSQL_PASSWORD' && poetry --directory tools/sync run python sync_rag.py http://localhost/api/backend/posts/ minodu-minodu-ai-services-1"
   },
   "private": true,
   "devDependencies": {

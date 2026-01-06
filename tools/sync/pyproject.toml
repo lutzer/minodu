@@ -1,5 +1,5 @@
 [project]
-name = "sync_database"
+name = "sync_tools"
 version = "0.1.0"
 description = ""
 authors = [
