@@ -25,6 +25,7 @@ class Config:
         self._max_file_size = None
         self._service_url = None
         self._data_dir = None
+        self._admin_password = None
 
     @property
     def port(self):
@@ -99,6 +100,12 @@ class Config:
     @property
     def celery_backend_url(self):
         return os.getenv('CELERY_BACKEND_URL', 'redis://localhost:6379/1')
+    
+    @property
+    def admin_password(self):
+        if self._admin_password is None:
+            self._admin_password = os.getenv("ADMIN_PASSWORD", None)
+        return self._admin_password
     
     @property
     def app_dir(self) -> Path:

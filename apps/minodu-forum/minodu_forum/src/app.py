@@ -9,7 +9,7 @@ from .models.avatar import create_avatar_table
 
 from .config import Config
 from .database import get_db_connection
-from .routers import authors, avatars, events, files, login, posts
+from .routers import authors, avatars, events, files, login, posts, admin
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -28,6 +28,7 @@ app.include_router(files.router, prefix="/files", tags=["files"])
 app.include_router(avatars.router, prefix="/avatars", tags=["avatars"])
 app.include_router(login.router, prefix="/login", tags=["login"])
 app.include_router(events.router, prefix="/events", tags=["events"])
+app.include_router(admin.router, prefix="/admin", tags=["admin"])
 
 # create static dirs
 Config().get_upload_dir().mkdir(parents=True, exist_ok=True)
