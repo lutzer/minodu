@@ -1,6 +1,16 @@
 <script lang="ts">
-    export let link : string 
-    export let icon : string
+    import { page } from '$app/stores';
+
+    export let link : string;
+    export let icon : string;
+    export let iconDisabled : string;
+    export let strictRoute : boolean = false;
+
+    let disabled : boolean; 
+
+    $: {
+		disabled = strictRoute ? $page.url.pathname === link : $page.url.pathname.startsWith(link);
+	}
 </script>
 
 <style>
@@ -23,10 +33,14 @@
         width: 100%;
         object-fit: contain;
     }
+
+    .footer-menu-button a.disabled {
+        pointer-events: none;
+    } 
 </style>
 
 <div class="footer-menu-button">
-    <a href={link}>
-        <img src={icon} alt="Icon for link to {link}"/>
+    <a href={link} class={disabled ? "disabled" : ""}>
+        <img src={disabled ? iconDisabled : icon} alt="Icon for link to {link}"/>
     </a>
 </div>

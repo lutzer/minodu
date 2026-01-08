@@ -57,6 +57,16 @@
 		opacity: 0;
     }
 
+	
+
+	#object-overlay-container {
+		position: absolute;
+		top:0;
+		bottom:0;
+		left:0;
+		right:0;
+	}
+
 	#tree {
 		position: absolute;
 		top: 44%;
@@ -73,26 +83,36 @@
 
 	#cloud {
 		position: absolute;
-		top: 5%;
-    	right: 10%;
+		top: 0%;
+    	left: 50%;
+		bottom:50%;
+		right: 0%;
 	}
 
 	#cloud img {
-		width: 25vw;
-		height: 20vh;
+		position: absolute;
+		top: 15%;
+		right:20%;
+		width: 50%;
+		height: 40%;
 		min-width: 130px;
 		object-fit: contain;
 	}
 
 	#chat {
 		position: absolute;
-		top: 9%;
-    	left: 12%;
+		top: 0%;
+    	left: 0%;
+		bottom:50%;
+		right: 50%;
 	}
 
 	#chat img {
-		width: 25vw;
-		height: 20vh;
+		position: absolute;
+		top: 15%;
+		left:20%;
+		width: 50%;
+		height: 40%;
 		min-width: 130px;
 		object-fit: contain;
 	}
@@ -110,20 +130,22 @@
 			alt="4 minodu tiles showing different apps"
 			class="responsive-image tablet"/>
 	</div>
-	<div id="cloud">
-		<img
-			src={cloudImage}
-			alt="a rainy cloud in the sky"/>
-	</div>
-	<div id="chat">
-		<img
-			src={chatImage}
-			alt="two people and a speech bubble in the sky"/>
-	</div>
-	<div id="tree">
-		<img
-			src={baobapImage}
-			alt="a baobap tree"/>
+	<div id="object-overlay-container" class="content-width">
+		<div id="cloud">
+			<img
+				src={cloudImage}
+				alt="a rainy cloud in the sky"/>
+		</div>
+		<div id="chat">
+			<img
+				src={chatImage}
+				alt="two people and a speech bubble in the sky"/>
+		</div>
+		<div id="tree">
+			<img
+				src={baobapImage}
+				alt="a baobap tree"/>
+		</div>
 	</div>
 	<div class="grid-link-container">
 		<a href="/forum" class="grid-link">Forum</a>
