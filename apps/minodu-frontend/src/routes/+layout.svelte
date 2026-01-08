@@ -3,10 +3,15 @@
 	import FooterMenuButton from '$lib/components/common/FooterMenuButton.svelte';
 
 	import agricultureIcon from '$lib/assets/agriculture-icon.png';
+	import agricultureIconDisabled from '$lib/assets/agriculture-icon-disabled.png';
 	import forumIcon from '$lib/assets/forum-icon.png';
+	import forumIconDisabled from '$lib/assets/forum-icon-disabled.png';
 	import treeIcon from '$lib/assets/tree-icon.png';
+	import treeIconDisabled from '$lib/assets/tree-icon-disabled.png';
 	import weatherIcon from '$lib/assets/weather-icon.png';
+	import weatherIconDisabled from '$lib/assets/weather-icon-disabled.png';
 	import marketIcon from '$lib/assets/market-icon.png';
+	import marketIconDisabled from '$lib/assets/market-icon-disabled.png';
 
 	let { children } = $props();
 </script>
@@ -21,11 +26,22 @@
 	</div>
 	<div id="footer">
 		<div class="menu-bar">
-			<FooterMenuButton link="/agriculture" icon={agricultureIcon}/>
-			<FooterMenuButton link="/forum" icon={forumIcon}/>
-			<FooterMenuButton link="/" icon={treeIcon}/>
-			<FooterMenuButton link="/weather" icon={weatherIcon}/>
-			<FooterMenuButton link="/market" icon={marketIcon}/>
+			<FooterMenuButton link="/agriculture" 
+				icon={agricultureIcon} 
+				iconDisabled={agricultureIconDisabled}/>
+			<FooterMenuButton link="/forum" 
+				icon={forumIcon} 
+				iconDisabled={forumIconDisabled}/>
+			<FooterMenuButton link="/" 
+				icon={treeIcon} 
+				iconDisabled={treeIconDisabled}
+				strictRoute={true}/>
+			<FooterMenuButton link="/weather" 
+				icon={weatherIcon}
+				iconDisabled={weatherIconDisabled}/>
+			<FooterMenuButton link="/market" 
+				icon={marketIcon}
+				iconDisabled={marketIconDisabled}/>
 		</div>
 	</div>
 </div>
@@ -65,7 +81,7 @@
 
 	:global(:root) {
 		--small-padding: 10px;
-		--bg-color-light: #E2E2E2;
+		--bg-color-light: #C2B4B0;
 		--border-radius: 20px;
 	}
 
