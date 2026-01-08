@@ -75,6 +75,7 @@ MYSQL_PASSWORD=<password>
 MYSQL_ROOT_PASSWORD=<rootpassword>
 JWT_SECRET_KEY=secret
 ENVIRONMENT=production
+FORUM_ADMIN_PASSWORD=<some_password>
 ```
 * setup ollama
 ```

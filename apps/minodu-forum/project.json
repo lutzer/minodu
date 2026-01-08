@@ -98,7 +98,8 @@
         "cwd": "{projectRoot}",
         "env": {
           "DATABASE_URL" : "sqlite:///./tests/files/test_database.db",
-          "FILE_DIR" :"../tests/testdata"
+          "FILE_DIR" :"../tests/testdata",
+          "ADMIN_PASSWORD": "admin_password"
         }
       },
       "cache": true
@@ -132,7 +133,8 @@
           "PORT": "3003",
           "DATABASE_URL": "sqlite:///./dev_database.db",
           "CELERY_BROKER_URL" : "redis://localhost:6379/0",
-          "CELERY_BACKEND_URL" : "redis://localhost:6379/1"
+          "CELERY_BACKEND_URL" : "redis://localhost:6379/1",
+          "ADMIN_PASSWORD": "admin_password"
         }
       }
     },
