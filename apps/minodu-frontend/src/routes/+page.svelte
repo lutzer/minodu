@@ -4,6 +4,7 @@
 	import baobapImage from '$lib/assets/baobap.png';
 	import chatImage from '$lib/assets/startscreen_chat.png';
 	import cloudImage from '$lib/assets/startscreen_cloud.png';
+	import ExplainPageButton from '$lib/components/common/ExplainPageButton.svelte';
 
 	let { children } = $props();
 </script>
@@ -153,4 +154,7 @@
 		<a href="/agriculture" class="grid-link">Agriculture</a>
 		<a href="/market" class="grid-link">Market</a>
 	</div>
+	<ExplainPageButton 
+		audioFr={"https://audio-samples.github.io/samples/mp3/blizzard_unconditional/sample-0.mp3"}
+		audioKb={"https://audio-samples.github.io/samples/mp3/blizzard_unconditional/sample-1.mp3"}/>
 </div>

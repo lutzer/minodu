@@ -1,8 +1,9 @@
-import type { BotMessage, Optional } from './types';
+import type { BotMessage, Language, Optional } from './types';
 
 export class Store {
 	static readonly FORUM_TOKEN_KEY = 'FORUM_AUTH_TOKEN';
 	static readonly BOT_HISTORY_KEY = 'BOT_MESSAGE_HISTORY';
+	static readonly APP_LANGUAGE_KEY = 'APP_LANGUAGE';
 
 	public static set forumToken(token: Optional<string>) {
 		if (token) localStorage.setItem(Store.FORUM_TOKEN_KEY, token);
@@ -20,5 +21,13 @@ export class Store {
 
 	public static get chatMessages(): BotMessage[] {
 		return JSON.parse(localStorage.getItem(Store.BOT_HISTORY_KEY) || '[]');
+	}
+
+	public static set language(language: Language) {
+		localStorage.setItem(Store.APP_LANGUAGE_KEY, language);
+	}
+
+	public static get language() : Language {
+		return localStorage.getItem(Store.APP_LANGUAGE_KEY) == 'kb' ? 'kb' : 'fr';
 	}
 }
