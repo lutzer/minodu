@@ -52,7 +52,7 @@
 		bottom:0;
 		left: 0;
 		right: 0;
-		height: 100px;
+		height: var(--footer-height);
 	}
 
 	#content {
@@ -81,8 +81,11 @@
 
 	:global(:root) {
 		--small-padding: 10px;
+		--medium-padding: 20px;
 		--bg-color-light: #C2B4B0;
 		--border-radius: 20px;
+		--footer-height: 100px;
+		--button-size: 52px;
 	}
 
 
