@@ -1,5 +1,6 @@
 <script lang="ts">
     import explainPageButton from '$lib/assets/explain-page-button.png';
+    import explainPageButtonActive from '$lib/assets/explain-page-button-active.png';
     import languageKbButton from '$lib/assets/language-kb-button.png';
     import languageFrButton from '$lib/assets/language-fr-button.png';
 	import type { Language } from '$lib/types';
@@ -12,6 +13,7 @@
     let language : Language;
 
     let audio : HTMLAudioElement;
+    let isPlaying : boolean = false;
 
     onMount(() => {
         language = Store.language;
@@ -21,43 +23,47 @@
 		language = language == 'kb' ? 'fr' : 'kb';
         Store.language = language;
         audio?.pause();
+        isPlaying = false
 	}
 
     function explainPageButtonClicked() {
-        if (audio && audio.paused) {
+        if (!isPlaying) {
             audio.currentTime = 0;
             audio.play();
+            isPlaying = true
         } else {
             audio.pause()
+            isPlaying = false
         }
+    }
+
+    function handleAudioEnded() {
+        isPlaying = false;
     }
 
 </script>
 
 <style>
     .explain-page-button-group {
-        position: absolute;
+        position: fixed;
         bottom: var(--footer-height);
-        left:0;
-        margin: var(--medium-padding);
+        display: flex;
+        box-sizing: border-box;
+        margin: var(--page-padding);
+        pointer-events: none;
     }
 
-    button {
-        background: none;
-        border: none;
-        width: var(--button-size);
-        height: var(--button-size);
-        padding: 0;
+    @media screen and (min-width: 550px) {
+		.explain-page-button-group {
+			bottom: calc(var(--footer-height) + var(--medium-padding));
+		}
+	}
+
+    .explain-page-button-group button {
+        pointer-events: auto;
     }
 
-    button img {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-    }
-
-    .shadow {
+    /* .shadow {
         position: absolute;
         border-radius: 10px;
         background-color: #cccccc;
@@ -66,22 +72,20 @@
         bottom:-1px;
         right:-4px;
         opacity: 0.8;
-    }
+    } */
 
     audio {
         display: none;
     }
 </style>
 
-<div class="explain-page-button-group">
-    <div class="shadow">
-    </div>
+<div class="explain-page-button-group content-width">
     <button class="button" onclick={explainPageButtonClicked}>
-        <img src={explainPageButton} alt="Button to speak out page info"/>
+        <img src={isPlaying ? explainPageButtonActive : explainPageButton} alt="Button to speak out page info"/>
     </button>
     <button class="button" onclick={languageButtonClicked}>
         <img src={language == 'kb' ? languageKbButton : languageFrButton} alt="Button to switch language"/>
     </button>
-    <audio bind:this={audio} src={language == 'kb' ? audioKb : audioFr}>
+    <audio bind:this={audio} src={language == 'kb' ? audioKb : audioFr} onended={handleAudioEnded}>
     </audio>
 </div>

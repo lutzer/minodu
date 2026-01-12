@@ -13,6 +13,8 @@
 	import marketIcon from '$lib/assets/market-icon.png';
 	import marketIconDisabled from '$lib/assets/market-icon-disabled.png';
 
+	import '../global.css';
+
 	let { children } = $props();
 </script>
 
@@ -47,6 +49,8 @@
 </div>
 
 <style>
+	
+
 	#footer {
 		position: fixed;
 		bottom:0;
@@ -79,61 +83,5 @@
 		}
 	}
 
-	:global(:root) {
-		--small-padding: 10px;
-		--medium-padding: 20px;
-		--bg-color-light: #C2B4B0;
-		--border-radius: 20px;
-		--footer-height: 100px;
-		--button-size: 52px;
-	}
-
-
-	:global(.input-textarea) {
-		background: white;
-		border: 1px;
-	}
-
-	:global(textarea) {
-		width: 100%;
-		resize: none;
-		border: none;
-		background: none;
-	}
-
-	:global(textarea:focus) {
-		outline: none;
-		box-shadow: none;
-	}
-
-	:global(.input-text) {
-		background: none;
-		border: 1px;
-	}
-
-	:global(input[type='text']) {
-		width: 100%;
-		resize: none;
-		border: none;
-		background: none;
-	}
-
-	:global(input[type='text']:focus) {
-		outline: none;
-		box-shadow: none;
-	}
-
-	:global(h3) {
-		margin: 0;
-		font-size: 110%;
-	}
-
-	:global(.paragraph:not(:first-of-type)) {
-		margin-top: 10px;
-	}
-
-	:global(.content-width) {
-		max-width: 1100px;
-		margin: 0 auto;
-	}
+	
 </style>

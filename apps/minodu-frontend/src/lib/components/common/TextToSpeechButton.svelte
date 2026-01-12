@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import TextToSpeechPlayer from './TextToSpeechPlayer.svelte';
+	import ttsButton from '$lib/assets/forum-tts-button.png';
 
 	export let ttsPlayer: TextToSpeechPlayer;
 	export let text: string;
@@ -23,6 +24,17 @@
 	}
 </script>
 
+<style>
+
+	button {
+		width: 42px;
+		height: 42px;
+	}
+
+</style>
+
 <div>
-	<button onclick={handleClick}>{playing ? 'Stop' : 'Listen'}</button>
+	<button onclick={handleClick}>
+		<img src={ttsButton} alt="transcribe selected text">
+	</button>
 </div>

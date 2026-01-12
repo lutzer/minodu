@@ -120,8 +120,8 @@
 
 </style>
 
-<div>
-	<div id="tile-image-container" class="content-width">
+<div class="content-width">
+	<div id="tile-image-container">
 		<img 
 			src={tileImageMobile} 
 			alt="4 minodu tiles showing different apps"
@@ -131,7 +131,7 @@
 			alt="4 minodu tiles showing different apps"
 			class="responsive-image tablet"/>
 	</div>
-	<div id="object-overlay-container" class="content-width">
+	<div id="object-overlay-container">
 		<div id="cloud">
 			<img
 				src={cloudImage}
