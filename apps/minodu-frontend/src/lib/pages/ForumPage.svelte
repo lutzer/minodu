@@ -4,19 +4,27 @@
 	import type { ForumPost } from '$lib/apis/forum/models/forumPost';
 	import AuthorCreateDialog from '$lib/components/forum/AuthorCreateDialog.svelte';
 	import type { ForumAuthor } from '$lib/apis/forum/models/forumAuthor';
-	import type { Optional } from '$lib/types';
+	import { ForumPostType, type Optional } from '$lib/types';
 	import ForumPostElement from '$lib/components/forum/ForumPostElement.svelte';
 	import ForumInputElement from '$lib/components/forum/ForumInputElement.svelte';
 	import TextToSpeechPlayer from '$lib/components/common/TextToSpeechPlayer.svelte';
 	import { Store } from '$lib/store';
 	import { Config } from '$lib';
+	import { fly, fade } from 'svelte/transition';
+
+	import createPostButton from '$lib/assets/forum-new-post-button.png';
+	import type { HtmlTagDescriptor } from 'vite';
 
 	let createAuthorDialog: AuthorCreateDialog;
 	let ttsPlayer: TextToSpeechPlayer;
-	let forumInputElement: ForumInputElement;
+
+	let scrollContainer : HTMLDivElement;
+	
 
 	let posts: ForumPost[] = [];
 	let author: Optional<ForumAuthor> = undefined;
+
+	let showCreatePostDialog : boolean = false
 
 	onMount(() => {
 		update();
@@ -36,29 +44,12 @@
 	});
 
 	async function update() {
-		posts = await ForumApi.getPosts();
+		posts = (await ForumApi.getPosts()).reverse();
 		author = await ForumApi.checkToken();
 	}
 
-	function onAuthorCreated() {
-		update();
-	}
-
-	async function createPost(
-		title: string,
-		text: string,
-		audio: Optional<Blob>,
-		image: Optional<File>
-	) {
-		let post = await ForumApi.createPost({ title: title, text: text });
-		if (audio) {
-			await ForumApi.attachFile(post.id, audio, Config.language);
-		}
-		if (image) {
-			let imageBlob = new Blob([image], { type: image.type });
-			await ForumApi.attachFile(post.id, imageBlob, Config.language);
-		}
-		forumInputElement?.reset();
+	async function createPost() {
+		showCreatePostDialog = true;
 	}
 
 	async function deletePost(id: number) {
@@ -69,54 +60,96 @@
 		Store.forumToken = undefined;
 		author = undefined;
 	}
+
+	function scrollToTop() {
+		scrollContainer.scrollTo({
+			top: 0,
+			behavior: "smooth",
+		});
+	}
 </script>
 
 <div class="forum-page">
-	<div class="post-container">
-		<h3>Posts</h3>
-		{#if posts.length > 0}
-			<ul>
-				{#each posts as post}
-					<li>
-						<ForumPostElement
-							{post}
-							isOwn={author?.id == post.author.id}
-							onDeleteClicked={() => deletePost(post.id)}
-							{ttsPlayer}
-						/>
-					</li>
-				{/each}
-			</ul>
-		{:else}
-			<p>No posts yet.</p>
-		{/if}
+	<div class="scroll-container" bind:this={scrollContainer}>
+		<div class="post-container content-width">
+			{#if posts.length > 0}
+				<ul>
+					{#each posts as post}
+						<li>
+							<ForumPostElement
+								{post}
+								isOwn={author?.id == post.author.id}
+								onDeleteClicked={() => deletePost(post.id)}
+								ttsPlayer={ttsPlayer}
+							/>
+						</li>
+					{/each}
+				</ul>
+			{:else}
+				<p class="no-posts">No posts yet.</p>
+			{/if}
+		</div>
 	</div>
-
-	<div class="post-create">
-		<h3>New Post</h3>
+	
+	{#if showCreatePostDialog}
+	<div class="create-post-container content-width" transition:fly={{ y: 200, duration: 300 }}>
 		<ForumInputElement
-			bind:this={forumInputElement}
-			{author}
-			onCreateAuthorClicked={async () => createAuthorDialog.open()}
-			onSubmitPostClicked={async (title, text, audio, image) =>
-				createPost(title, text, audio, image)}
-			onLogoutAuthorClicked={async () => logout()}
+			postType={ForumPostType.TEXT}
+			onPostSubmitted={() => { showCreatePostDialog = false; scrollToTop(); }}
+			onPostCancelled={() => { showCreatePostDialog = false; }}
 		/>
-
-		<AuthorCreateDialog bind:this={createAuthorDialog} onCreated={onAuthorCreated} />
-
-		<TextToSpeechPlayer bind:this={ttsPlayer} />
 	</div>
+	{:else}
+	<div class="create-post-button content-width" transition:fly={{ y: 200, duration: 300 }}>
+		<button class="big" onclick={createPost}>
+			<img src={createPostButton} alt="create new forum post"/>
+		</button>
+	</div>
+	{/if}
+	<TextToSpeechPlayer bind:this={ttsPlayer} />
 </div>
 
 <style>
-	.post-create {
-		background-color: lightblue;
-		padding: 10px;
+	.scroll-container {
+		position: fixed;
+		top:0;
+		left:0;
+		height: 100vh;
+		width: 100vw;
+		background-color: #EDCA82;
+		overflow: scroll;
+	}
+
+	.create-post-container {
+		position: fixed;
+		background-color: #ffffff;
+		bottom: 0;
+		left:0;
+		right:0;
+		z-index: 1;
+		padding: var(--small-padding);
+		border-top: 1px solid #ccc;
+		border-radius: var(--border-radius) var(--border-radius) 0 0;
+        box-sizing: border-box;
 	}
 
 	.post-container {
-		background-color: lightcyan;
-		padding: 10px;
+		padding: var(--page-padding);
+		margin-bottom: calc(var(--footer-height) + var(--page-padding) + 60px);
+		box-sizing: border-box;
+	}
+
+	.create-post-button {
+		display: flex;
+		position: fixed;
+		bottom: var(--footer-height);
+		justify-content: end;
+        box-sizing: border-box;
+        padding: var(--page-padding);
+	}
+
+	.no-posts {
+		text-align: center;
+		font-weight: 800;
 	}
 </style>

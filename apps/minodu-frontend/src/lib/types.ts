@@ -7,3 +7,9 @@ export type BotMessage = {
 	response: string;
 	generated: boolean;
 };
+
+export enum ForumPostType {
+	TEXT,
+	AUDIO,
+	IMAGE
+}

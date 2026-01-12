@@ -1,24 +1,25 @@
 <script lang="ts">
+	import { Config } from '$lib';
+	import { ForumApi } from '$lib/apis/forum/api';
 	import type { ForumAuthor } from '$lib/apis/forum/models/forumAuthor.ts';
-	import type { Optional } from '$lib/types';
+	import type {Optional} from '$lib/types';
+	import { ForumPostType } from '$lib/types';
 	import AudioRecorder from '../common/AudioRecorder.svelte';
-	import ForumImagePicker from './ForumImagePicker.svelte';
 
-	export let author: Optional<ForumAuthor>;
-	export let onCreateAuthorClicked: () => void;
-	export let onLogoutAuthorClicked: () => void;
-	export let onSubmitPostClicked: (
-		title: string,
-		text: string,
-		audio: Optional<Blob>,
-		image: Optional<File>
-	) => void;
+	import submitButton from '$lib/assets/forum-submit-post.png'
+	import cancelButton from '$lib/assets/delete-forum-post.png'
+	import { Store } from '$lib/store';
+	import { onMount } from 'svelte';
+
+	export let postType: ForumPostType;
+
+	export let onPostSubmitted : () => void;
+	export let onPostCancelled : () => void;
 
 	let audioRecorder: AudioRecorder;
 	let audioBlob: Optional<Blob>;
 	let audioRecording: boolean = false;
 
-	let title: string = '';
 	let text: string = '';
 	let image: Optional<File>;
 
@@ -26,11 +27,36 @@
 
 	$: {
 		submitEnabled =
-			(title.length >= 3 && text.length >= 3) || audioBlob != undefined || image != undefined;
+			(text.length >= 3) || audioBlob != undefined || image != undefined;
+	}
+
+	onMount(() => {
+		text = Store.forumPostText;
+	})
+
+	async function createPost(
+		text: Optional<string>,
+		audio: Optional<Blob>,
+		image: Optional<File>
+	) {
+		let post = await ForumApi.createPost({ title: "", text: text != undefined ? text : "" });
+		if (audio) {
+			await ForumApi.attachFile(post.id, audio, Config.language);
+		}
+		if (image) {
+			let imageBlob = new Blob([image], { type: image.type });
+			await ForumApi.attachFile(post.id, imageBlob, Config.language);
+		}
+		onPostSubmitted();
+		Store.forumPostText = "";
+	}
+
+	function close() {
+		onPostCancelled();
+		Store.forumPostText = text;
 	}
 
 	export function reset() {
-		title = '';
 		text = '';
 		audioBlob = undefined;
 		image = undefined;
@@ -38,7 +64,22 @@
 </script>
 
 <div class="forum-input-container">
-	<div class="author input-block">
+	{#if postType == ForumPostType.TEXT}
+		<div class="input-text-field">
+			<div class="input-textarea">
+				<textarea id="text" bind:value={text}></textarea>
+			</div>
+		</div>
+		<div class="input-button-group">
+			<button onclick={() => createPost(text, undefined, undefined)} disabled={!submitEnabled}>
+				<img src={submitButton} alt="Submit forum post"/>
+			</button>
+			<button onclick={close}>
+				<img src={cancelButton} alt="Submit forum post"/>
+			</button>
+		</div>
+	{/if}
+	<!-- <div class="author input-block">
 		{#if author != undefined}
 			<h4>{author.name}</h4>
 			<p>{author.avatar}</p>
@@ -84,21 +125,24 @@
 		</div>
 	{:else}
 		<div><p>Please login</p></div>
-	{/if}
+	{/if} -->
 </div>
 
 <style>
-	.input-block {
-		background-color: lightgray;
-		margin: 10px;
-		padding: 10px;
+
+	.forum-input-container {
+		display: flex;
+		flex-direction: row;
+		gap: 5px;
 	}
 
-	.input-block.text {
-		min-width: 300px;
+	.input-text-field {
+		flex: 1;
 	}
 
-	.author {
+	.input-button-group {
+		flex-shrink: 0;
+		width: 60px;
 		text-align: center;
 	}
 </style>
