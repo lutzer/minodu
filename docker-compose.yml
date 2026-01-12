@@ -40,6 +40,7 @@ services:
     volumes:
       - ./data/minodu-backend/audios:/app/static/audios
       - ./data/minodu-backend/images:/app/static/images
+      - ./data/minodu-backend/docs:/app/static/docs
     depends_on:
       minodu-database:
         condition: service_healthy

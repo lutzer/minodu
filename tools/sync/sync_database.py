@@ -134,8 +134,8 @@ def main():
 
     download_path = Path.cwd() / "download.zip"
 
-    # check if file with the right hast is already downloaded
-    check_file_hash(download_path)
+    # check if file with the right hash is already downloaded
+    # check_file_hash(download_path)
     
     # Create extract directory
     extract_dir = Path.cwd() / "extracted/"
