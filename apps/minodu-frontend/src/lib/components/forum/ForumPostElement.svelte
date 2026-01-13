@@ -12,7 +12,7 @@
 	export let onDeleteClicked: () => void;
 </script>
 
-<div class="post">
+<div class="post shadow">
 	<div class="post-avatar">
 		<div class="avatar-picture">
 			<img src="/api/forum/static/avatars/avatar1.jpeg" alt="avatar of the user"/>
@@ -76,10 +76,10 @@
 		display: flex;
 		padding: var(--medium-padding);
 		margin-bottom: var(--medium-padding);
-		background-color: #ffffff;
+		background-color: #f6eddb;
 		border-radius: var(--border-radius);
-		box-shadow: 3px 3px 2px #00000033;
 		gap: var(--small-padding);
+		--box-shadow-color: #67625a;
 	}
 
 	.post-avatar {
