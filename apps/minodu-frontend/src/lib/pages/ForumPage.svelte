@@ -24,10 +24,10 @@
 	let posts: ForumPost[] = [];
 	let author: Optional<ForumAuthor> = undefined;
 
-	let showCreatePostDialog : boolean = false
+	let showCreatePostDialog : boolean = false;
 
 	onMount(() => {
-		update();
+		update(false)
 
 		let eventSource = ForumApi.getEventSource();
 		eventSource.onmessage = (msg) => {
@@ -43,9 +43,14 @@
 		};
 	});
 
-	async function update() {
-		posts = (await ForumApi.getPosts()).reverse();
+	async function update(smoothScroll : boolean = true) {
+		posts = await ForumApi.getPosts();
 		author = await ForumApi.checkToken();
+
+		scrollContainer.scrollTo({
+			top: scrollContainer.scrollHeight,
+			behavior: smoothScroll ? "smooth" : undefined
+		});
 	}
 
 	async function createPost() {
@@ -59,13 +64,6 @@
 	async function logout() {
 		Store.forumToken = undefined;
 		author = undefined;
-	}
-
-	function scrollToTop() {
-		scrollContainer.scrollTo({
-			top: 0,
-			behavior: "smooth",
-		});
 	}
 </script>
 
@@ -95,7 +93,7 @@
 	<div class="create-post-container content-width" transition:fly={{ y: 200, duration: 300 }}>
 		<ForumInputElement
 			postType={ForumPostType.TEXT}
-			onPostSubmitted={() => { showCreatePostDialog = false; scrollToTop(); }}
+			onPostSubmitted={() => { showCreatePostDialog = false; }}
 			onPostCancelled={() => { showCreatePostDialog = false; }}
 		/>
 	</div>

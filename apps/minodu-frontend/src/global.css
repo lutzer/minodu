@@ -114,3 +114,7 @@ li {
     margin: 0;
     padding: 0;
 }
+
+.shadow {
+	box-shadow: 4px 4px 0px var(--box-shadow-color), 0px 4px 0px var(--box-shadow-color);
+}
