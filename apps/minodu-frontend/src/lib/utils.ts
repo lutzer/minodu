@@ -4,6 +4,14 @@ export function delay(ms: number): Promise<void> {
 	});
 }
 
+export function waitForAnimationFrame() : Promise<void> {
+	return new Promise((resolve) => {
+		requestAnimationFrame(() => {
+			requestAnimationFrame(() => resolve());
+  		});
+	});
+}
+
 export function mimeTypeToFileExtension(mimeType: string): string {
 	const mimeToExtension: Record<string, string> = {
 		// Images
