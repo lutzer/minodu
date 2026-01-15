@@ -13,18 +13,22 @@
 	import { fly, fade } from 'svelte/transition';
 
 	import createPostButton from '$lib/assets/forum-new-post-button.png';
-	import type { HtmlTagDescriptor } from 'vite';
+	import { waitForAnimationFrame } from '$lib/utils';
 
-	let createAuthorDialog: AuthorCreateDialog;
+	// let createAuthorDialog: AuthorCreateDialog;
 	let ttsPlayer: TextToSpeechPlayer;
 
 	let scrollContainer : HTMLDivElement;
 	
-
 	let posts: ForumPost[] = [];
+	let visiblePosts: ForumPost[] = [];
+
 	let author: Optional<ForumAuthor> = undefined;
 
 	let showCreatePostDialog : boolean = false;
+
+	let showNumberOfPosts : number = 3;
+	let loadingMorePosts : boolean = false
 
 	onMount(() => {
 		update(false)
@@ -47,6 +51,8 @@
 		posts = await ForumApi.getPosts();
 		author = await ForumApi.checkToken();
 
+		await waitForAnimationFrame();
+		
 		scrollContainer.scrollTo({
 			top: scrollContainer.scrollHeight,
 			behavior: smoothScroll ? "smooth" : undefined
@@ -65,10 +71,33 @@
 		Store.forumToken = undefined;
 		author = undefined;
 	}
+
+	async function handleScroll() {
+		
+		// //Check if scrolled to top (with small threshold)
+		// if (scrollContainer.scrollTop < 100 && !loadingMorePosts) {
+		// 	loadingMorePosts = true;
+		// 	const scrollBottom = scrollContainer.scrollHeight - scrollContainer.scrollTop - scrollContainer.clientHeight;
+		// 	showNumberOfPosts += 3;
+		// 	// if (showNumberOfPosts < posts.length) {
+		// 	// 	console.log("load more");
+		// 	// 	showNumberOfPosts += 3;
+		// 	// 	// posts = (await ForumApi.getPosts()).splice(-showNumberOfPosts);
+				
+		// 	// 	await waitForAnimationFrame();
+				
+		// 	// 	scrollContainer.scrollTo({
+		// 	// 		top: scrollContainer.scrollHeight - scrollContainer.clientHeight - scrollBottom
+		// 	// 	});
+		// 	// }
+		// 	console.log(showNumberOfPosts)
+		// 	loadingMorePosts = false;
+		// }
+  };
 </script>
 
 <div class="forum-page">
-	<div class="scroll-container" bind:this={scrollContainer}>
+	<div class="scroll-container" bind:this={scrollContainer} onscroll={handleScroll}>
 		<div class="post-container content-width">
 			{#if posts.length > 0}
 				<ul>
@@ -112,11 +141,13 @@
 		position: fixed;
 		top:0;
 		left:0;
-		height: 100vh;
-		width: 100vw;
+		right:0;
+		bottom: var(--footer-height);
 		background-color: #EDCA82;
 		overflow: scroll;
 	}
+
+	
 
 	.create-post-container {
 		position: fixed;
@@ -133,7 +164,7 @@
 
 	.post-container {
 		padding: var(--page-padding);
-		margin-bottom: calc(var(--footer-height) + var(--page-padding) + 60px);
+		margin-bottom: calc(var(--page-padding) + var(--button-size));
 		box-sizing: border-box;
 	}
 
@@ -149,5 +180,15 @@
 	.no-posts {
 		text-align: center;
 		font-weight: 800;
+	}
+
+	@media screen and (min-width: 550px) {
+		.scroll-container {
+			bottom: 0;
+		}
+
+		.post-container {
+			margin-bottom: calc(var(--page-padding) + var(--footer-height) + var(--button-size));
+		}
 	}
 </style>
