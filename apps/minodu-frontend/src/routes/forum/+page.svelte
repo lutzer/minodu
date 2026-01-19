@@ -3,10 +3,6 @@
 	import ForumPage from '$lib/pages/ForumPage.svelte';
 </script>
 
-<style>
-	
-</style>
-
 <div class="forum-page-container">
 	<ForumPage />
 	<ExplainPageButton 
