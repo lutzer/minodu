@@ -12,6 +12,63 @@
 	export let onDeleteClicked: () => void;
 </script>
 
+
+<style>
+	.post {
+		position:relative;
+		display: flex;
+		padding: var(--medium-padding);
+		margin-bottom: var(--medium-padding);
+		background-color: #f6eddb;
+		border-radius: var(--border-radius);
+		gap: var(--small-padding);
+		--box-shadow-color: #67625a;
+	}
+
+	.post-avatar {
+		width: 60px;
+  		flex-shrink: 0; 
+		text-align: center;
+	}
+
+	.post-avatar img {
+		width:100%;
+		height: auto;
+		object-fit: contain;
+		margin-bottom: var(--small-padding);
+	}
+
+	.paragraph {
+		text-align: left;
+	}
+
+	.post-content {
+		flex: 1;
+	}
+
+	.image {
+		height: 500px;
+		width: 100%;
+	}
+
+	.image > img {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+	}
+
+	.delete-button {
+		height: 32px;
+		width: 32px;
+	}
+
+	.post-delete-container {
+		position: absolute;
+		right:8px;
+		top:8px;
+	}
+</style>
+
 <div class="post shadow">
 	<div class="post-avatar">
 		<div class="avatar-picture">
@@ -69,59 +126,3 @@
 		{/if}
 	</div>
 </div>
-
-<style>
-	.post {
-		position:relative;
-		display: flex;
-		padding: var(--medium-padding);
-		margin-bottom: var(--medium-padding);
-		background-color: #f6eddb;
-		border-radius: var(--border-radius);
-		gap: var(--small-padding);
-		--box-shadow-color: #67625a;
-	}
-
-	.post-avatar {
-		width: 60px;
-  		flex-shrink: 0; 
-		text-align: center;
-	}
-
-	.post-avatar img {
-		width:100%;
-		height: auto;
-		object-fit: contain;
-		margin-bottom: var(--small-padding);
-	}
-
-	.paragraph {
-		text-align: left;
-	}
-
-	.post-content {
-		flex: 1;
-	}
-
-	.image {
-		height: 500px;
-		width: 100%;
-	}
-
-	.image > img {
-		width: 100%;
-		height: 100%;
-		object-fit: contain;
-	}
-
-	.delete-button {
-		height: 32px;
-		width: 32px;
-	}
-
-	.post-delete-container {
-		position: absolute;
-		right:8px;
-		top:8px;
-	}
-</style>

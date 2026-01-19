@@ -30,20 +30,20 @@
 		<div class="menu-bar">
 			<FooterMenuButton link="/agriculture" 
 				icon={agricultureIcon} 
-				iconDisabled={agricultureIconDisabled}/>
+				iconSelected={agricultureIconDisabled}/>
 			<FooterMenuButton link="/forum" 
 				icon={forumIcon} 
-				iconDisabled={forumIconDisabled}/>
+				iconSelected={forumIconDisabled}/>
 			<FooterMenuButton link="/" 
 				icon={treeIcon} 
-				iconDisabled={treeIconDisabled}
+				iconSelected={treeIconDisabled}
 				strictRoute={true}/>
 			<FooterMenuButton link="/weather" 
 				icon={weatherIcon}
-				iconDisabled={weatherIconDisabled}/>
+				iconSelected={weatherIconDisabled}/>
 			<FooterMenuButton link="/market" 
 				icon={marketIcon}
-				iconDisabled={marketIconDisabled}/>
+				iconSelected={marketIconDisabled}/>
 		</div>
 	</div>
 </div>

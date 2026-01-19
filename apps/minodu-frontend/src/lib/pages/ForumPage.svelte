@@ -71,33 +71,10 @@
 		Store.forumToken = undefined;
 		author = undefined;
 	}
-
-	async function handleScroll() {
-		
-		// //Check if scrolled to top (with small threshold)
-		// if (scrollContainer.scrollTop < 100 && !loadingMorePosts) {
-		// 	loadingMorePosts = true;
-		// 	const scrollBottom = scrollContainer.scrollHeight - scrollContainer.scrollTop - scrollContainer.clientHeight;
-		// 	showNumberOfPosts += 3;
-		// 	// if (showNumberOfPosts < posts.length) {
-		// 	// 	console.log("load more");
-		// 	// 	showNumberOfPosts += 3;
-		// 	// 	// posts = (await ForumApi.getPosts()).splice(-showNumberOfPosts);
-				
-		// 	// 	await waitForAnimationFrame();
-				
-		// 	// 	scrollContainer.scrollTo({
-		// 	// 		top: scrollContainer.scrollHeight - scrollContainer.clientHeight - scrollBottom
-		// 	// 	});
-		// 	// }
-		// 	console.log(showNumberOfPosts)
-		// 	loadingMorePosts = false;
-		// }
-  };
 </script>
 
 <div class="forum-page">
-	<div class="scroll-container" bind:this={scrollContainer} onscroll={handleScroll}>
+	<div class="scroll-container" bind:this={scrollContainer}>
 		<div class="post-container content-width">
 			{#if posts.length > 0}
 				<ul>

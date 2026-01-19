@@ -6,11 +6,15 @@ export default defineConfig({
 	server: {
 		proxy: {
 			'/api/services': {
-				target: 'http://localhost:3002',
+				target: 'http://localhost',
 				changeOrigin: true
 			},
 			'/api/forum': {
-				target: 'http://localhost:3003',
+				target: 'http://localhost',
+				changeOrigin: true
+			},
+			'/api/backend': {
+				target: 'http://localhost',
 				changeOrigin: true
 			}
 		}

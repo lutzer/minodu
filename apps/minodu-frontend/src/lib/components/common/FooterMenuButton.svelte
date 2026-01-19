@@ -3,13 +3,13 @@
 
     export let link : string;
     export let icon : string;
-    export let iconDisabled : string;
+    export let iconSelected : string;
     export let strictRoute : boolean = false;
 
-    let disabled : boolean; 
+    let selected : boolean; 
 
     $: {
-		disabled = strictRoute ? $page.url.pathname === link : $page.url.pathname.startsWith(link);
+		selected = !(strictRoute ? $page.url.pathname === link : $page.url.pathname.startsWith(link)) && $page.url.pathname !== "/";
 	}
 </script>
 
@@ -34,13 +34,13 @@
         object-fit: contain;
     }
 
-    .footer-menu-button a.disabled {
-        pointer-events: none;
+    .footer-menu-button a.active {
+        /* pointer-events: all; */
     } 
 </style>
 
 <div class="footer-menu-button">
-    <a href={link} class={disabled ? "disabled" : ""}>
-        <img src={disabled ? iconDisabled : icon} alt="Icon for link to {link}"/>
+    <a href={link} class={selected ? "active" : ""}>
+        <img src={selected ? iconSelected : icon} alt="Icon for link to {link}"/>
     </a>
 </div>
