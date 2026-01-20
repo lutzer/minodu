@@ -49,11 +49,21 @@ class DocumentStore:
             loader = TextLoader(file_path)
         else:
             raise ValueError("Unsupported file type")
-        
+
         documents = loader.load()
-        texts = [doc.page_content for doc in documents]
-        metadatas = [{"source": os.path.basename(file_path), "page": i, "source_id" : source_id} for i in range(len(texts))]
-        
+
+        # Filter out empty pages
+        texts = []
+        metadatas = []
+        for i, doc in enumerate(documents):
+            content = doc.page_content.strip()
+            if content:
+                texts.append(content)
+                metadatas.append({"source": os.path.basename(file_path), "page": i, "source_id": source_id})
+
+        if not texts:
+            raise DocumentStoreException(f"No extractable text found in {os.path.basename(file_path)}")
+
         self.add_text_documents(texts, metadatas)
     
     def add_directory(self, directory_path, extension="pdf"):
