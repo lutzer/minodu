@@ -74,11 +74,11 @@ export abstract class BaseConfig {
 
   static getFilePath(filename: string) {
     if (filename) {
-      if (filename.match(/\.(docx|txt|pdf|csv)$/)) return './temp/docs';
-      if (filename.match(/\.(jpg|jpeg|png|gif|jfif|webp)$/)) return './temp/images';
-      if (filename.match(/\.(avi|mp4|mkv|mov|flv)$/)) return './temp/videos';
-      if (filename.match(/\.(mp3|wav|bwf|ogg|flac)$/)) return './temp/audios';
-      if (filename.match(/\.(zip)$/)) return './temp';
+      if (filename.match(/\.(docx|txt|pdf|csv)$/)) return './static/docs';
+      if (filename.match(/\.(jpg|jpeg|png|gif|jfif|webp)$/)) return './static/images';
+      if (filename.match(/\.(avi|mp4|mkv|mov|flv)$/)) return './static/videos';
+      if (filename.match(/\.(mp3|wav|bwf|ogg|flac)$/)) return './static/audios';
+      if (filename.match(/\.(zip)$/)) return './static';
     }
   }
 
