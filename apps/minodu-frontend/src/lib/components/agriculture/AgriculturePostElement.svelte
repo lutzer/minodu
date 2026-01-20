@@ -20,15 +20,16 @@
 	}
 
     .post-image {
-        width: 100px;
-        height: 100px;
+        width: 125px;
+        height: 125px;
         flex-shrink: 0;
     }
 
     .post-image img {
         width: 100%;
         height: 100%;
-        object-fit: contain;
+        object-fit: cover;
+        border-radius: var(--border-radius);
     }
 
     .post-content {
@@ -41,7 +42,7 @@
 
 <div class="post shadow">
 	<div class="post-image">
-		<img src={placeholderImage} alt="image for {post.title}"/>
+		<img src={post.image} alt="image for {post.title}"/>
 	</div>
 	<div class="post-content">
 		<h3>{post.title}</h3>
