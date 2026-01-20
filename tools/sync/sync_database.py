@@ -98,12 +98,31 @@ def import_mysql(sql_file, host, database, user, password, port=3306):
         print(f"Error during import: {e}")
         return False
     
-def copy_files(source_dir, destination_dir):
+def copy_files(source_dir: Path, destination_dir: Path) -> bool:
+    """
+    Copy audios, images, and docs directories from source to destination.
+    """
     try:
-        if Path(destination_dir).exists():
-            shutil.rmtree(destination_dir)
-        shutil.move(source_dir, destination_dir)
-        print(f"File copied to: {destination_dir}")
+        source_dir = Path(source_dir)
+        destination_dir = Path(destination_dir)
+        destination_dir.mkdir(parents=True, exist_ok=True)
+
+        directories = ['audios', 'images', 'docs']
+
+        for dir_name in directories:
+            src = source_dir / dir_name
+            dest = destination_dir / dir_name
+
+            if src.exists() and src.is_dir():
+                if dest.exists():
+                    shutil.rmtree(dest)
+                shutil.copytree(src, dest)
+                file_count = len(list(dest.iterdir()))
+                print(f"  - {dir_name}: {file_count} files")
+            else:
+                print(f"  - {dir_name}: not found in source")
+
+        print(f"Files copied to {destination_dir}")
         return True
     except Exception as e:
         print(f"Error copying files: {e}")
@@ -122,7 +141,7 @@ def cleanup(dir):
 def main():
     parser = argparse.ArgumentParser(description='Download, extract, and import SQL database dump')
     parser.add_argument('url', help='URL of the zip file to download')
-    parser.add_argument('--destination', required=True, help='Path where the content of the archive should be extracted to.')
+    parser.add_argument('--destination', required=True, help='Base path for file distribution (files go to destination/audios, destination/images, destination/docs)')
     parser.add_argument('--host', default='localhost', help='Database host (default: localhost)')
     parser.add_argument('--port', default=3306, type=int, help='Database port')
     parser.add_argument('--database', default="minodu", help='Database name')
@@ -158,13 +177,13 @@ def main():
         cleanup(extract_dir)
         return 1
 
-    # copy files
+    # Copy files to destination
     destination = Path(args.destination)
     destination_path = destination if destination.is_absolute() else Path.cwd() / destination
     if not copy_files(extract_dir.resolve(), destination_path.resolve()):
         cleanup(extract_dir)
         return 1
-        
+
     # Cleanup
     cleanup(extract_dir)
 

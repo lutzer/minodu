@@ -18,6 +18,8 @@ This file contains guidelines, practices, and principles that should be consider
 - Prefer explicit over implicit
 - Avoid over-engineering; solve the current problem, not hypothetical future ones
 - Delete unused code rather than commenting it out
+- the data directory contains all the data that needs to be preserved or shared across containers
+- the whole system must run on a raspberry pi 5, so avoid any operations that are heavily computational or need a lot of memory
 
 ### TypeScript (Frontend & Backend)
 
@@ -35,6 +37,7 @@ This file contains guidelines, practices, and principles that should be consider
 - use redis and celery for task that last longer
 - write unit tests for all newly added functions
 - uses python poetry 
+- the llm is running localy with ollama
 
 ### Svelte (Frontend)
 
