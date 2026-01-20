@@ -1,4 +1,5 @@
 import argparse
+import sys
 from pathlib import Path
 from src.rag.rag import RAG
 from src.rag.document_store import DocumentStore
@@ -10,12 +11,12 @@ def main():
     parser.add_argument("--remove-doc", type=int, metavar='ID', help="Removes document")
     parser.add_argument("--remove-all", action="store_true", help="Removes all documents")
     parser.add_argument("--list-docs", action="store_true", help="lists all documents")
-    
+
     args = parser.parse_args()
 
     if not(args.language == "en" or args.language == "fr"):
         print("The only available languages are 'en' or 'fr'")
-        return
+        return 1
 
     if args.list_docs:
         rag = RAG(language=args.language)
@@ -25,13 +26,14 @@ def main():
             print("LIST OF DOCUMENTS:")
             print("id\tsource_id\tfile\tpage\tchunk")
             for doc in documents:
-                print(str(doc['id']) + "\t" + 
-                    str(doc["metadata"]["source_id"]) + "\t" + 
-                    str(doc["metadata"]["source"]) + "\t" + 
-                    str(doc["metadata"]["page"]) + "\t" + 
+                print(str(doc['id']) + "\t" +
+                    str(doc["metadata"]["source_id"]) + "\t" +
+                    str(doc["metadata"]["source"]) + "\t" +
+                    str(doc["metadata"]["page"]) + "\t" +
                     str(doc["metadata"]["chunk_id"]) )
         except Exception as e:
             print(f"Error: {e}")
+            return 1
 
     elif args.add_doc:
         rag = RAG(language=args.language)
@@ -39,16 +41,20 @@ def main():
 
         try:
             id = int(args.add_doc[0])
+        except ValueError:
+            print("Error: ID must be an integer")
+            return 1
+
+        try:
             path = args.add_doc[1]
 
             if not Path(path).exists():
                 raise Exception(f"file {path} doesnt exist.")
 
             store.add_file(path, id)
-        except ValueError:
-            print("Error: ID must be an integer")
         except Exception as e:
             print(f"Error: {e}")
+            return 1
 
     elif args.remove_doc:
         rag = RAG(language=args.language)
@@ -59,9 +65,11 @@ def main():
             store.delete_document_by_id(id)
         except ValueError:
             print("Error: ID must be an integer")
+            return 1
         except Exception as e:
             print(f"Error: {e}")
-    
+            return 1
+
     elif args.remove_all:
         rag = RAG(language=args.language)
         store = DocumentStore(rag.vectorstore, rag.chroma_client)
@@ -70,10 +78,13 @@ def main():
             store.delete_all_documents()
         except Exception as e:
             print(f"Error: {e}")
+            return 1
 
     else:
        parser.print_help()
-    
+
+    return 0
+
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

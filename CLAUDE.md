@@ -20,6 +20,8 @@ This file contains guidelines, practices, and principles that should be consider
 - Delete unused code rather than commenting it out
 - the data directory contains all the data that needs to be preserved or shared across containers
 - the whole system must run on a raspberry pi 5, so avoid any operations that are heavily computational or need a lot of memory
+- the scripts to start the docker services are located in package.json.
+- the tools directory contains tools, to sync the local database to an online one
 
 ### TypeScript (Frontend & Backend)
 
