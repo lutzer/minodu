@@ -1,29 +1,83 @@
 <script lang="ts">
 	import playButtonImage from '$lib/assets/audioplayer-play.png';
 	import pauseButtonImage from '$lib/assets/audioplayer-pause.png';
+	import { onMount, onDestroy } from 'svelte';
 
 	export let audioSource: string;
 
 	let audioElement: HTMLAudioElement;
 	let isPlaying: boolean = false;
+	let currentTime: number = 0;
+	let duration: number = 0;
+	let progressBar: HTMLDivElement;
+
+	const playerId = Math.random().toString(36).substring(2);
+
+	$: progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+	$: remainingTime = duration > 0 ? duration - currentTime : 0;
+
+	function formatTime(seconds: number): string {
+		if (isNaN(seconds) || seconds === 0) return '0:00';
+		const mins = Math.floor(seconds / 60);
+		const secs = Math.floor(seconds % 60);
+		return `${mins}:${secs.toString().padStart(2, '0')}`;
+	}
+
+	function handleOtherPlayerStarted(event: CustomEvent<string>) {
+		if (event.detail !== playerId && isPlaying) {
+			pausePlayback();
+		}
+	}
+
+	onMount(() => {
+		window.addEventListener('audioplayer:started', handleOtherPlayerStarted as EventListener);
+	});
+
+	onDestroy(() => {
+		window.removeEventListener('audioplayer:started', handleOtherPlayerStarted as EventListener);
+	});
 
 	export function startPlayback() {
+		window.dispatchEvent(new CustomEvent('audioplayer:started', { detail: playerId }));
 		audioElement?.play();
-		isPlaying = true
+		isPlaying = true;
 	}
 
 	export function pausePlayback() {
 		audioElement?.pause();
-		isPlaying = false
+		isPlaying = false;
+	}
+
+	function onTimeUpdate() {
+		currentTime = audioElement.currentTime;
+	}
+
+	function onLoadedMetadata() {
+		duration = audioElement.duration;
+	}
+
+	function onEnded() {
+		isPlaying = false;
+		currentTime = 0;
+	}
+
+	function seek(event: MouseEvent) {
+		if (!progressBar || duration === 0) return;
+		const rect = progressBar.getBoundingClientRect();
+		const clickX = event.clientX - rect.left;
+		const percentage = clickX / rect.width;
+		audioElement.currentTime = percentage * duration;
 	}
 </script>
 
 <style>
 	.audio-player {
-		border-radius: var(--border-radius);
+		height: 40px;
+		border-radius: 30px;
 		background-color: #FFF8E5;
 		display: flex;
 		align-items: center;
+		margin: var(--small-padding) 0;
 	}
 
 	.play-button {
@@ -32,8 +86,13 @@
 		padding: var(--small-padding);
 	}
 
+	.play-button img {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+	}
+
 	.button {
-		width:40px;
 		flex-shrink: 0;
 	}
 
@@ -42,9 +101,8 @@
 	}
 
 	.time {
-		width:40px;
 		flex-shrink: 0;
-		padding-left: var(--small-padding);
+		padding: 0 var(--small-padding);
 	}
 
 	.progress-background {
@@ -52,29 +110,38 @@
 		width: 100%;
 		height: 4px;
 		border-radius: 2px;
+		cursor: pointer;
+		position: relative;
 	}
 
 	.progress {
-		width:30%;
 		height: 100%;
 		background-color: black;
 		border-radius: 2px;
+		transition: width 0.1s linear;
+		pointer-events: none;
 	}
 </style>
 
 <div class="audio-player">
-	<audio bind:this={audioElement} src={audioSource}></audio>
+	<audio
+		bind:this={audioElement}
+		src={audioSource}
+		ontimeupdate={onTimeUpdate}
+		onloadedmetadata={onLoadedMetadata}
+		onended={onEnded}
+	></audio>
 	<div class="button">
-		<button class="play-button" onclick={() => isPlaying ? pausePlayback() : startPlayback()}><img src={isPlaying ? pauseButtonImage : playButtonImage} alt="button to start/pause audio"/></button>
+		<button class="play-button" onclick={() => isPlaying ? pausePlayback() : startPlayback()}>
+			<img src={isPlaying ? pauseButtonImage : playButtonImage} alt="button to start/pause audio"/>
+		</button>
 	</div>
 	<div class="slider">
-		<div class="progress-background">
-			<div class="progress">
-
-			</div>
+		<div class="progress-background" bind:this={progressBar} onclick={seek}>
+			<div class="progress" style="width: {progress}%"></div>
 		</div>
 	</div>
 	<div class="time">
-		0:00
+		{formatTime(remainingTime)}
 	</div>
 </div>

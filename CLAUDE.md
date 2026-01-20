@@ -28,6 +28,7 @@ This file contains guidelines, practices, and principles that should be consider
 - Use strict TypeScript; avoid `any` types
 - Prefer interfaces over type aliases for object shapes
 - Use meaningful variable and function names
+- dont use values for spacing in the css style. only use the css vars defined in globals.css
 
 
 ### Python (Forum & AI Services)

@@ -7,20 +7,22 @@
 
     let posts : BackendPost[] = []
     let categories : BackendCategory[] = []
+    let selectedCategoryId : number | null = null;
 
     let scrollContainer : HTMLDivElement;
 
     onMount( async () => {
 		posts = await BackendApi.getPosts();
         categories = await BackendApi.getCategories();
-        console.log(posts, categories)
 	});
 
-
-
-	function selectCategory(id: number): any {
-		throw new Error("Function not implemented.");
+	function selectCategory(id: number) {
+		selectedCategoryId = selectedCategoryId === id ? null : id;
 	}
+
+    $: filteredPosts = selectedCategoryId
+        ? posts.filter(post => post.category.id === selectedCategoryId)
+        : posts;
 
 </script>
 
@@ -55,13 +57,19 @@
     }
 
     #categories button {
-        background-color: red;
+        background-color: #4a7c59;
+        color: white;
         width: 100%;
         border-radius: var(--border-radius);
         overflow: hidden;
         text-overflow: ellipsis;
         padding: var(--small-padding);
         white-space: nowrap;
+    }
+
+    #categories button.selected {
+        outline: 3px solid white;
+        outline-offset: -3px;
     }
 
     .post-container {
@@ -71,6 +79,10 @@
 		box-sizing: border-box;
 	}
 
+    .no-posts {
+        text-align: center;
+    }
+
 </style>
 
 
@@ -78,9 +90,9 @@
     
 	<div class="scroll-container" bind:this={scrollContainer}>
 		<div class="post-container content-width">
-			{#if posts.length > 0}
+			{#if filteredPosts.length > 0}
             <ul>
-                {#each posts as post}
+                {#each filteredPosts as post}
                 <li>
                     <AgriculturePostElement
                         post={post}
@@ -89,14 +101,17 @@
                 {/each}
             </ul>
 			{:else}
-			<p class="no-posts">No posts yet.</p>
+			<p class="no-posts">No posts in this category.</p>
 			{/if}
 		</div>
 	</div>
     <div id="categories" class="content-width">
         <ul>
             {#each categories as category}
-            <li><button onclick={() => selectCategory(category.id)}>{category.name}</button></li>
+            <li><button
+                class:selected={selectedCategoryId === category.id}
+                onclick={() => selectCategory(category.id)}
+            >{category.name}</button></li>
             {/each}
         </ul>
     </div>
