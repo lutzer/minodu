@@ -66,6 +66,7 @@ services:
       - OLLAMA_HOST=host.docker.internal:11434
       - PORT=3002
       - ENVIRONMENT=${ENVIRONMENT}
+      - EMBEDDING_DATABASE_PATH=/app/data/minodu-ai-services
     volumes:
       - shared-data:/app/data
     restart: unless-stopped

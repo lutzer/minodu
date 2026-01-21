@@ -4,5 +4,5 @@ export interface ForumFile {
 	text: string;
 	content_type: string;
 	file_urlpath: string;
-	processing_state: "error" | "done" | "processing";
+	processing_state: 'error' | 'done' | 'processing';
 }

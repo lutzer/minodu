@@ -24,17 +24,15 @@
 	}
 </script>
 
-<style>
+<div>
+	<button onclick={handleClick}>
+		<img src={ttsButton} alt="transcribe selected text" />
+	</button>
+</div>
 
+<style>
 	button {
 		width: 42px;
 		height: 42px;
 	}
-
 </style>
-
-<div>
-	<button onclick={handleClick}>
-		<img src={ttsButton} alt="transcribe selected text">
-	</button>
-</div>

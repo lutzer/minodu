@@ -2,19 +2,19 @@
 	import { Config } from '$lib';
 	import { ForumApi } from '$lib/apis/forum/api';
 	import type { ForumAuthor } from '$lib/apis/forum/models/forumAuthor.ts';
-	import type {Optional} from '$lib/types';
+	import type { Optional } from '$lib/types';
 	import { ForumPostType } from '$lib/types';
 	import AudioRecorder from '../common/AudioRecorder.svelte';
 
-	import submitButton from '$lib/assets/forum-submit-post.png'
-	import cancelButton from '$lib/assets/delete-forum-post.png'
+	import submitButton from '$lib/assets/forum-submit-post.png';
+	import cancelButton from '$lib/assets/delete-forum-post.png';
 	import { Store } from '$lib/store';
 	import { onMount } from 'svelte';
 
 	export let postType: ForumPostType;
 
-	export let onPostSubmitted : () => void;
-	export let onPostCancelled : () => void;
+	export let onPostSubmitted: () => void;
+	export let onPostCancelled: () => void;
 
 	let audioRecorder: AudioRecorder;
 	let audioBlob: Optional<Blob>;
@@ -26,20 +26,15 @@
 	let submitEnabled: boolean = false;
 
 	$: {
-		submitEnabled =
-			(text.length >= 3) || audioBlob != undefined || image != undefined;
+		submitEnabled = text.length >= 3 || audioBlob != undefined || image != undefined;
 	}
 
 	onMount(() => {
 		text = Store.forumPostText;
-	})
+	});
 
-	async function createPost(
-		text: Optional<string>,
-		audio: Optional<Blob>,
-		image: Optional<File>
-	) {
-		let post = await ForumApi.createPost({ title: "", text: text != undefined ? text : "" });
+	async function createPost(text: Optional<string>, audio: Optional<Blob>, image: Optional<File>) {
+		let post = await ForumApi.createPost({ title: '', text: text != undefined ? text : '' });
 		if (audio) {
 			await ForumApi.attachFile(post.id, audio, Config.language);
 		}
@@ -48,7 +43,7 @@
 			await ForumApi.attachFile(post.id, imageBlob, Config.language);
 		}
 		onPostSubmitted();
-		Store.forumPostText = "";
+		Store.forumPostText = '';
 	}
 
 	function close() {
@@ -72,10 +67,10 @@
 		</div>
 		<div class="input-button-group">
 			<button onclick={() => createPost(text, undefined, undefined)} disabled={!submitEnabled}>
-				<img src={submitButton} alt="Submit forum post"/>
+				<img src={submitButton} alt="Submit forum post" />
 			</button>
 			<button onclick={close}>
-				<img src={cancelButton} alt="Submit forum post"/>
+				<img src={cancelButton} alt="Submit forum post" />
 			</button>
 		</div>
 	{/if}
@@ -129,7 +124,6 @@
 </div>
 
 <style>
-
 	.forum-input-container {
 		display: flex;
 		flex-direction: row;

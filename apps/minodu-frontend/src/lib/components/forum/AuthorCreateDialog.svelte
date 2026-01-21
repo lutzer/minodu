@@ -54,15 +54,15 @@
 		align-items: center;
 		margin-bottom: 15px;
 	}
-	
+
 	.form-row label {
 		width: 80px;
 		margin-right: 10px;
 	}
-	
+
 	.form-row input {
 		background-color: lightgray;
-		padding:5px;
+		padding: 5px;
 		flex: 1;
-    }
+	}
 </style>

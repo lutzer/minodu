@@ -70,11 +70,34 @@
 	}
 </script>
 
+<div class="audio-player">
+	<audio
+		bind:this={audioElement}
+		src={audioSource}
+		ontimeupdate={onTimeUpdate}
+		onloadedmetadata={onLoadedMetadata}
+		onended={onEnded}
+	></audio>
+	<div class="button">
+		<button class="play-button" onclick={() => (isPlaying ? pausePlayback() : startPlayback())}>
+			<img src={isPlaying ? pauseButtonImage : playButtonImage} alt="button to start/pause audio" />
+		</button>
+	</div>
+	<div class="slider">
+		<div class="progress-background" bind:this={progressBar} onclick={seek}>
+			<div class="progress" style="width: {progress}%"></div>
+		</div>
+	</div>
+	<div class="time">
+		{formatTime(remainingTime)}
+	</div>
+</div>
+
 <style>
 	.audio-player {
 		height: 40px;
 		border-radius: 30px;
-		background-color: #FFF8E5;
+		background-color: #fff8e5;
 		display: flex;
 		align-items: center;
 		margin: var(--small-padding) 0;
@@ -122,26 +145,3 @@
 		pointer-events: none;
 	}
 </style>
-
-<div class="audio-player">
-	<audio
-		bind:this={audioElement}
-		src={audioSource}
-		ontimeupdate={onTimeUpdate}
-		onloadedmetadata={onLoadedMetadata}
-		onended={onEnded}
-	></audio>
-	<div class="button">
-		<button class="play-button" onclick={() => isPlaying ? pausePlayback() : startPlayback()}>
-			<img src={isPlaying ? pauseButtonImage : playButtonImage} alt="button to start/pause audio"/>
-		</button>
-	</div>
-	<div class="slider">
-		<div class="progress-background" bind:this={progressBar} onclick={seek}>
-			<div class="progress" style="width: {progress}%"></div>
-		</div>
-	</div>
-	<div class="time">
-		{formatTime(remainingTime)}
-	</div>
-</div>
