@@ -1,4 +1,8 @@
+<script lang="ts">
+	import { t, language } from '$lib/translations';
+</script>
+
 <div>
-	<a href="/">Home</a>
-	<h2>Market</h2>
+	<a href="/">{t('nav.home', $language)}</a>
+	<h2>{t('nav.market', $language)}</h2>
 </div>

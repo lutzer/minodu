@@ -9,8 +9,10 @@
 	import ForumInputElement from '$lib/components/forum/ForumInputElement.svelte';
 	import TextToSpeechPlayer from '$lib/components/common/TextToSpeechPlayer.svelte';
 	import { Store } from '$lib/store';
+	import { language } from '$lib/translations';
 	import { Config } from '$lib';
 	import { fly, fade } from 'svelte/transition';
+	import { t } from '$lib/translations';
 
 	import createPostButton from '$lib/assets/forum-new-post-button.png';
 	import { waitForAnimationFrame } from '$lib/utils';
@@ -91,7 +93,7 @@
 					{/each}
 				</ul>
 			{:else}
-				<p class="no-posts">No posts yet. Click on the button below to start a conversation.</p>
+				<p class="no-posts">{t('forum.noPosts', $language)}</p>
 			{/if}
 		</div>
 	</div>

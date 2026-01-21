@@ -3,6 +3,7 @@
 	import AudioPlayer from '../common/AudioPlayer.svelte';
 	import TextToSpeechButton from '../common/TextToSpeechButton.svelte';
 	import TextToSpeechPlayer from '../common/TextToSpeechPlayer.svelte';
+	import { t, language } from '$lib/translations';
 
 	import postDeleteButton from '$lib/assets/delete-forum-post.png';
 
@@ -15,7 +16,7 @@
 <div class="post shadow">
 	<div class="post-avatar">
 		<div class="avatar-picture">
-			<img src="/api/forum/static/avatars/avatar1.jpeg" alt="avatar of the user" />
+			<img src="/api/forum/static/avatars/avatar1.jpeg" alt={t('alt.avatarOfUser', $language)} />
 		</div>
 		{#if post.text.length > 0}
 			<div class="tts-button">
@@ -42,14 +43,14 @@
 			{#each post.files as file}
 				<li class="file">
 					{#if file.processing_state == 'processing'}
-						<div>Processing File</div>
+						<div>{t('forum.processingFile', $language)}</div>
 					{:else if file.processing_state == 'error'}
-						<div>Error Processing File</div>
+						<div>{t('forum.errorProcessingFile', $language)}</div>
 					{:else if file.content_type.startsWith('audio')}
 						<AudioPlayer audioSource={file.file_urlpath}></AudioPlayer>
 					{:else if file.content_type.startsWith('image')}
 						<div class="image">
-							<img src={file.file_urlpath} alt="no description" />
+							<img src={file.file_urlpath} alt={t('alt.noDescription', $language)} />
 						</div>
 					{:else}
 						{file.id} - {file.filename} : {file.file_urlpath}
@@ -62,7 +63,7 @@
 	<div class="post-delete-container">
 		{#if isOwn}
 			<button class="delete-button small" onclick={onDeleteClicked}>
-				<img src={postDeleteButton} alt="Delete forum post" />
+				<img src={postDeleteButton} alt={t('alt.deleteForumPost', $language)} />
 			</button>
 		{/if}
 	</div>
