@@ -44,7 +44,7 @@ class RAG:
 
         self.vectorstore = Chroma(
             client=self.chroma_client,
-            collection_name=f"documents_{str(language)}",
+            collection_name=f"documents_{str(language.value)}",
             embedding_function=self.embeddings
         )
         

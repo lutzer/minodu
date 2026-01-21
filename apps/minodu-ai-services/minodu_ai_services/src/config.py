@@ -47,12 +47,14 @@ class Config:
             self._embedding_model = os.getenv("EMBEDDING_MODEL", "all-minilm:l6-v2")
         return self._embedding_model
 
-    @property 
+    @property
     def database_path(self):
         if self._database_path is None:
-            script_dir = os.path.dirname(os.path.abspath(__file__))
             env_dir = os.getenv("EMBEDDING_DATABASE_PATH", "data/minodu-ai-services")
-            print(env_dir)
-            self._database_path = os.path.join(script_dir, "..", env_dir)
+            if os.path.isabs(env_dir):
+                self._database_path = env_dir
+            else:
+                script_dir = os.path.dirname(os.path.abspath(__file__))
+                self._database_path = os.path.join(script_dir, "..", env_dir)
         return self._database_path
 

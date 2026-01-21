@@ -5,13 +5,14 @@ import time
 
 from minodu_ai_services.src.rag.document_store import DocumentStore
 from minodu_ai_services.src.rag.rag import RAG
+from minodu_ai_services.src.vars import LanguageEnum
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
 @pytest.fixture(scope="module", autouse=True)
 def setup_and_teardown():
     
-    rag = RAG(language="en")
+    rag = RAG(language=LanguageEnum.en)
     store = DocumentStore(rag.vectorstore, rag.chroma_client)
     store.delete_all_documents()
     time.sleep(1)
@@ -23,7 +24,7 @@ class TestDocumentStore:
     def test_add_document(self):
         file_path = os.path.join(script_dir, "docs/1_EN_AKPE_Script.pdf")
 
-        rag = RAG(language="en")
+        rag = RAG(language=LanguageEnum.en)
         store = DocumentStore(rag.vectorstore, rag.chroma_client)
         store.add_file(file_path, 1)
 
@@ -39,7 +40,7 @@ class TestDocumentStore:
     def test_retrive_filtered_document(self):
         file_path2 = os.path.join(script_dir, "docs/2_EN_AMANA_SCRIPT AUDIO.pdf")
 
-        rag = RAG(language="en")
+        rag = RAG(language=LanguageEnum.en)
         store = DocumentStore(rag.vectorstore, rag.chroma_client)
         store.add_file(file_path2, 2)
 
@@ -58,19 +59,19 @@ class TestDocumentStore:
             assert doc.metadata["source_id"] == 2
 
     def test_rag_ask_without_source(self):
-        rag = RAG(language="en")
+        rag = RAG(language=LanguageEnum.en)
 
         result = rag.ask(RAG.RagRequestData(question="Tell me something abour your providec context", history=""))
         assert len(result) > 0
 
     def test_rag_ask_with_source(self):
-        rag = RAG(language="en")
+        rag = RAG(language=LanguageEnum.en)
 
         result = rag.ask(RAG.RagRequestData(question="test", history="", source_id=2))
         assert len(result) > 0
 
     def test_rag_extract_sources(self):
-        rag = RAG(language="en")
+        rag = RAG(language=LanguageEnum.en)
 
         result = rag.ask(RAG.RagRequestData(question="Tell me what you know about insect pests", history=""))
         assert len(result) > 0
@@ -82,7 +83,7 @@ class TestDocumentStore:
 
     def test_delete_document_sources(self):
 
-        rag = RAG(language="en")
+        rag = RAG(language=LanguageEnum.en)
         store = DocumentStore(rag.vectorstore, rag.chroma_client)
         store.delete_document("2_EN_AMANA_SCRIPT AUDIO.pdf")
 
@@ -95,7 +96,7 @@ class TestDocumentStore:
             assert doc["metadata"]["source"] != "2_EN_AMANA_SCRIPT AUDIO.pdf"
 
     def test_delete_document_error(self):
-        rag = RAG(language="en")
+        rag = RAG(language=LanguageEnum.en)
         store = DocumentStore(rag.vectorstore, rag.chroma_client)
         with pytest.raises(Exception):
             store.delete_document("2_EN_AMANA_SCRIPT AUDIO.pdf")
@@ -103,7 +104,7 @@ class TestDocumentStore:
     def test_delete_document_by_id(self):
         file_path = os.path.join(script_dir, "docs/1_EN_AKPE_Script.pdf")
 
-        rag = RAG(language="en")
+        rag = RAG(language=LanguageEnum.en)
         store = DocumentStore(rag.vectorstore, rag.chroma_client)
         store.add_file(file_path, 5)
 
@@ -119,7 +120,7 @@ class TestDocumentStore:
             assert doc["metadata"]["source_id"] != 5
 
     def test_delete_document_by_id_error(self):
-        rag = RAG(language="en")
+        rag = RAG(language=LanguageEnum.en)
         store = DocumentStore(rag.vectorstore, rag.chroma_client)
 
         with pytest.raises(Exception):

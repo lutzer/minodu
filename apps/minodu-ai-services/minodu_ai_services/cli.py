@@ -1,6 +1,7 @@
 import argparse
 import sys
 from pathlib import Path
+from src.vars import LanguageEnum
 from src.rag.rag import RAG
 from src.rag.document_store import DocumentStore
 
@@ -12,14 +13,19 @@ def main():
     parser.add_argument("--remove-all", action="store_true", help="Removes all documents")
     parser.add_argument("--list-docs", action="store_true", help="lists all documents")
 
-    args = parser.parse_args()
-
-    if not(args.language == "en" or args.language == "fr"):
+    args = parser.parse_args()        
+    
+    language : LanguageEnum
+    if (args.language == "fr"):
+        language = LanguageEnum.fr
+    elif args.language == "en":
+        language = LanguageEnum.en
+    else:
         print("The only available languages are 'en' or 'fr'")
         return 1
 
     if args.list_docs:
-        rag = RAG(language=args.language)
+        rag = RAG(language=language)
         store = DocumentStore(rag.vectorstore, rag.chroma_client)
         try:
             documents = store.list_documents()
@@ -36,7 +42,7 @@ def main():
             return 1
 
     elif args.add_doc:
-        rag = RAG(language=args.language)
+        rag = RAG(language=language)
         store = DocumentStore(rag.vectorstore, rag.chroma_client)
 
         try:
@@ -57,7 +63,7 @@ def main():
             return 1
 
     elif args.remove_doc:
-        rag = RAG(language=args.language)
+        rag = RAG(language=language)
         store = DocumentStore(rag.vectorstore, rag.chroma_client)
 
         try:
@@ -71,7 +77,7 @@ def main():
             return 1
 
     elif args.remove_all:
-        rag = RAG(language=args.language)
+        rag = RAG(language=language)
         store = DocumentStore(rag.vectorstore, rag.chroma_client)
 
         try:
