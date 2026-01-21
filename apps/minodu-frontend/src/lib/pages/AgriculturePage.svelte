@@ -116,4 +116,8 @@
 		padding: var(--medium-padding);
 		text-align: center;
 	}
+
+	.scroll-container {
+		background-color: #EBF9F2;
+	}
 </style>

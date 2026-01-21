@@ -61,7 +61,7 @@
 	</div>
 	<div class="post-delete-container">
 		{#if isOwn}
-			<button class="delete-button" onclick={onDeleteClicked}>
+			<button class="delete-button small" onclick={onDeleteClicked}>
 				<img src={postDeleteButton} alt="Delete forum post" />
 			</button>
 		{/if}
@@ -110,11 +110,6 @@
 		width: 100%;
 		height: 100%;
 		object-fit: contain;
-	}
-
-	.delete-button {
-		height: 32px;
-		width: 32px;
 	}
 
 	.post-delete-container {
