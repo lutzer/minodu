@@ -6,6 +6,7 @@
 	import { onMount } from 'svelte';
 	import chatbotButton from '$lib/assets/chatbot-button.png';
 	import { goto } from '$app/navigation';
+	import FloatingButton from '$lib/components/common/FloatingButton.svelte';
 
 	let posts: BackendPost[] = [];
 	let categories: BackendCategory[] = [];
@@ -56,11 +57,9 @@
 			{/each}
 		</ul>
 	</div>
-	<div class="floating-button content-width">
-		<button class="big" onclick={() => goto("/bot")}>
-			<img src={chatbotButton} alt="create new forum post" />
-		</button>
-	</div>
+	<FloatingButton
+		icon={chatbotButton}
+		onclick={() => goto("/agriculture/bot/")}/>
 </div>
 
 <style>
