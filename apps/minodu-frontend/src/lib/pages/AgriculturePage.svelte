@@ -7,6 +7,7 @@
 	import chatbotButton from '$lib/assets/chatbot-button.png';
 	import { goto } from '$app/navigation';
 	import FloatingButton from '$lib/components/common/FloatingButton.svelte';
+	import { t, language } from '$lib/translations';
 
 	let posts: BackendPost[] = [];
 	let categories: BackendCategory[] = [];
@@ -41,7 +42,7 @@
 					{/each}
 				</ul>
 			{:else}
-				<p class="no-posts">No posts in the selected category. Please select a different category.</p>
+				<p class="no-posts">{t('agriculture.noPosts', $language)}</p>
 			{/if}
 		</div>
 	</div>

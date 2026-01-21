@@ -3,25 +3,20 @@
 	import explainPageButtonActive from '$lib/assets/explain-page-button-active.png';
 	import languageKbButton from '$lib/assets/language-kb-button.png';
 	import languageFrButton from '$lib/assets/language-fr-button.png';
-	import type { Language } from '$lib/types';
+	import { language } from '$lib/translations';
+	import { t } from '$lib/translations';
 	import { onMount } from 'svelte';
 	import { Store } from '$lib/store';
+	import type { Language } from '$lib/types';
 
 	export let audioKb: string;
 	export let audioFr: string;
 
-	let language: Language;
-
 	let audio: HTMLAudioElement;
 	let isPlaying: boolean = false;
 
-	onMount(() => {
-		language = Store.language;
-	});
-
 	function languageButtonClicked() {
-		language = language == 'kb' ? 'fr' : 'kb';
-		Store.language = language;
+		language.set($language == 'kb' ? 'fr' : 'kb');
 		audio?.pause();
 		isPlaying = false;
 	}
@@ -40,6 +35,11 @@
 	function handleAudioEnded() {
 		isPlaying = false;
 	}
+
+	// set initial language
+	onMount(() => {
+		language.refresh();
+	});
 </script>
 
 <div class="explain-page-button-group">
@@ -47,16 +47,16 @@
 		<button class="button" onclick={explainPageButtonClicked}>
 			<img
 				src={isPlaying ? explainPageButtonActive : explainPageButton}
-				alt="Button to speak out page info"
+				alt={t('alt.speakPageInfo', $language)}
 			/>
 		</button>
 		<button class="button" onclick={languageButtonClicked}>
 			<img
-				src={language == 'kb' ? languageKbButton : languageFrButton}
-				alt="Button to switch language"
+				src={$language === 'kb' ? languageKbButton : languageFrButton}
+				alt={t('alt.switchLanguage', $language)}
 			/>
 		</button>
-		<audio bind:this={audio} src={language == 'kb' ? audioKb : audioFr} onended={handleAudioEnded}>
+		<audio bind:this={audio} src={$language == 'kb' ? audioKb : audioFr} onended={handleAudioEnded}>
 		</audio>
 	</div>
 </div>

@@ -2,6 +2,7 @@
 	import playButtonImage from '$lib/assets/audioplayer-play.png';
 	import pauseButtonImage from '$lib/assets/audioplayer-pause.png';
 	import { onMount, onDestroy } from 'svelte';
+	import { t, language } from '$lib/translations';
 
 	export let audioSource: string;
 
@@ -54,6 +55,7 @@
 
 	function onLoadedMetadata() {
 		duration = audioElement.duration;
+		pausePlayback();
 	}
 
 	function onEnded() {
@@ -90,7 +92,7 @@
 	></audio>
 	<div class="button">
 		<button class="play-button" onclick={() => (isPlaying ? pausePlayback() : startPlayback())}>
-			<img src={isPlaying ? pauseButtonImage : playButtonImage} alt="button to start/pause audio" />
+			<img src={isPlaying ? pauseButtonImage : playButtonImage} alt={t('alt.playPauseAudio', $language)} />
 		</button>
 	</div>
 	<div
@@ -100,7 +102,7 @@
 		onkeydown={handleKeydown}
 		tabindex="0"
 		role="slider"
-		aria-label="Audio progress"
+		aria-label={t('alt.audioProgress', $language)}
 		aria-valuemin={0}
 		aria-valuemax={100}
 		aria-valuenow={Math.round(progress)}
@@ -145,6 +147,7 @@
 		height: 100%;
 		display: flex;
 		align-items: center;
+		cursor: pointer;
 	}
 
 	.time {
@@ -157,7 +160,6 @@
 		width: 100%;
 		height: 4px;
 		border-radius: 2px;
-		cursor: pointer;
 		position: relative;
 	}
 

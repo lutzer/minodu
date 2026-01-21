@@ -4,6 +4,9 @@
 	import chatImage from '$lib/assets/startscreen_chat.png';
 	import cloudImage from '$lib/assets/startscreen_cloud.png';
 	import ExplainPageButton from '$lib/components/common/ExplainPageButton.svelte';
+	import { Store } from '$lib/store';
+	import { t, language } from '$lib/translations';
+	import { onMount } from 'svelte';
 
 	let { children } = $props();
 </script>
@@ -12,28 +15,28 @@
 	<div id="tile-image-container" class="content-width">
 		<img
 			src={tileImageMobile}
-			alt="4 minodu tiles showing different apps"
+			alt={t('alt.tilesShowingApps', $language)}
 			class="responsive-image mobile"
 		/>
 		<img
 			src={tileImageTablet}
-			alt="4 minodu tiles showing different apps"
+			alt={t('alt.tilesShowingApps', $language)}
 			class="responsive-image tablet"
 		/>
 	</div>
 	<div id="object-overlay-container" class="content-width">
 		<div id="cloud">
-			<img src={cloudImage} alt="a rainy cloud in the sky" />
+			<img src={cloudImage} alt={t('alt.rainyCloud', $language)} />
 		</div>
 		<div id="chat">
-			<img src={chatImage} alt="two people and a speech bubble in the sky" />
+			<img src={chatImage} alt={t('alt.speechBubble', $language)} />
 		</div>
 	</div>
 	<div class="grid-link-container">
-		<a href="/forum" class="grid-link">Forum</a>
-		<a href="/weather" class="grid-link">Weather</a>
-		<a href="/agriculture" class="grid-link">Agriculture</a>
-		<a href="/market" class="grid-link">Market</a>
+		<a href="/forum" class="grid-link">{t('nav.forum', $language)}</a>
+		<a href="/weather" class="grid-link">{t('nav.weather', $language)}</a>
+		<a href="/agriculture" class="grid-link">{t('nav.agriculture', $language)}</a>
+		<a href="/market" class="grid-link">{t('nav.market', $language)}</a>
 	</div>
 	<ExplainPageButton
 		audioFr={'https://audio-samples.github.io/samples/mp3/blizzard_unconditional/sample-0.mp3'}

@@ -5,10 +5,12 @@
 	import type { Optional } from '$lib/types';
 	import { ForumPostType } from '$lib/types';
 	import AudioRecorder from '../common/AudioRecorder.svelte';
+	import { t } from '$lib/translations';
 
 	import submitButton from '$lib/assets/forum-submit-post.png';
 	import cancelButton from '$lib/assets/delete-forum-post.png';
 	import { Store } from '$lib/store';
+	import { language } from '$lib/translations';
 	import { onMount } from 'svelte';
 
 	export let postType: ForumPostType;
@@ -67,10 +69,10 @@
 		</div>
 		<div class="input-button-group">
 			<button onclick={() => createPost(text, undefined, undefined)} disabled={!submitEnabled}>
-				<img src={submitButton} alt="Submit forum post" />
+				<img src={submitButton} alt={t('alt.submitForumPost', $language)} />
 			</button>
 			<button onclick={close}>
-				<img src={cancelButton} alt="Submit forum post" />
+				<img src={cancelButton} alt={t('action.cancel', $language)} />
 			</button>
 		</div>
 	{/if}

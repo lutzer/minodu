@@ -6,6 +6,7 @@
 	import TextToSpeechButton from '../common/TextToSpeechButton.svelte';
 	import TextToSpeechPlayer from '../common/TextToSpeechPlayer.svelte';
 	import { Config } from '$lib';
+	import { t, language } from '$lib/translations';
 
 	export let message: BotMessage;
 	export let conversation: string;
@@ -65,14 +66,14 @@
 </script>
 
 <div class="bot-message">
-	<h3>Question</h3>
+	<h3>{t('chatbot.question', $language)}</h3>
 	<p>
 		{message.question}
 		{#if message.question.length > 0}
 			<TextToSpeechButton text={message.question} {ttsPlayer} />
 		{/if}
 	</p>
-	<h3>Answer</h3>
+	<h3>{t('chatbot.answer', $language)}</h3>
 	<p class={error ? 'error' : ''}>
 		{message.response}
 		{#if streaming}
@@ -82,7 +83,7 @@
 		{/if}
 	</p>
 	{#if streaming}
-		<button onclick={stop}>Stop</button>
+		<button onclick={stop}>{t('action.stop', $language)}</button>
 	{/if}
 </div>
 

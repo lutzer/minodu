@@ -5,8 +5,10 @@
 	import AudioRecorder from '$lib/components/common/AudioRecorder.svelte';
 	import TextToSpeechPlayer from '$lib/components/common/TextToSpeechPlayer.svelte';
 	import { Store } from '$lib/store';
+	import { language } from '$lib/translations';
 	import type { BotMessage } from '$lib/types';
 	import { onMount } from 'svelte';
+	import { t } from '$lib/translations';
 
 	let inputText: string = '';
 	let messages: BotMessage[] = [];
@@ -84,17 +86,17 @@
 				bind:recording={audioRecording}
 			/>
 			{#if !audioBlob && !audioRecording}
-				<button onclick={audioRecorder.startRecording}>Record</button>
+				<button onclick={audioRecorder.startRecording}>{t('action.record', $language)}</button>
 			{:else if !audioBlob && audioRecording}
-				<button onclick={audioRecorder.stopRecording}>Stop</button>
+				<button onclick={audioRecorder.stopRecording}>{t('action.stop', $language)}</button>
 			{:else}
-				<button onclick={audioRecorder.reset}>Cancel</button>
-				<button onclick={() => transcribeAudio(audioBlob)}>Send</button>
+				<button onclick={audioRecorder.reset}>{t('action.cancel', $language)}</button>
+				<button onclick={() => transcribeAudio(audioBlob)}>{t('action.send', $language)}</button>
 			{/if}
 		</div>
 		<div class="input-block">
-			<button onclick={submitMessage} disabled={generating || inputText.length <= 3}>Submit</button>
-			<button onclick={clearChat}>Clear Chat</button>
+			<button onclick={submitMessage} disabled={generating || inputText.length <= 3}>{t('action.submit', $language)}</button>
+			<button onclick={clearChat}>{t('action.clearChat', $language)}</button>
 		</div>
 	</div>
 	<TextToSpeechPlayer bind:this={ttsPlayer} />

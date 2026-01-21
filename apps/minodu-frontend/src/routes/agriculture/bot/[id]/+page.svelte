@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-  
-    $: postId = $page.params.id;
+	import { t, language } from '$lib/translations';
+
+	$: postId = $page.params.id;
 </script>
 
 <div>
-	<h2>Chatbot for id {postId}</h2>
+	<h2>{t('chatbot.forPost', $language)} {postId}</h2>
 </div>
