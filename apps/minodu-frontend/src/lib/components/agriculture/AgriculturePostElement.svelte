@@ -23,18 +23,22 @@
 </script>
 
 <div class="post shadow cat {post.category.name}" style="background-image: url({backgroundImage})">
-	<div class="post-image">
-		<img src={post.image} alt="image for {post.title}" />
-	</div>
-	<div class="post-content">
-		<div class="title">
-			<h3>{post.title}</h3>
-			<h4>{post.author}</h4>
-		</div>
-		<div class="chat-button">
-			<button class="small" onclick={() => goto(`/bot/${post.id}`)}>
-				<img src={chatbotButtonSmall} alt="chatbot icon"/>
-			</button>		
+	<div class="vertical-layout">
+		<div class="horizontal-layout">
+			<div class="post-image">
+				<img src={post.image} alt="image for {post.title}" />
+			</div>
+			<div class="post-content">
+				<div class="title">
+					<h3>{post.title}</h3>
+					<h4>{post.author}</h4>
+				</div>
+				<div class="chat-button">
+					<button class="small" onclick={() => goto(`/bot/${post.id}`)}>
+						<img src={chatbotButtonSmall} alt="chatbot icon"/>
+					</button>		
+				</div>
+			</div>
 		</div>
 		<div class="audioplayer">
 			<AudioPlayer audioSource={post.attachment} />
@@ -45,18 +49,25 @@
 <style>
 	.post {
 		position: relative;
-		display: flex;
 		padding: var(--small-padding);
 		margin-bottom: var(--medium-padding);
 		background-color: #f6eddb;
 		border-radius: var(--border-radius);
-		gap: var(--small-padding);
 		--box-shadow-color: #67625a;
 	}
 
+	.vertical-layout {
+		width: 100%;
+	}
+
+	.horizontal-layout {
+		gap: var(--small-padding);
+		display: flex;
+	}
+
 	.post-image {
-		width: 125px;
-		height: 125px;
+		width: 100px;
+		height: 100px;
 		flex-shrink: 0;
 	}
 
