@@ -13,7 +13,7 @@ body {
 	--medium-padding: 20px;
 	--page-padding: 15px;
 	--bg-color-light: #c2b4b0;
-	--border-radius: 20px;
+	--border-radius: 10px;
 	--footer-height: 100px;
 	--header-height: 80px;
 	--button-size: 52px;
@@ -138,4 +138,28 @@ li {
 	bottom: 0;
 	overflow: scroll;
 	padding-bottom: calc(var(--footer-height));
+}
+
+.color.SOL
+{
+	background-color: #EFD6C3;
+	--box-shadow-color: #D5AE90;
+}
+
+.color.PLANTES
+{
+	background-color: #C2EFDA;
+	--box-shadow-color: #9CC9B4;
+}
+
+.color.AUTRES
+{
+	background-color: #FFE9B3;
+	--box-shadow-color: #D9C38C;
+}
+
+.color.ELEVAGE
+{
+	background-color: #F9D9B8;
+	--box-shadow-color: #D9B38C;
 }

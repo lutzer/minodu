@@ -41,7 +41,7 @@
 
 </script>
 
-<div class="post shadow cat {post.category.name}" style="background-image: url({backgroundImage})">
+<div class="post shadow color {post.category.name}" style="background-image: url({backgroundImage})">
 	<div class="vertical-layout">
 		<div class="horizontal-layout">
 			<div class="post-image">
@@ -70,9 +70,7 @@
 		position: relative;
 		padding: var(--small-padding);
 		margin-bottom: var(--medium-padding);
-		background-color: #f6eddb;
 		border-radius: var(--border-radius);
-		--box-shadow-color: #67625a;
 	}
 
 	.vertical-layout {
@@ -114,33 +112,9 @@
 		min-height: 70px;
 	}
 
-	.cat {
-		background-position: 130% 100%;
+	.post.color {
+		background-position: 150% 100%;
     	background-size: contain;
     	background-repeat: no-repeat;
-	}
-
-	:global(.cat.SOL)
-	{
-		background-color: #EFD6C3;
-		--box-shadow-color: #D5AE90;
-	}
-
-	:global(.cat.PLANTES)
-	{
-		background-color: #C2EFDA;
-		--box-shadow-color: #9CC9B4;
-	}
-
-	:global(.cat.AUTRES)
-	{
-		background-color: #FFE9B3;
-		--box-shadow-color: #D9C38C;
-	}
-
-	:global(.cat.ELEVAGE)
-	{
-		background-color: #F9D9B8;
-		--box-shadow-color: #D9B38C;
 	}
 </style>
