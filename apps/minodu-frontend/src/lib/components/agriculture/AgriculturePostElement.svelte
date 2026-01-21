@@ -3,12 +3,14 @@
 	import type { BackendPost } from '$lib/apis/backend/models/backendPost';
 	import chatbotButtonSmall from '$lib/assets/chatbot-button-small.png';
 	import { goto } from '$app/navigation';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 
 	import solBackground from '$lib/assets/agriculture-cat-sol.png';
 	import autresBackground from '$lib/assets/agriculture-cat-autres.png';
 	import elevageBackground from '$lib/assets/agriculture-cat-elevage.png';
 	import plantesBackground from '$lib/assets/agriculture-cat-plantes.png';
+	import { Store } from '$lib/store';
+	import type { Language } from '$lib/types';
 
 	export let post: BackendPost;
 
@@ -20,6 +22,23 @@
 	};
 
 	$: backgroundImage = backgroundImages[post.category.name as keyof typeof backgroundImages];
+	
+	let language : Language
+
+	onMount(() => {
+		onLanguageChanged()
+		window.addEventListener("language:changed", onLanguageChanged);
+	})
+
+	onDestroy(() => {
+		window.removeEventListener("language:changed", onLanguageChanged);
+	});
+
+	function onLanguageChanged() {
+		language = Store.language
+	}
+
+
 </script>
 
 <div class="post shadow cat {post.category.name}" style="background-image: url({backgroundImage})">
@@ -34,14 +53,14 @@
 					<h4>{post.author}</h4>
 				</div>
 				<div class="chat-button">
-					<button class="small" onclick={() => goto(`/bot/${post.id}`)}>
+					<button class="small" onclick={() => goto(`/agriculture/bot/${post.id}`)}>
 						<img src={chatbotButtonSmall} alt="chatbot icon"/>
 					</button>		
 				</div>
 			</div>
 		</div>
 		<div class="audioplayer">
-			<AudioPlayer audioSource={post.attachment} />
+			<AudioPlayer audioSource={language === "kb" ? post.attachment_kb : post.attachment} />
 		</div>
 	</div>
 </div>
@@ -66,8 +85,8 @@
 	}
 
 	.post-image {
-		width: 100px;
-		height: 100px;
+		width: 120px;
+		height: 120px;
 		flex-shrink: 0;
 	}
 

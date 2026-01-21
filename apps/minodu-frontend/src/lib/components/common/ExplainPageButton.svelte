@@ -42,31 +42,37 @@
 	}
 </script>
 
-<div class="explain-page-button-group content-width">
-	<button class="button" onclick={explainPageButtonClicked}>
-		<img
-			src={isPlaying ? explainPageButtonActive : explainPageButton}
-			alt="Button to speak out page info"
-		/>
-	</button>
-	<button class="button" onclick={languageButtonClicked}>
-		<img
-			src={language == 'kb' ? languageKbButton : languageFrButton}
-			alt="Button to switch language"
-		/>
-	</button>
-	<audio bind:this={audio} src={language == 'kb' ? audioKb : audioFr} onended={handleAudioEnded}>
-	</audio>
+<div class="explain-page-button-group">
+	<div class="content-width">
+		<button class="button" onclick={explainPageButtonClicked}>
+			<img
+				src={isPlaying ? explainPageButtonActive : explainPageButton}
+				alt="Button to speak out page info"
+			/>
+		</button>
+		<button class="button" onclick={languageButtonClicked}>
+			<img
+				src={language == 'kb' ? languageKbButton : languageFrButton}
+				alt="Button to switch language"
+			/>
+		</button>
+		<audio bind:this={audio} src={language == 'kb' ? audioKb : audioFr} onended={handleAudioEnded}>
+		</audio>
+	</div>
 </div>
 
 <style>
 	.explain-page-button-group {
 		position: fixed;
 		bottom: var(--footer-height);
-		display: flex;
-		box-sizing: border-box;
-		margin: var(--page-padding);
 		pointer-events: none;
+		width:100%;
+
+	}
+
+	.explain-page-button-group .content-width {
+		padding: var(--page-padding);
+		box-sizing: border-box;
 	}
 
 	@media screen and (min-width: 550px) {
@@ -78,17 +84,6 @@
 	.explain-page-button-group button {
 		pointer-events: auto;
 	}
-
-	/* .shadow {
-        position: absolute;
-        border-radius: 10px;
-        background-color: #cccccc;
-        top:0;
-        left:0;
-        bottom:-1px;
-        right:-4px;
-        opacity: 0.8;
-    } */
 
 	audio {
 		display: none;

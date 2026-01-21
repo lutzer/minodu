@@ -14,6 +14,7 @@
 
 	import createPostButton from '$lib/assets/forum-new-post-button.png';
 	import { waitForAnimationFrame } from '$lib/utils';
+	import FloatingButton from '$lib/components/common/FloatingButton.svelte';
 
 	// let createAuthorDialog: AuthorCreateDialog;
 	let ttsPlayer: TextToSpeechPlayer;
@@ -108,11 +109,9 @@
 			/>
 		</div>
 	{:else}
-		<div class="floating-button content-width" transition:fly={{ y: 200, duration: 300 }}>
-			<button class="big" onclick={createPost}>
-				<img src={createPostButton} alt="create new forum post" />
-			</button>
-		</div>
+		<FloatingButton
+			icon={createPostButton}
+			onclick={() => createPost()}/>
 	{/if}
 	<TextToSpeechPlayer bind:this={ttsPlayer} />
 </div>

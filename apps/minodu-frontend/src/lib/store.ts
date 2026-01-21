@@ -26,6 +26,7 @@ export class Store {
 
 	public static set language(language: Language) {
 		localStorage.setItem(Store.APP_LANGUAGE_KEY, language);
+		window.dispatchEvent(new CustomEvent('language:changed'));
 	}
 
 	public static get language(): Language {
