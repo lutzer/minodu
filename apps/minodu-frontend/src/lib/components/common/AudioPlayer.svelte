@@ -68,6 +68,16 @@
 		const percentage = clickX / rect.width;
 		audioElement.currentTime = percentage * duration;
 	}
+
+	function handleKeydown(event: KeyboardEvent) {
+		if (duration === 0) return;
+		const step = 15;
+		if (event.key === 'ArrowRight') {
+			audioElement.currentTime = Math.min(duration, currentTime + step);
+		} else if (event.key === 'ArrowLeft') {
+			audioElement.currentTime = Math.max(0, currentTime - step);
+		}
+	}
 </script>
 
 <div class="audio-player">
@@ -83,7 +93,18 @@
 			<img src={isPlaying ? pauseButtonImage : playButtonImage} alt="button to start/pause audio" />
 		</button>
 	</div>
-	<div class="slider" bind:this={progressBar} onclick={seek}>
+	<div
+		class="slider"
+		bind:this={progressBar}
+		onclick={seek}
+		onkeydown={handleKeydown}
+		tabindex="0"
+		role="slider"
+		aria-label="Audio progress"
+		aria-valuemin={0}
+		aria-valuemax={100}
+		aria-valuenow={Math.round(progress)}
+	>
 		<div class="progress-background">
 			<div class="progress" style="width: {progress}%"></div>
 		</div>

@@ -50,6 +50,7 @@
 			{#each categories as category}
 				<li>
 					<button
+						class={`color ${category.name}`}
 						class:selected={selectedCategoryId === category.id}
 						onclick={() => selectCategory(category.id)}>{category.name}</button
 					>
@@ -94,19 +95,20 @@
 	}
 
 	#categories button {
-		background-color: #4a7c59;
-		color: white;
 		width: 100%;
 		border-radius: var(--border-radius);
 		overflow: hidden;
 		text-overflow: ellipsis;
 		padding: var(--small-padding);
 		white-space: nowrap;
+		height: 48px;
+		
 	}
 
 	#categories button.selected {
 		outline: 3px solid white;
-		outline-offset: -3px;
+		/* outline-offset: -3px; */
+		box-shadow: none;
 	}
 
 	.post-container {

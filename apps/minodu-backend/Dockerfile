@@ -22,7 +22,6 @@ COPY package*.json ./
 RUN npm ci --omit=dev
 
 COPY --from=builder /app/dist/src ./dist
-COPY --from=builder /app/temp ./temp
 
 ENV NODE_ENV=production
 ENV PORT=3000

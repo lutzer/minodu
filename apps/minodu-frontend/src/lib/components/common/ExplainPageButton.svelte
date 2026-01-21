@@ -65,8 +65,9 @@
 	.explain-page-button-group {
 		position: fixed;
 		bottom: var(--footer-height);
+        left:0;
+        right:0;
 		pointer-events: none;
-		width:100%;
 
 	}
 
