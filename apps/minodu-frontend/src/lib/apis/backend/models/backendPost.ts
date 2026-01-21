@@ -1,4 +1,4 @@
-import type { BackendCategory } from "./backendCategory";
+import type { BackendCategory } from './backendCategory';
 
 export interface BackendTag {
 	id: number;

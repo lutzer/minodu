@@ -8,13 +8,46 @@
 	let { children } = $props();
 </script>
 
+<div class="content-width">
+	<div id="tile-image-container" class="content-width">
+		<img
+			src={tileImageMobile}
+			alt="4 minodu tiles showing different apps"
+			class="responsive-image mobile"
+		/>
+		<img
+			src={tileImageTablet}
+			alt="4 minodu tiles showing different apps"
+			class="responsive-image tablet"
+		/>
+	</div>
+	<div id="object-overlay-container" class="content-width">
+		<div id="cloud">
+			<img src={cloudImage} alt="a rainy cloud in the sky" />
+		</div>
+		<div id="chat">
+			<img src={chatImage} alt="two people and a speech bubble in the sky" />
+		</div>
+	</div>
+	<div class="grid-link-container">
+		<a href="/forum" class="grid-link">Forum</a>
+		<a href="/weather" class="grid-link">Weather</a>
+		<a href="/agriculture" class="grid-link">Agriculture</a>
+		<a href="/market" class="grid-link">Market</a>
+	</div>
+	<ExplainPageButton
+		audioFr={'https://audio-samples.github.io/samples/mp3/blizzard_unconditional/sample-0.mp3'}
+		audioKb={'https://audio-samples.github.io/samples/mp3/blizzard_unconditional/sample-1.mp3'}
+	/>
+</div>
+
 <style>
 	#tile-image-container {
 		position: absolute;
-		top:0;
-		bottom:0;
-		left:0;
-		right:0;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
 	}
 
 	#tile-image-container img {
@@ -39,32 +72,30 @@
 
 	.grid-link-container {
 		position: absolute;
-		top:0;
-		bottom:0;
-		left:0;
-		right:0;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
 		display: grid;
 		width: 100%;
 		height: 100%;
 		grid-template-columns: 1fr 1fr;
 		grid-template-rows: 1fr 1fr;
-    }
+	}
 
 	.grid-link {
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		opacity: 0;
-    }
-
-	
+	}
 
 	#object-overlay-container {
 		position: absolute;
-		top:0;
-		bottom:0;
-		left:0;
-		right:0;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
 		overflow: hidden;
 	}
 
@@ -77,54 +108,18 @@
 	#cloud {
 		position: absolute;
 		top: 5%;
-    	right: 7%;
+		right: 7%;
 		width: 25%;
 		height: 20%;
 		min-width: 130px;
 	}
 
-
 	#chat {
 		position: absolute;
 		top: 5%;
-    	left: 10%;
+		left: 10%;
 		width: 25%;
 		height: 15%;
 		min-width: 130px;
 	}
-
 </style>
-
-<div class="content-width">
-	<div id="tile-image-container" class="content-width">
-		<img 
-			src={tileImageMobile} 
-			alt="4 minodu tiles showing different apps"
-			class="responsive-image mobile"/>
-		<img 
-			src={tileImageTablet} 
-			alt="4 minodu tiles showing different apps"
-			class="responsive-image tablet"/>
-	</div>
-	<div id="object-overlay-container" class="content-width">
-		<div id="cloud">
-			<img
-				src={cloudImage}
-				alt="a rainy cloud in the sky"/>
-		</div>
-		<div id="chat">
-			<img
-				src={chatImage}
-				alt="two people and a speech bubble in the sky"/>
-		</div>
-	</div>
-	<div class="grid-link-container">
-		<a href="/forum" class="grid-link">Forum</a>
-		<a href="/weather" class="grid-link">Weather</a>
-		<a href="/agriculture" class="grid-link">Agriculture</a>
-		<a href="/market" class="grid-link">Market</a>
-	</div>
-	<ExplainPageButton 
-		audioFr={"https://audio-samples.github.io/samples/mp3/blizzard_unconditional/sample-0.mp3"}
-		audioKb={"https://audio-samples.github.io/samples/mp3/blizzard_unconditional/sample-1.mp3"}/>
-</div>

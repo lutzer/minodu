@@ -4,11 +4,11 @@ export function delay(ms: number): Promise<void> {
 	});
 }
 
-export function waitForAnimationFrame() : Promise<void> {
+export function waitForAnimationFrame(): Promise<void> {
 	return new Promise((resolve) => {
 		requestAnimationFrame(() => {
 			requestAnimationFrame(() => resolve());
-  		});
+		});
 	});
 }
 

@@ -28,32 +28,28 @@
 	</div>
 	<div id="footer">
 		<div class="menu-bar">
-			<FooterMenuButton link="/agriculture" 
-				icon={agricultureIcon} 
-				iconSelected={agricultureIconDisabled}/>
-			<FooterMenuButton link="/forum" 
-				icon={forumIcon} 
-				iconSelected={forumIconDisabled}/>
-			<FooterMenuButton link="/" 
-				icon={treeIcon} 
+			<FooterMenuButton
+				link="/agriculture"
+				icon={agricultureIcon}
+				iconSelected={agricultureIconDisabled}
+			/>
+			<FooterMenuButton link="/forum" icon={forumIcon} iconSelected={forumIconDisabled} />
+			<FooterMenuButton
+				link="/"
+				icon={treeIcon}
 				iconSelected={treeIconDisabled}
-				strictRoute={true}/>
-			<FooterMenuButton link="/weather" 
-				icon={weatherIcon}
-				iconSelected={weatherIconDisabled}/>
-			<FooterMenuButton link="/market" 
-				icon={marketIcon}
-				iconSelected={marketIconDisabled}/>
+				strictRoute={true}
+			/>
+			<FooterMenuButton link="/weather" icon={weatherIcon} iconSelected={weatherIconDisabled} />
+			<FooterMenuButton link="/market" icon={marketIcon} iconSelected={marketIconDisabled} />
 		</div>
 	</div>
 </div>
 
 <style>
-	
-
 	#footer {
 		position: fixed;
-		bottom:0;
+		bottom: 0;
 		left: 0;
 		right: 0;
 		height: var(--footer-height);
@@ -82,6 +78,4 @@
 			max-width: 450px;
 		}
 	}
-
-	
 </style>

@@ -1,7 +1,6 @@
-import { HttpError } from "$lib/errors";
-import type { BackendCategory } from "./models/backendCategory";
-import type { BackendPost } from "./models/backendPost";
-
+import { HttpError } from '$lib/errors';
+import type { BackendCategory } from './models/backendCategory';
+import type { BackendPost } from './models/backendPost';
 
 export class BackendApi {
 	public static async getCategories(): Promise<BackendCategory[]> {

@@ -18,20 +18,20 @@
 	// let createAuthorDialog: AuthorCreateDialog;
 	let ttsPlayer: TextToSpeechPlayer;
 
-	let scrollContainer : HTMLDivElement;
-	
+	let scrollContainer: HTMLDivElement;
+
 	let posts: ForumPost[] = [];
 	let visiblePosts: ForumPost[] = [];
 
 	let author: Optional<ForumAuthor> = undefined;
 
-	let showCreatePostDialog : boolean = false;
+	let showCreatePostDialog: boolean = false;
 
-	let showNumberOfPosts : number = 3;
-	let loadingMorePosts : boolean = false
+	let showNumberOfPosts: number = 3;
+	let loadingMorePosts: boolean = false;
 
 	onMount(() => {
-		update(false)
+		update(false);
 
 		let eventSource = ForumApi.getEventSource();
 		eventSource.onmessage = (msg) => {
@@ -47,15 +47,15 @@
 		};
 	});
 
-	async function update(smoothScroll : boolean = true) {
+	async function update(smoothScroll: boolean = true) {
 		posts = await ForumApi.getPosts();
 		author = await ForumApi.checkToken();
 
 		await waitForAnimationFrame();
-		
+
 		scrollContainer.scrollTo({
 			top: scrollContainer.scrollHeight,
-			behavior: smoothScroll ? "smooth" : undefined
+			behavior: smoothScroll ? 'smooth' : undefined
 		});
 	}
 
@@ -84,59 +84,51 @@
 								{post}
 								isOwn={author?.id == post.author.id}
 								onDeleteClicked={() => deletePost(post.id)}
-								ttsPlayer={ttsPlayer}
+								{ttsPlayer}
 							/>
 						</li>
 					{/each}
 				</ul>
 			{:else}
-				<p class="no-posts">No posts yet.</p>
+				<p class="no-posts">No posts yet. Click on the button below to start a conversation.</p>
 			{/if}
 		</div>
 	</div>
-	
+
 	{#if showCreatePostDialog}
-	<div class="create-post-container content-width" transition:fly={{ y: 200, duration: 300 }}>
-		<ForumInputElement
-			postType={ForumPostType.TEXT}
-			onPostSubmitted={() => { showCreatePostDialog = false; }}
-			onPostCancelled={() => { showCreatePostDialog = false; }}
-		/>
-	</div>
+		<div class="create-post-container content-width" transition:fly={{ y: 200, duration: 300 }}>
+			<ForumInputElement
+				postType={ForumPostType.TEXT}
+				onPostSubmitted={() => {
+					showCreatePostDialog = false;
+				}}
+				onPostCancelled={() => {
+					showCreatePostDialog = false;
+				}}
+			/>
+		</div>
 	{:else}
-	<div class="create-post-button content-width" transition:fly={{ y: 200, duration: 300 }}>
-		<button class="big" onclick={createPost}>
-			<img src={createPostButton} alt="create new forum post"/>
-		</button>
-	</div>
+		<div class="floating-button content-width" transition:fly={{ y: 200, duration: 300 }}>
+			<button class="big" onclick={createPost}>
+				<img src={createPostButton} alt="create new forum post" />
+			</button>
+		</div>
 	{/if}
 	<TextToSpeechPlayer bind:this={ttsPlayer} />
 </div>
 
 <style>
-	.scroll-container {
-		position: fixed;
-		top:0;
-		left:0;
-		right:0;
-		bottom: var(--footer-height);
-		background-color: #EDCA82;
-		overflow: scroll;
-	}
-
-	
-
 	.create-post-container {
 		position: fixed;
 		background-color: #ffffff;
 		bottom: 0;
-		left:0;
-		right:0;
+		left: 0;
+		right: 0;
 		z-index: 1;
 		padding: var(--small-padding);
 		border-top: 1px solid #ccc;
 		border-radius: var(--border-radius) var(--border-radius) 0 0;
-        box-sizing: border-box;
+		box-sizing: border-box;
 	}
 
 	.post-container {
@@ -145,27 +137,8 @@
 		box-sizing: border-box;
 	}
 
-	.create-post-button {
-		display: flex;
-		position: fixed;
-		bottom: var(--footer-height);
-		justify-content: end;
-        box-sizing: border-box;
-        padding: var(--page-padding);
-	}
-
 	.no-posts {
+		padding: var(--medium-padding);
 		text-align: center;
-		font-weight: 800;
-	}
-
-	@media screen and (min-width: 550px) {
-		.scroll-container {
-			bottom: 0;
-		}
-
-		.post-container {
-			margin-bottom: calc(var(--page-padding) + var(--footer-height) + var(--button-size));
-		}
 	}
 </style>

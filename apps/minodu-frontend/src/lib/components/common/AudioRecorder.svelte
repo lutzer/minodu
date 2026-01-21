@@ -14,7 +14,7 @@
 
 	onMount(async () => {
 		// mediaDeviveAvailable = navigator.mediaDevices?.getUserMedia !== undefined;
-		mediaDeviveAvailable = false
+		mediaDeviveAvailable = false;
 	});
 
 	$: {

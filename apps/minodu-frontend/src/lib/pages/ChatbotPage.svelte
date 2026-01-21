@@ -56,7 +56,7 @@
 	}
 </script>
 
-<div class="chat-container">
+<div class="scroll-container">
 	<div class="chat-messages">
 		<ul>
 			{#each messages as msg}
