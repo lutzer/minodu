@@ -110,6 +110,11 @@ button.big {
 	height: 72px;
 }
 
+button.small {
+	width: 58px;
+	height: 58px;
+}
+
 button img {
 	position: relative;
 	width: 100%;
@@ -140,7 +145,6 @@ li {
 	left: 0;
 	right: 0;
 	bottom: 0;
-	background-color: #edca82;
 	overflow: scroll;
 	padding-bottom: calc(var(--footer-height));
 }

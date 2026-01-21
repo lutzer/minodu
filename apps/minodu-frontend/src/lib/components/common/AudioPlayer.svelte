@@ -83,8 +83,8 @@
 			<img src={isPlaying ? pauseButtonImage : playButtonImage} alt="button to start/pause audio" />
 		</button>
 	</div>
-	<div class="slider">
-		<div class="progress-background" bind:this={progressBar} onclick={seek}>
+	<div class="slider" bind:this={progressBar} onclick={seek}>
+		<div class="progress-background">
 			<div class="progress" style="width: {progress}%"></div>
 		</div>
 	</div>
@@ -121,6 +121,9 @@
 
 	.slider {
 		flex-grow: 1;
+		height: 100%;
+		display: flex;
+		align-items: center;
 	}
 
 	.time {
