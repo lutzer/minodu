@@ -83,10 +83,15 @@
 		display: flex;
 		gap: var(--small-padding);
 		padding: var(--small-padding);
+		flex-wrap: wrap;
+		justify-content: space-between;
+		
 	}
 
 	#categories li {
-		width: 20%;
+		width: 22%;
+		flex-grow: 0;
+		flex-shrink: 0;
 	}
 
 	#categories button {
