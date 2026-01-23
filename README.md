@@ -109,6 +109,8 @@ sudo apt install git-lfs
 git lfs pull
 
 # install dependencies
+sudo apt install npm
+sudo apt install python3-poetry
 npm install
 
 # build and start services
