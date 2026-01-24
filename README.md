@@ -65,6 +65,16 @@ nx g @nxlv/python:poetry-project <name> --directory=apps/<name> --projectType=ap
 nx g @nx/node:application <name> --directory=apps/<name>
 ```
 
+## Update Proecedure
+
+* run `sync:update_backup` to create new backup file on digital ocean
+* run `sync:database`to fetch and sync data locally
+* run `sync:rag`to update embeddings
+
+or run all three steps with
+
+* `npm run sync`
+
 ## Deployment on raspberry pi
 
 * install base image rasp pi os 64 bit lite
