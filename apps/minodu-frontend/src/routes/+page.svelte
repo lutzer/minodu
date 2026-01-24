@@ -4,8 +4,8 @@
 	import chatImage from '$lib/assets/startscreen_chat.png';
 	import cloudImage from '$lib/assets/startscreen_cloud.png';
 	import ExplainPageButton from '$lib/components/common/ExplainPageButton.svelte';
-	import { Store } from '$lib/store';
-	import { t, language } from '$lib/translations';
+	import { language } from '$lib/stores';
+	import { t } from '$lib/translations';
 	import { onMount } from 'svelte';
 
 	let { children } = $props();

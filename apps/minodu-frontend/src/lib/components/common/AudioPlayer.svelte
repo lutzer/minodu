@@ -2,7 +2,8 @@
 	import playButtonImage from '$lib/assets/audioplayer-play.png';
 	import pauseButtonImage from '$lib/assets/audioplayer-pause.png';
 	import { onMount, onDestroy } from 'svelte';
-	import { t, language } from '$lib/translations';
+	import { language } from '$lib/stores';
+	import { t } from '$lib/translations';
 
 	export let audioSource: string;
 
@@ -92,7 +93,10 @@
 	></audio>
 	<div class="button">
 		<button class="play-button" onclick={() => (isPlaying ? pausePlayback() : startPlayback())}>
-			<img src={isPlaying ? pauseButtonImage : playButtonImage} alt={t('alt.playPauseAudio', $language)} />
+			<img
+				src={isPlaying ? pauseButtonImage : playButtonImage}
+				alt={t('alt.playPauseAudio', $language)}
+			/>
 		</button>
 	</div>
 	<div

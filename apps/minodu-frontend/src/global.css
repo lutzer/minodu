@@ -140,26 +140,22 @@ li {
 	padding-bottom: calc(var(--footer-height));
 }
 
-.color.SOL
-{
-	background-color: #EFD6C3;
-	--box-shadow-color: #D5AE90;
+.color.SOL {
+	background-color: #efd6c3;
+	--box-shadow-color: #d5ae90;
 }
 
-.color.PLANTES
-{
-	background-color: #C2EFDA;
-	--box-shadow-color: #9CC9B4;
+.color.PLANTES {
+	background-color: #c2efda;
+	--box-shadow-color: #9cc9b4;
 }
 
-.color.AUTRES
-{
-	background-color: #FFE9B3;
-	--box-shadow-color: #D9C38C;
+.color.AUTRES {
+	background-color: #ffe9b3;
+	--box-shadow-color: #d9c38c;
 }
 
-.color.ELEVAGE
-{
-	background-color: #F9D9B8;
-	--box-shadow-color: #D9B38C;
+.color.ELEVAGE {
+	background-color: #f9d9b8;
+	--box-shadow-color: #d9b38c;
 }

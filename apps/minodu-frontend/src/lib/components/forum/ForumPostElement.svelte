@@ -3,7 +3,8 @@
 	import AudioPlayer from '../common/AudioPlayer.svelte';
 	import TextToSpeechButton from '../common/TextToSpeechButton.svelte';
 	import TextToSpeechPlayer from '../common/TextToSpeechPlayer.svelte';
-	import { t, language } from '$lib/translations';
+	import { language } from '$lib/stores';
+	import { t } from '$lib/translations';
 
 	import postDeleteButton from '$lib/assets/delete-forum-post.png';
 

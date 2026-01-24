@@ -5,7 +5,7 @@ import type { ForumAuthor } from './models/forumAuthor';
 import type { Language, Optional } from '$lib/types';
 import type { ForumFile } from './models/forumFile';
 import { mimeTypeToFileExtension } from '$lib/utils';
-import { Store } from '$lib/store';
+import { Storage } from '$lib/storage';
 
 type CreateAuthorRequest = {
 	name: string;
@@ -49,7 +49,7 @@ export class ForumApi {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				Authorization: `Bearer ${Store.forumToken}`
+				Authorization: `Bearer ${Storage.forumToken}`
 			},
 			body: JSON.stringify(request)
 		});
@@ -64,7 +64,7 @@ export class ForumApi {
 			method: 'DELETE',
 			headers: {
 				'Content-Type': 'application/json',
-				Authorization: `Bearer ${Store.forumToken}`
+				Authorization: `Bearer ${Storage.forumToken}`
 			}
 		});
 		if (!response.ok) {
@@ -88,7 +88,7 @@ export class ForumApi {
 		const response = await fetch(`${ForumApi.API_PREFIX}/files/upload`, {
 			method: 'POST',
 			headers: {
-				Authorization: `Bearer ${Store.forumToken}`
+				Authorization: `Bearer ${Storage.forumToken}`
 			},
 			body: formData
 		});
@@ -110,7 +110,9 @@ export class ForumApi {
 		return new EventSource(`${ForumApi.API_PREFIX}/events/`);
 	}
 
-	public static async checkToken(token: string = Store.forumToken): Promise<Optional<ForumAuthor>> {
+	public static async checkToken(
+		token: string = Storage.forumToken
+	): Promise<Optional<ForumAuthor>> {
 		if (!token) {
 			return undefined;
 		} else {

@@ -9,8 +9,8 @@
 
 	import submitButton from '$lib/assets/forum-submit-post.png';
 	import cancelButton from '$lib/assets/delete-forum-post.png';
-	import { Store } from '$lib/store';
-	import { language } from '$lib/translations';
+	import { Storage } from '$lib/storage';
+	import { language } from '$lib/stores';
 	import { onMount } from 'svelte';
 
 	export let postType: ForumPostType;
@@ -32,7 +32,7 @@
 	}
 
 	onMount(() => {
-		text = Store.forumPostText;
+		text = Storage.forumPostText;
 	});
 
 	async function createPost(text: Optional<string>, audio: Optional<Blob>, image: Optional<File>) {
@@ -45,12 +45,12 @@
 			await ForumApi.attachFile(post.id, imageBlob, Config.language);
 		}
 		onPostSubmitted();
-		Store.forumPostText = '';
+		Storage.forumPostText = '';
 	}
 
 	function close() {
 		onPostCancelled();
-		Store.forumPostText = text;
+		Storage.forumPostText = text;
 	}
 
 	export function reset() {

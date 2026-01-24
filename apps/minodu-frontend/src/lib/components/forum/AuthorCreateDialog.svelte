@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { ForumApi } from '$lib/apis/forum/api';
 	import type { ForumAvatar } from '$lib/apis/forum/models/fromAvatar';
-	import { Store } from '$lib/store';
-	import { language } from '$lib/translations';
+	import { Storage } from '$lib/storage';
+	import { language } from '$lib/stores';
 	import type { Optional } from '$lib/types';
 	import { t } from '$lib/translations';
 
@@ -24,7 +24,7 @@
 	async function createAuthor(name: string, avatar: Optional<number>) {
 		try {
 			let response = await ForumApi.createAuthor({ name: name, avatar: avatar });
-			Store.forumToken = response.token;
+			Storage.forumToken = response.token;
 			name = '';
 			dialog?.close();
 			onCreated();

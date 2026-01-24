@@ -8,22 +8,25 @@
 	import autresBackground from '$lib/assets/agriculture-cat-autres.png';
 	import elevageBackground from '$lib/assets/agriculture-cat-elevage.png';
 	import plantesBackground from '$lib/assets/agriculture-cat-plantes.png';
-	import { language } from '$lib/translations';
+	import { language } from '$lib/stores';
 	import { t } from '$lib/translations';
 
 	export let post: BackendPost;
 
 	const backgroundImages = {
-		'SOL': solBackground,
-		'AUTRES': autresBackground,
-		'ELEVAGE': elevageBackground,
-		'PLANTES': plantesBackground
+		SOL: solBackground,
+		AUTRES: autresBackground,
+		ELEVAGE: elevageBackground,
+		PLANTES: plantesBackground
 	};
 
 	$: backgroundImage = backgroundImages[post.category.name as keyof typeof backgroundImages];
 </script>
 
-<div class="post shadow color {post.category.name}" style="background-image: url({backgroundImage})">
+<div
+	class="post shadow color {post.category.name}"
+	style="background-image: url({backgroundImage})"
+>
 	<div class="vertical-layout">
 		<div class="horizontal-layout">
 			<div class="post-image">
@@ -36,13 +39,13 @@
 				</div>
 				<div class="chat-button">
 					<button class="small" onclick={() => goto(`/agriculture/bot/${post.id}`)}>
-						<img src={chatbotButtonSmall} alt={t('alt.chatbotIcon', $language)}/>
-					</button>		
+						<img src={chatbotButtonSmall} alt={t('alt.chatbotIcon', $language)} />
+					</button>
 				</div>
 			</div>
 		</div>
 		<div class="audioplayer">
-			<AudioPlayer audioSource={$language === "kb" ? post.attachment_kb : post.attachment} />
+			<AudioPlayer audioSource={$language === 'kb' ? post.attachment_kb : post.attachment} />
 		</div>
 	</div>
 </div>
@@ -96,7 +99,7 @@
 
 	.post.color {
 		background-position: 150% 100%;
-    	background-size: contain;
-    	background-repeat: no-repeat;
+		background-size: contain;
+		background-repeat: no-repeat;
 	}
 </style>

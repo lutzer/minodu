@@ -7,7 +7,8 @@
 	import chatbotButton from '$lib/assets/chatbot-button.png';
 	import { goto } from '$app/navigation';
 	import FloatingButton from '$lib/components/common/FloatingButton.svelte';
-	import { t, language } from '$lib/translations';
+	import { language } from '$lib/stores';
+	import { t } from '$lib/translations';
 
 	let posts: BackendPost[] = [];
 	let categories: BackendCategory[] = [];
@@ -27,7 +28,6 @@
 	$: filteredPosts = selectedCategoryId
 		? posts.filter((post) => post.category.id === selectedCategoryId)
 		: posts;
-
 </script>
 
 <div class="forum-page">
@@ -59,13 +59,10 @@
 			{/each}
 		</ul>
 	</div>
-	<FloatingButton
-		icon={chatbotButton}
-		onclick={() => goto("/agriculture/bot/")}/>
+	<FloatingButton icon={chatbotButton} onclick={() => goto('/agriculture/bot/')} />
 </div>
 
 <style>
-
 	/* @media screen and (min-width: 550px) {
 		.scroll-container {
 			bottom: 0;
@@ -86,7 +83,6 @@
 		padding: var(--small-padding);
 		flex-wrap: wrap;
 		justify-content: space-between;
-		
 	}
 
 	#categories li {
@@ -103,7 +99,6 @@
 		padding: var(--small-padding);
 		white-space: nowrap;
 		height: 48px;
-		
 	}
 
 	#categories button.selected {
@@ -125,6 +120,6 @@
 	}
 
 	.scroll-container {
-		background-color: #EBF9F2;
+		background-color: #ebf9f2;
 	}
 </style>

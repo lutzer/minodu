@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { t, language } from '$lib/translations';
+	import { language } from '$lib/stores';
+	import { t } from '$lib/translations';
 
 	$: postId = $page.params.id;
 </script>

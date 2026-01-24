@@ -1,6 +1,7 @@
 <script lang="ts">
 	import ChatbotPage from '$lib/pages/ChatbotPage.svelte';
-	import { t, language } from '$lib/translations';
+	import { language } from '$lib/stores';
+	import { t } from '$lib/translations';
 </script>
 
 <div>

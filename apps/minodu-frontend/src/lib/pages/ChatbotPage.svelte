@@ -4,8 +4,8 @@
 	import BotMessageElement from '$lib/components/bot/BotMessageElement.svelte';
 	import AudioRecorder from '$lib/components/common/AudioRecorder.svelte';
 	import TextToSpeechPlayer from '$lib/components/common/TextToSpeechPlayer.svelte';
-	import { Store } from '$lib/store';
-	import { language } from '$lib/translations';
+	import { Storage } from '$lib/storage';
+	import { language } from '$lib/stores';
 	import type { BotMessage } from '$lib/types';
 	import { onMount } from 'svelte';
 	import { t } from '$lib/translations';
@@ -21,7 +21,7 @@
 	let audioRecording: boolean;
 
 	onMount(() => {
-		messages = Store.chatMessages;
+		messages = Storage.chatMessages;
 	});
 
 	$: {
@@ -33,7 +33,7 @@
 	}
 
 	function updateGenerateState() {
-		Store.chatMessages = messages;
+		Storage.chatMessages = messages;
 		generating = isGenerating();
 	}
 
@@ -47,7 +47,7 @@
 	}
 
 	function clearChat() {
-		Store.chatMessages = undefined;
+		Storage.chatMessages = undefined;
 		messages = [];
 	}
 
@@ -95,7 +95,9 @@
 			{/if}
 		</div>
 		<div class="input-block">
-			<button onclick={submitMessage} disabled={generating || inputText.length <= 3}>{t('action.submit', $language)}</button>
+			<button onclick={submitMessage} disabled={generating || inputText.length <= 3}
+				>{t('action.submit', $language)}</button
+			>
 			<button onclick={clearChat}>{t('action.clearChat', $language)}</button>
 		</div>
 	</div>

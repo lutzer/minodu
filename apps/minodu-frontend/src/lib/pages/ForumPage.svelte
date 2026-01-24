@@ -8,8 +8,8 @@
 	import ForumPostElement from '$lib/components/forum/ForumPostElement.svelte';
 	import ForumInputElement from '$lib/components/forum/ForumInputElement.svelte';
 	import TextToSpeechPlayer from '$lib/components/common/TextToSpeechPlayer.svelte';
-	import { Store } from '$lib/store';
-	import { language } from '$lib/translations';
+	import { Storage } from '$lib/storage';
+	import { language } from '$lib/stores';
 	import { Config } from '$lib';
 	import { fly, fade } from 'svelte/transition';
 	import { t } from '$lib/translations';
@@ -71,7 +71,7 @@
 	}
 
 	async function logout() {
-		Store.forumToken = undefined;
+		Storage.forumToken = undefined;
 		author = undefined;
 	}
 </script>
@@ -111,9 +111,7 @@
 			/>
 		</div>
 	{:else}
-		<FloatingButton
-			icon={createPostButton}
-			onclick={() => createPost()}/>
+		<FloatingButton icon={createPostButton} onclick={() => createPost()} />
 	{/if}
 	<TextToSpeechPlayer bind:this={ttsPlayer} />
 </div>

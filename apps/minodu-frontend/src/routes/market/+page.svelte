@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { t, language } from '$lib/translations';
+	import { language } from '$lib/stores';
+	import { t } from '$lib/translations';
 </script>
 
 <div>
