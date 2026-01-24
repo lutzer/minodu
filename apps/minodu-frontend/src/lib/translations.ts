@@ -1,4 +1,4 @@
-import type { Language } from './types';
+import type { Language, Optional } from './types';
 
 type TranslationStrings = {
 	[key: string]: {
@@ -165,7 +165,7 @@ const translations: TranslationStrings = {
 	}
 };
 
-export function t(key: string, language: Language): string {
+export function t(key: string, language: Optional<Language>): string {
 	if (!language) {
 		return '';
 	}
