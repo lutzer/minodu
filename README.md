@@ -116,11 +116,27 @@ sudo systemctl enable docker
 
 # install git-lfs and get lfs files
 sudo apt install git-lfs
-git lfs pull
 
-# install dependencies
+# install npm and poetry
 sudo apt install npm
 sudo apt install python3-poetry
+
+# install pyenv# Install pyenv
+curl https://pyenv.run | bash
+
+# Add to your ~/.bashrc or ~/.zshrc
+echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
+echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
+echo 'eval "$(pyenv init -)"' >> ~/.bashrc
+source ~/.bashrc
+
+pyenv install 3.12.11
+```
+
+* install docker containers
+```
+# run this inside minodu repo folder
+git lfs pull
 npm install
 
 # build and start services
