@@ -1,26 +1,4 @@
-import { browser } from '$app/environment';
-import { writable } from 'svelte/store';
-import { Store } from './store';
-import type { Language, Optional } from './types';
-
-function createLanguageStore() {
-	const { subscribe, set } = writable<Optional<Language>>( browser ? Store.language : undefined);
-
-	return {
-		subscribe,
-		set: (value: Language) => {
-			if (browser) Store.language = value;
-			set(value);
-		},
-		refresh: () => {
-			// Force notify subscribers without changing value
-			set(undefined);
-			set(Store.language);
-		}
-	};
-}
-
-export const language = createLanguageStore();
+import type { Language } from './types';
 
 type TranslationStrings = {
 	[key: string]: {
@@ -134,7 +112,7 @@ const translations: TranslationStrings = {
 
 	// Accessibility / Alt texts
 	'alt.playPauseAudio': {
-		fr: 'Bouton pour démarrer/mettre en pause l\'audio',
+		fr: "Bouton pour démarrer/mettre en pause l'audio",
 		kb: 'Buto yo gutangira/guhagarika amajwi'
 	},
 	'alt.audioProgress': {
@@ -143,7 +121,7 @@ const translations: TranslationStrings = {
 	},
 	'alt.speakPageInfo': {
 		fr: 'Bouton pour lire les informations de la page',
-		kb: 'Buto yo gusoma amakuru y\'urupapuro'
+		kb: "Buto yo gusoma amakuru y'urupapuro"
 	},
 	'alt.switchLanguage': {
 		fr: 'Bouton pour changer de langue',
@@ -151,19 +129,19 @@ const translations: TranslationStrings = {
 	},
 	'alt.submitForumPost': {
 		fr: 'Soumettre le message du forum',
-		kb: 'Ohereza ubutumwa bw\'inama'
+		kb: "Ohereza ubutumwa bw'inama"
 	},
 	'alt.deleteForumPost': {
 		fr: 'Supprimer le message du forum',
-		kb: 'Siba ubutumwa bw\'inama'
+		kb: "Siba ubutumwa bw'inama"
 	},
 	'alt.chatbotIcon': {
 		fr: 'Icône du chatbot',
 		kb: 'Ishusho ya chatbot'
 	},
 	'alt.avatarOfUser': {
-		fr: 'Avatar de l\'utilisateur',
-		kb: 'Ishusho y\'ukoresha'
+		fr: "Avatar de l'utilisateur",
+		kb: "Ishusho y'ukoresha"
 	},
 	'alt.imageFor': {
 		fr: 'Image pour',
@@ -183,13 +161,13 @@ const translations: TranslationStrings = {
 	},
 	'alt.speechBubble': {
 		fr: 'Deux personnes et une bulle de dialogue',
-		kb: 'Abantu babiri n\'igishushanyo cy\'ikiganiro'
+		kb: "Abantu babiri n'igishushanyo cy'ikiganiro"
 	}
 };
 
 export function t(key: string, language: Language): string {
 	if (!language) {
-		return "";
+		return '';
 	}
 	const translation = translations[key];
 	if (!translation) {

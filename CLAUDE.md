@@ -46,6 +46,7 @@ This file contains guidelines, practices, and principles that should be consider
 - Keep components small and focused
 - Use Svelte 5 runes syntax (`$state`, `$derived`, `$effect`)
 - Colocate styles within components
+- Run linter after every major edit with `npm run lint` and `npm run format` 
 
 ### NestJS (Backend)
 

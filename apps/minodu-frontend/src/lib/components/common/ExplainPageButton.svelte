@@ -3,11 +3,9 @@
 	import explainPageButtonActive from '$lib/assets/explain-page-button-active.png';
 	import languageKbButton from '$lib/assets/language-kb-button.png';
 	import languageFrButton from '$lib/assets/language-fr-button.png';
-	import { language } from '$lib/translations';
+	import { language } from '$lib/stores';
 	import { t } from '$lib/translations';
 	import { onMount } from 'svelte';
-	import { Store } from '$lib/store';
-	import type { Language } from '$lib/types';
 
 	export let audioKb: string;
 	export let audioFr: string;
@@ -65,10 +63,9 @@
 	.explain-page-button-group {
 		position: fixed;
 		bottom: var(--footer-height);
-        left:0;
-        right:0;
+		left: 0;
+		right: 0;
 		pointer-events: none;
-
 	}
 
 	.explain-page-button-group .content-width {

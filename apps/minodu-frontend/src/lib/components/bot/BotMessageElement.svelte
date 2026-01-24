@@ -6,7 +6,8 @@
 	import TextToSpeechButton from '../common/TextToSpeechButton.svelte';
 	import TextToSpeechPlayer from '../common/TextToSpeechPlayer.svelte';
 	import { Config } from '$lib';
-	import { t, language } from '$lib/translations';
+	import { language } from '$lib/stores';
+	import { t } from '$lib/translations';
 
 	export let message: BotMessage;
 	export let conversation: string;
