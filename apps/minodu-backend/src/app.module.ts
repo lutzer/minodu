@@ -24,6 +24,7 @@ import { ProductOfferModule } from './product_offers/product_offer.module';
 import { PartnerModule } from './partners/partner.module';
 import { BackupService } from './backup/backup.service';
 import { BackupModule } from './backup/backup.module';
+import { NginxLogsModule } from './nginx-logs/nginx-logs.module';
 
 @Module({
   imports: [
@@ -70,7 +71,8 @@ import { BackupModule } from './backup/backup.module';
     PartnerModule,
     ProductDemandModule,
     ProductOfferModule,
-    BackupModule
+    BackupModule,
+    NginxLogsModule
   ],
   controllers: [AppController],
   providers: [AppService],
