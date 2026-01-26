@@ -16,7 +16,8 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      timeout: 20s
+      interval: 15s
+      timeout: 10s
       retries: 10
       
    # Backend Service
@@ -49,7 +50,7 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000"]
-      interval: 30s
+      interval: 15s
       timeout: 10s
       retries: 3
 
@@ -72,7 +73,7 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3002/api/services/"]
-      interval: 30s
+      interval: 15s
       timeout: 10s
       retries: 3
 
@@ -104,7 +105,7 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3003/api/forum/"]
-      interval: 30s
+      interval: 15s
       timeout: 10s
       retries: 3
 
@@ -125,7 +126,7 @@ services:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "celery inspect ping --destination celery@$$HOSTNAME"]
-      interval: 30s
+      interval: 15s
       timeout: 10s
       retries: 3
       start_period: 5s
@@ -137,8 +138,8 @@ services:
       - "6379:6379"
     healthcheck:
       test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
-      interval: 30s
-      timeout: 15s
+      interval: 15s
+      timeout: 10s
       retries: 3
 
    # Web Service [Frontend + Backoffice]
