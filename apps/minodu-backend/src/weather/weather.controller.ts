@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { WeatherService } from './weather.service';
@@ -17,8 +17,8 @@ export class WeatherController {
 
   @ApiOperation({ summary: "Weather list", description: "All weather list" })
   @Get()
-  findAll() {
-    return this.weatherService.findAll();
+  findAll(@Query('limit') limit: number = 500) {
+    return this.weatherService.findAll(limit);
   }
 
   @ApiOperation({ summary: "Current weather", description: "current weather details" })

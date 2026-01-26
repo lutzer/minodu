@@ -23,7 +23,7 @@ export class BackupController {
    */
   @ApiOperation({ summary: "Create backup", description: "Create the system files & db dump backup" })
   @Public()
-  @Post('create')
+  @Get('create')
   async createBackup(): Promise<{ success: boolean; data: BackupResult }> {
     const result = await this.backupService.createBackup();
     return {
