@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { exec } from 'child_process';
 import { createHash } from 'crypto';
 import * as fs from 'fs';
@@ -6,8 +6,8 @@ import * as path from 'path';
 import * as archiver from 'archiver';
 import * as fse from 'fs-extra';
 import { promisify } from 'util';
-import { Role } from 'src/roles/entities/role.entity';
 import { BaseConfig } from 'src/utils/common.util';
+import { LoggerService } from 'src/logs/logger.service';
 
 const execAsync = promisify(exec);
 
@@ -22,11 +22,12 @@ export interface BackupResult {
 
 @Injectable()
 export class BackupService {
-  private readonly logger = new Logger(BackupService.name);
   private readonly tempDir = path.join(process.cwd(), 'temp');
   private readonly backupFileName = 'minodu_backend_backup.zip';
 
-  constructor() {
+  constructor(
+    private readonly logger: LoggerService
+  ) {
     // Ensure temp directory exists
     fse.ensureDirSync(this.tempDir);
   }
@@ -67,10 +68,11 @@ export class BackupService {
       };
 
     } catch (error) {
-      this.logger.error(`Backup failed: ${error.message}`);
+      const errorMessage = error.message.replace(/mysqldump.*?-p.*?(\s|$)/gi, 'mysqldump [credentials hidden]');
+      this.logger.error(`Backup failed: ${errorMessage}`);
       return {
         success: false,
-        message: `Backup failed: ${error.message}`
+        message: `Backup failed: ${errorMessage}`
       };
     }
   }
@@ -90,7 +92,7 @@ export class BackupService {
         }
       }
     } catch (error) {
-      this.logger.warn(`Could not clean old backups: ${error.message}`);
+      this.logger.log(`Could not clean old backups: ${error.message}`);
     }
   }
 
@@ -115,6 +117,7 @@ export class BackupService {
         'backend_user_status',
         'backend_role', 
         'backend_product_category',
+        'backend_product',
         'backend_post_tag',
         'backend_post_resource',
         'backend_post_category',
@@ -124,7 +127,7 @@ export class BackupService {
     ];
 
     // Build mysqldump command
-    const command = `mysqldump -h ${dbConfig.host} -P ${dbConfig.port} -u ${dbConfig.username} -p${dbConfig.password} ${dbConfig.database} ${tablesToBackup.join(' ')} > ${dumpPath}`;
+    const command = `mysqldump --skip-ssl -h ${dbConfig.host} -P ${dbConfig.port} -u ${dbConfig.username} -p${dbConfig.password} ${dbConfig.database} ${tablesToBackup.join(' ')} > ${dumpPath}`;
 
     try {
       this.logger.log('Creating MySQL dump...');

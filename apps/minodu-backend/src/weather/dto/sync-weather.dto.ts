@@ -91,4 +91,55 @@ export class SyncWeatherDto {
   @IsNumber()
   @IsOptional()
   NO2?: number;
+
+  @ApiProperty({
+    type: Number,
+    description: 'Wind direction in degrees',
+    required: false,
+    example: 12
+  })
+  @IsNumber()
+  @IsOptional()
+  wind_dir?: number;
+
+  @ApiProperty({
+    type: Number,
+    description: 'wind speed in m/s',
+    required: false,
+    example: 12
+  })
+  @IsNumber()
+  @IsOptional()
+  wind_spd?: number;
+
+  @ApiProperty({
+    type: Number,
+    description: 'UV index',
+    required: false,
+    example: 12
+  })
+  @IsNumber()
+  @IsOptional()
+  uv?: number;
+
+  @ApiProperty({
+    type: Number,
+    description: 'battery level in %',
+    required: false,
+    example: 12
+  })
+  @IsNumber()
+  @IsOptional()
+  battery?: number;
+
+  @ApiProperty({
+    type: String,
+    description: 'time of the measurement',
+    required: false,
+    example: 12
+  })
+  @IsString()
+  @IsOptional()
+  time?: string;
+
 }
