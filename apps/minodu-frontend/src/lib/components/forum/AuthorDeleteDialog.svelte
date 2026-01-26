@@ -20,7 +20,7 @@
 	
 </script>
 
-<dialog bind:this={dialog} class="shadow">
+<dialog bind:this={dialog} class="shadow overlay">
 	<h2>{t('forum.deleteAuthor', $language)}</h2>
     {#if author}
 	<div class="author-image">

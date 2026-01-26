@@ -68,7 +68,7 @@
 		display: flex;
 		padding: var(--medium-padding);
 		margin-bottom: var(--medium-padding);
-		background-color: #f6eddb;
+		background-color: #eeeae1;
 		border-radius: var(--border-radius);
 		gap: var(--small-padding);
 		--box-shadow-color: #67625a;

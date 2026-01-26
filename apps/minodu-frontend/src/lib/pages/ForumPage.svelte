@@ -10,8 +10,6 @@
 	import TextToSpeechPlayer from '$lib/components/common/TextToSpeechPlayer.svelte';
 	import { Storage } from '$lib/storage';
 	import { language } from '$lib/stores';
-	import { Config } from '$lib';
-	import { fly, fade } from 'svelte/transition';
 	import { t } from '$lib/translations';
 
 	import { waitForAnimationFrame } from '$lib/utils';
@@ -71,12 +69,7 @@
 	}
 
 	async function createPost() {
-		if (!author) {
-			showDialog('createAuthor')
-		} else {
-			showDialog('createPost')
-		}
-		// showingDialog = true;
+		showDialog('createPost')
 	}
 
 	async function deletePost(id: number) {
@@ -118,18 +111,8 @@
 	<FloatingForumButtons 
 		author={author} 
 		onAvatarClicked={() => showDialog('logoutAuthor')} 
-		onPostClicked={() => createPost()} />
-		<!-- FloatingButton icon={createPostButton} onclick={() => createPost()} -->
-		<!-- {#if author}
-			<FloatingAvatarButton icon={author.avatar.file_urlpath} onclick={() => } />
-		{/if} -->
-		<!-- <div class="post-type-menu">
-			<ul>
-				<li><button><img src={postTypeText}/></button></li>
-				<li><button><img src={postTypeAudio}/></button></li>
-				<li><button><img src={postTypeImage}/></button></li>
-			</ul>
-		</div> -->
+		onAuthorSelect={() => showDialog('createAuthor')}
+		onPostTypeSelected={() => createPost()} />
 	{/if}
 	<TextToSpeechPlayer bind:this={ttsPlayer} />
 	{#if visibleDialogs.createAuthor}
@@ -144,33 +127,20 @@
 		onBack={() => {closeDialog('logoutAuthor')}}/>
 	{/if}
 	{#if visibleDialogs.createPost}
-	<div class="create-post-container content-width" transition:fly={{ y: 200, duration: 300 }}>
-		<ForumInputElement
-			postType={ForumPostType.TEXT}
-			onPostSubmitted={() => {
-				closeDialog('createPost');
-			}}
-			onPostCancelled={() => {
-				closeDialog('createPost');
-			}}
-		/>
-	</div> 
+	<ForumInputElement
+		postType={ForumPostType.TEXT}
+		onPostSubmitted={() => {
+			closeDialog('createPost');
+			update();
+		}}
+		onPostCancelled={() => {
+			closeDialog('createPost');
+		}}
+	/>
 	{/if}
 </div>
 
 <style>
-	.create-post-container {
-		position: fixed;
-		background-color: #ffffff;
-		bottom: 0;
-		left: 0;
-		right: 0;
-		z-index: 1;
-		padding: var(--small-padding);
-		border-top: 1px solid #ccc;
-		border-radius: var(--border-radius) var(--border-radius) 0 0;
-		box-sizing: border-box;
-	}
 
 	.post-container {
 		padding: var(--page-padding);
@@ -184,6 +154,6 @@
 	}
 
 	.scroll-container {
-		background-color: #edca82;
+		background-color: #e2d0ac;
 	}
 </style>

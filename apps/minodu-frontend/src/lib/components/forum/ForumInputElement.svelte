@@ -12,6 +12,7 @@
 	import { Storage } from '$lib/storage';
 	import { language } from '$lib/stores';
 	import { onMount } from 'svelte';
+	import { fly } from 'svelte/transition';
 
 	export let postType: ForumPostType;
 
@@ -60,72 +61,86 @@
 	}
 </script>
 
-<div class="forum-input-container">
-	{#if postType == ForumPostType.TEXT}
-		<div class="input-text-field">
-			<div class="input-textarea">
-				<textarea id="text" bind:value={text}></textarea>
-			</div>
-		</div>
-		<div class="input-button-group">
-			<button onclick={() => createPost(text, undefined, undefined)} disabled={!submitEnabled}>
-				<img src={submitButton} alt={t('alt.submitForumPost', $language)} />
-			</button>
-			<button onclick={close}>
-				<img src={cancelButton} alt={t('action.cancel', $language)} />
-			</button>
-		</div>
-	{/if}
-	<!-- <div class="author input-block">
-		{#if author != undefined}
-			<h4>{author.name}</h4>
-			<p>{author.avatar}</p>
-			<button onclick={onLogoutAuthorClicked}>logout</button>
-		{:else}
-			<button onclick={onCreateAuthorClicked}>Create Author</button>
-		{/if}
-	</div>
-	{#if author !== undefined}
-		<div class="input-block text">
-			<div class="input">
-				<label for="title">Title</label>
-				<div class="input-text">
-					<input id="title" type="text" bind:value={title} />
-				</div>
-			</div>
-			<div class="input">
-				<label for="text">Text</label>
+<div class="create-post-container" transition:fly={{ y: 200, duration: 300 }}>
+	<div class="forum-input-container">
+		{#if postType == ForumPostType.TEXT}
+			<div class="input-text-field">
 				<div class="input-textarea">
 					<textarea id="text" bind:value={text}></textarea>
 				</div>
 			</div>
-		</div>
-		<div class="input-block audio">
-			<AudioRecorder bind:this={audioRecorder} bind:recording={audioRecording} bind:blob={audioBlob}
-			></AudioRecorder>
-			{#if !audioBlob && !audioRecording}
-				<button onclick={audioRecorder.startRecording}>Record</button>
-			{:else if !audioBlob && audioRecording}
-				<button onclick={audioRecorder.stopRecording}>Stop</button>
+			<div class="input-button-group">
+				<button onclick={() => createPost(text, undefined, undefined)} disabled={!submitEnabled}>
+					<img src={submitButton} alt={t('alt.submitForumPost', $language)} />
+				</button>
+				<button onclick={close}>
+					<img src={cancelButton} alt={t('action.cancel', $language)} />
+				</button>
+			</div>
+		{/if}
+		<!-- <div class="author input-block">
+			{#if author != undefined}
+				<h4>{author.name}</h4>
+				<p>{author.avatar}</p>
+				<button onclick={onLogoutAuthorClicked}>logout</button>
 			{:else}
-				<button onclick={audioRecorder.reset}>Reset</button>
+				<button onclick={onCreateAuthorClicked}>Create Author</button>
 			{/if}
 		</div>
-		<div class="input-block">
-			<ForumImagePicker bind:image />
-		</div>
-		<div class="submit input-block">
-			<button
-				onclick={() => onSubmitPostClicked(title, text, audioBlob, image)}
-				disabled={!submitEnabled}>Submit</button
-			>
-		</div>
-	{:else}
-		<div><p>Please login</p></div>
-	{/if} -->
+		{#if author !== undefined}
+			<div class="input-block text">
+				<div class="input">
+					<label for="title">Title</label>
+					<div class="input-text">
+						<input id="title" type="text" bind:value={title} />
+					</div>
+				</div>
+				<div class="input">
+					<label for="text">Text</label>
+					<div class="input-textarea">
+						<textarea id="text" bind:value={text}></textarea>
+					</div>
+				</div>
+			</div>
+			<div class="input-block audio">
+				<AudioRecorder bind:this={audioRecorder} bind:recording={audioRecording} bind:blob={audioBlob}
+				></AudioRecorder>
+				{#if !audioBlob && !audioRecording}
+					<button onclick={audioRecorder.startRecording}>Record</button>
+				{:else if !audioBlob && audioRecording}
+					<button onclick={audioRecorder.stopRecording}>Stop</button>
+				{:else}
+					<button onclick={audioRecorder.reset}>Reset</button>
+				{/if}
+			</div>
+			<div class="input-block">
+				<ForumImagePicker bind:image />
+			</div>
+			<div class="submit input-block">
+				<button
+					onclick={() => onSubmitPostClicked(title, text, audioBlob, image)}
+					disabled={!submitEnabled}>Submit</button
+				>
+			</div>
+		{:else}
+			<div><p>Please login</p></div>
+		{/if} -->
+	</div>
 </div>
 
 <style>
+	.create-post-container {
+		position: fixed;
+		background-color: #EDCA82;;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		z-index: 1;
+		padding: var(--small-padding);
+		border-radius: var(--border-radius) var(--border-radius) 0 0;
+		box-sizing: border-box;
+	}
+
 	.forum-input-container {
 		display: flex;
 		flex-direction: row;

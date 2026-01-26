@@ -39,7 +39,7 @@
 	}
 </script>
 
-<dialog bind:this={dialog} class="shadow">
+<dialog bind:this={dialog} class="shadow overlay">
 	<h2>{t('forum.createAuthor', $language)}</h2>
 	<ul class="avatar-list">
 		{#each avatarList as avatar}
