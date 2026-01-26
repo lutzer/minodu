@@ -38,9 +38,7 @@ services:
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - AI_SERVICE_URL=http://minodu-ai-services:3002/services
     volumes:
-      - ./data/minodu-backend/audios:/app/static/audios
-      - ./data/minodu-backend/images:/app/static/images
-      - ./data/minodu-backend/docs:/app/static/docs
+      - ./data/minodu-backend:/app/data
     depends_on:
       minodu-database:
         condition: service_healthy
