@@ -89,9 +89,9 @@
 	}
 
 	.floating-button button.author {
-		margin-bottom: 4px;
-		height: 68px;
-		width: 68px;
+		margin-bottom: 6px;
+		height: 65px;
+		width: 65px;
 		pointer-events: auto;
         background-color: #ffffff;
         border-radius: var(--border-radius);
@@ -127,8 +127,8 @@
 	}
 
 	button.post-type {
-		height: var(--button-big-size);
-		width: 150px;
+		height: var(--button-size);
+		width: 140px;
 		background-color: #CC604B;
 		border-radius: var(--border-radius);
 		--box-shadow-color: #8C4A3C;

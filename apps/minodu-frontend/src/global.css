@@ -16,10 +16,10 @@ body {
 	--border-radius: 10px;
 	--footer-height: 100px;
 	--header-height: 80px;
-	--button-size: 52px;
+	--button-size: 48px;
 	--max-page-width: 700px;
 	--input-color-bg: #ffffff;
-	--button-big-size: 72px;
+	--button-big-size: 68px;
 }
 
 .input-textarea {
@@ -104,6 +104,7 @@ button {
 	width: var(--button-size);
 	height: var(--button-size);
 	padding: 0;
+	border-radius: var(--border-radius);
 }
 
 button:disabled {
@@ -117,13 +118,13 @@ button.big {
 }
 
 button.small {
-	width: 58px;
-	height: 58px;
+	width: 40px;
+	height: 40px;
 }
 
 button.long {
-	width: 100px;
-	height: 58px;
+	width: 90px;
+	height: 48px;
 }
 
 button img {

@@ -71,7 +71,7 @@
 		background-color: #eeeae1;
 		border-radius: var(--border-radius);
 		gap: var(--small-padding);
-		--box-shadow-color: #67625a;
+		--box-shadow-color: #a29279;
 	}
 
 	.post-avatar {
