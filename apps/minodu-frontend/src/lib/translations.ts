@@ -77,6 +77,10 @@ const translations: TranslationStrings = {
 		fr: 'Ok',
 		kb: 'Yego'
 	},
+	'action.delete': {
+		fr: 'Supprimer',
+		kb: 'Supprimer'
+	},
 
 	// Forum
 	'forum.noPosts': {
@@ -102,6 +106,14 @@ const translations: TranslationStrings = {
 	'forum.avatar': {
 		fr: 'Avatar',
 		kb: 'Ishusho'
+	},
+	'forum.yourName' : {
+		fr: 'Votre nom',
+		kb: 'Votre nom'
+	},
+	'forum.deleteAuthor' : {
+		fr: 'Supprimer le profil ?',
+		kb: 'Supprimer le profil ?'
 	},
 
 	// Agriculture
@@ -142,6 +154,10 @@ const translations: TranslationStrings = {
 	'alt.avatarOfUser': {
 		fr: "Avatar de l'utilisateur",
 		kb: "Ishusho y'ukoresha"
+	},
+	'alt.avatarImage': {
+		fr: "Image d'un avatar",
+		kb: "Image d'un avatar"
 	},
 	'alt.imageFor': {
 		fr: 'Image pour',

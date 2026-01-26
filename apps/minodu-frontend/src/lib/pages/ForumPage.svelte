@@ -14,24 +14,27 @@
 	import { fly, fade } from 'svelte/transition';
 	import { t } from '$lib/translations';
 
-	import createPostButton from '$lib/assets/forum-new-post-button.png';
 	import { waitForAnimationFrame } from '$lib/utils';
-	import FloatingButton from '$lib/components/common/FloatingButton.svelte';
+	import AuthorDeleteDialog from '$lib/components/forum/AuthorDeleteDialog.svelte';
+	import FloatingForumButtons from '$lib/components/forum/FloatingForumButtons.svelte';
 
-	// let createAuthorDialog: AuthorCreateDialog;
 	let ttsPlayer: TextToSpeechPlayer;
 
 	let scrollContainer: HTMLDivElement;
 
 	let posts: ForumPost[] = [];
-	let visiblePosts: ForumPost[] = [];
 
 	let author: Optional<ForumAuthor> = undefined;
 
-	let showCreatePostDialog: boolean = false;
+	type DialogType = 'createAuthor' | 'logoutAuthor' | 'createPost';
 
-	let showNumberOfPosts: number = 3;
-	let loadingMorePosts: boolean = false;
+	let visibleDialogs : Record<DialogType, boolean> = {
+		'createAuthor' : false,
+		'logoutAuthor' : false,
+		'createPost' : false
+	} 
+
+	$: showFloatingButtons = !Object.values(visibleDialogs).some(v => v)
 
 	onMount(() => {
 		update(false);
@@ -62,17 +65,31 @@
 		});
 	}
 
+	async function logout() {
+		Storage.forumToken = undefined;
+		author = undefined;
+	}
+
 	async function createPost() {
-		showCreatePostDialog = true;
+		if (!author) {
+			showDialog('createAuthor')
+		} else {
+			showDialog('createPost')
+		}
+		// showingDialog = true;
 	}
 
 	async function deletePost(id: number) {
 		await ForumApi.deletePost(id);
 	}
 
-	async function logout() {
-		Storage.forumToken = undefined;
-		author = undefined;
+	
+	function showDialog(type: DialogType) {
+		visibleDialogs[type] = true;
+	}
+
+	function closeDialog(type: DialogType) {
+		visibleDialogs[type] = false;
 	}
 </script>
 
@@ -97,23 +114,48 @@
 			{/if}
 		</div>
 	</div>
-
-	{#if showCreatePostDialog}
-		<div class="create-post-container content-width" transition:fly={{ y: 200, duration: 300 }}>
-			<ForumInputElement
-				postType={ForumPostType.TEXT}
-				onPostSubmitted={() => {
-					showCreatePostDialog = false;
-				}}
-				onPostCancelled={() => {
-					showCreatePostDialog = false;
-				}}
-			/>
-		</div>
-	{:else}
-		<FloatingButton icon={createPostButton} onclick={() => createPost()} />
+	{#if showFloatingButtons}
+	<FloatingForumButtons 
+		author={author} 
+		onAvatarClicked={() => showDialog('logoutAuthor')} 
+		onPostClicked={() => createPost()} />
+		<!-- FloatingButton icon={createPostButton} onclick={() => createPost()} -->
+		<!-- {#if author}
+			<FloatingAvatarButton icon={author.avatar.file_urlpath} onclick={() => } />
+		{/if} -->
+		<!-- <div class="post-type-menu">
+			<ul>
+				<li><button><img src={postTypeText}/></button></li>
+				<li><button><img src={postTypeAudio}/></button></li>
+				<li><button><img src={postTypeImage}/></button></li>
+			</ul>
+		</div> -->
 	{/if}
 	<TextToSpeechPlayer bind:this={ttsPlayer} />
+	{#if visibleDialogs.createAuthor}
+	<AuthorCreateDialog 
+		onCreated={() => {closeDialog('createAuthor'); update()}} 
+		onBack={() => {closeDialog('createAuthor')}}/>
+	{/if}
+	{#if visibleDialogs.logoutAuthor}
+	<AuthorDeleteDialog 
+		author={author} 
+		onDeleted={() => {closeDialog('logoutAuthor'); logout()}}
+		onBack={() => {closeDialog('logoutAuthor')}}/>
+	{/if}
+	{#if visibleDialogs.createPost}
+	<div class="create-post-container content-width" transition:fly={{ y: 200, duration: 300 }}>
+		<ForumInputElement
+			postType={ForumPostType.TEXT}
+			onPostSubmitted={() => {
+				closeDialog('createPost');
+			}}
+			onPostCancelled={() => {
+				closeDialog('createPost');
+			}}
+		/>
+	</div> 
+	{/if}
 </div>
 
 <style>

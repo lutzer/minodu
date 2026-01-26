@@ -17,7 +17,7 @@
 <div class="post shadow">
 	<div class="post-avatar">
 		<div class="avatar-picture">
-			<img src="/api/forum/static/avatars/avatar1.jpeg" alt={t('alt.avatarOfUser', $language)} />
+			<img src={post.author.avatar.file_urlpath} alt={t('alt.avatarOfUser', $language)} />
 		</div>
 		{#if post.text.length > 0}
 			<div class="tts-button">
@@ -32,14 +32,6 @@
 				{post.text}
 			</div>
 		{/if}
-		<!-- {#if post.text.length > 0}
-			<div class="paragraph">
-				<h3>Text</h3>
-				{post.text}
-				<TextToSpeechButton text={post.text} {ttsPlayer} />
-			</div>
-		{/if} -->
-
 		<ul>
 			{#each post.files as file}
 				<li class="file">
