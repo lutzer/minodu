@@ -3,9 +3,10 @@ from __future__ import annotations
 from glob import glob
 import logging
 import os
+import re
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, Integer, String, event
+from sqlalchemy import Column, DateTime, Integer, String, Table, event
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 
@@ -42,12 +43,15 @@ def create_avatar_table():
     ]
 
     with get_db_session() as db:
+          # Drop all existing avatar entries
+        db.query(Avatar).delete()
+        db.commit()
+
         for image_path in avatar_images:
-            # check if entry already exists
             image_name = os.path.basename(image_path)
-            result = db.query(Avatar).filter(Avatar.filename == image_name).first()
-            if result == None:
-                db.add(Avatar(
-                    filename=image_name
-                ))
-                db.commit()
+            # Extract ID from filename pattern avatar-<n>.png
+            match = re.match(r'avatar-(\d+)\.\w+$', image_name)
+            if match:
+                avatar_id = int(match.group(1))
+                db.add(Avatar(id=avatar_id, filename=image_name))
+        db.commit()
