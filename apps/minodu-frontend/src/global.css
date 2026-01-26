@@ -180,7 +180,7 @@ li {
 	--box-shadow-color: #d9b38c;
 }
 
-dialog {
+dialog.overlay {
 	max-height: calc(100% - calc(4* var(--page-padding)));
 	max-width: var(--max-page-width);
 	padding: var(--page-padding);
@@ -192,7 +192,7 @@ dialog {
 	inset: var(--page-padding);
 }
 
-dialog::backdrop {
+dialog.overlay::backdrop {
   background-color: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(3px);
 }
