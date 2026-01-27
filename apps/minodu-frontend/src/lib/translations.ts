@@ -119,6 +119,10 @@ const translations: TranslationStrings = {
 		fr: 'Transcription',
 		kb: 'Transcription'
 	},
+	'forum.deletePost': {
+		fr: 'Supprimer le message',
+		kb: 'Supprimer le message'
+	},
 
 	// Agriculture
 	'agriculture.noPosts': {

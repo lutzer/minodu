@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import TextToSpeechPlayer from './TextToSpeechPlayer.svelte';
 	import ttsButton from '$lib/assets/forum-tts-button.png';
 	import ttsButtonActive from '$lib/assets/forum-tts-button-active.png';
@@ -10,9 +10,7 @@
 	let playing = false;
 
 	onMount(() => {
-		ttsPlayer.playbackReset.subscribe(() => {
-			playing = false;
-		});
+		ttsPlayer.playbackReset.subscribe(onMediaEnded);
 	});
 
 	async function handleClick() {
@@ -23,6 +21,11 @@
 			ttsPlayer.stop();
 		}
 	}
+
+	function onMediaEnded() {
+		playing = false;
+	}
+
 </script>
 
 <div>
