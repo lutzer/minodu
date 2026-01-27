@@ -10,7 +10,7 @@ export class BackendApi {
 		}
 		return response.json();
 	}
-	static readonly API_PREFIX = '/api/backend'; // No trailing slash
+	static readonly API_PREFIX = '/api/backend/v1'; // No trailing slash
 
 	public static async getPosts(): Promise<BackendPost[]> {
 		const response = await fetch(`${BackendApi.API_PREFIX}/posts/`);
