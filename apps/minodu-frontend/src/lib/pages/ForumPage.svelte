@@ -26,13 +26,15 @@
 
 	type DialogType = 'createAuthor' | 'logoutAuthor' | 'createPost';
 
-	let visibleDialogs : Record<DialogType, boolean> = {
-		'createAuthor' : false,
-		'logoutAuthor' : false,
-		'createPost' : false
-	} 
+	let visibleDialogs: Record<DialogType, boolean> = {
+		createAuthor: false,
+		logoutAuthor: false,
+		createPost: false
+	};
 
-	$: showFloatingButtons = !Object.values(visibleDialogs).some(v => v)
+	$: showFloatingButtons = !Object.values(visibleDialogs).some((v) => v);
+
+	let createPostType: ForumPostType = ForumPostType.TEXT;
 
 	onMount(() => {
 		update(false);
@@ -68,15 +70,15 @@
 		author = undefined;
 	}
 
-	async function createPost() {
-		showDialog('createPost')
+	async function createPost(type: ForumPostType) {
+		createPostType = type;
+		showDialog('createPost');
 	}
 
 	async function deletePost(id: number) {
 		await ForumApi.deletePost(id);
 	}
 
-	
 	function showDialog(type: DialogType) {
 		visibleDialogs[type] = true;
 	}
@@ -108,40 +110,52 @@
 		</div>
 	</div>
 	{#if showFloatingButtons}
-	<FloatingForumButtons 
-		author={author} 
-		onAvatarClicked={() => showDialog('logoutAuthor')} 
-		onAuthorSelect={() => showDialog('createAuthor')}
-		onPostTypeSelected={() => createPost()} />
+		<FloatingForumButtons
+			{author}
+			onAvatarClicked={() => showDialog('logoutAuthor')}
+			onAuthorSelect={() => showDialog('createAuthor')}
+			onPostTypeSelected={(type) => createPost(type)}
+		/>
 	{/if}
 	<TextToSpeechPlayer bind:this={ttsPlayer} />
 	{#if visibleDialogs.createAuthor}
-	<AuthorCreateDialog 
-		onCreated={() => {closeDialog('createAuthor'); update()}} 
-		onBack={() => {closeDialog('createAuthor')}}/>
+		<AuthorCreateDialog
+			onCreated={() => {
+				closeDialog('createAuthor');
+				update();
+			}}
+			onBack={() => {
+				closeDialog('createAuthor');
+			}}
+		/>
 	{/if}
 	{#if visibleDialogs.logoutAuthor}
-	<AuthorDeleteDialog 
-		author={author} 
-		onDeleted={() => {closeDialog('logoutAuthor'); logout()}}
-		onBack={() => {closeDialog('logoutAuthor')}}/>
+		<AuthorDeleteDialog
+			{author}
+			onDeleted={() => {
+				closeDialog('logoutAuthor');
+				logout();
+			}}
+			onBack={() => {
+				closeDialog('logoutAuthor');
+			}}
+		/>
 	{/if}
 	{#if visibleDialogs.createPost}
-	<ForumInputElement
-		postType={ForumPostType.TEXT}
-		onPostSubmitted={() => {
-			closeDialog('createPost');
-			update();
-		}}
-		onPostCancelled={() => {
-			closeDialog('createPost');
-		}}
-	/>
+		<ForumInputElement
+			postType={createPostType}
+			onPostSubmitted={() => {
+				closeDialog('createPost');
+				update();
+			}}
+			onPostCancelled={() => {
+				closeDialog('createPost');
+			}}
+		/>
 	{/if}
 </div>
 
 <style>
-
 	.post-container {
 		padding: var(--page-padding);
 		margin-bottom: calc(var(--page-padding) + var(--button-size));

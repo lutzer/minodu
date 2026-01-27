@@ -36,9 +36,9 @@
 			{#each post.files as file}
 				<li class="file">
 					{#if file.processing_state == 'processing'}
-						<div>{t('forum.processingFile', $language)}</div>
+						<div class="processing">{t('forum.processingFile', $language)}</div>
 					{:else if file.processing_state == 'error'}
-						<div>{t('forum.errorProcessingFile', $language)}</div>
+						<div class="processing-error">{t('forum.errorProcessingFile', $language)}</div>
 					{:else if file.content_type.startsWith('audio')}
 						<AudioPlayer audioSource={file.file_urlpath}></AudioPlayer>
 					{:else if file.content_type.startsWith('image')}
@@ -110,5 +110,11 @@
 		position: absolute;
 		right: 8px;
 		top: 8px;
+	}
+
+	.processing {
+		border-radius: var(--border-radius);
+		background-color: #fff8e5;
+		padding: var(--small-padding);
 	}
 </style>

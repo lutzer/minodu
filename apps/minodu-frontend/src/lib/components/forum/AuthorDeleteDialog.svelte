@@ -8,66 +8,65 @@
 	import { onMount } from 'svelte';
 
 	export let onDeleted: () => void;
-    export let onBack: () => void;
+	export let onBack: () => void;
 
 	let dialog: HTMLDialogElement;
 
-    onMount(() => {
+	onMount(() => {
 		dialog?.showModal();
-	})
+	});
 
-    export let author: Optional<ForumAuthor>
-	
+	export let author: Optional<ForumAuthor>;
 </script>
 
 <dialog bind:this={dialog} class="shadow overlay">
 	<h2>{t('forum.deleteAuthor', $language)}</h2>
-    {#if author}
-	<div class="author-image">
-        <img src={author.avatar.file_urlpath} alt={t('alt.avatarImage', $language)}/>
-    </div>
-    <div class="author-name">
-        <h3>{author.name}</h3>
-    </div>
-    {/if}
-    <div class="button-group">
+	{#if author}
+		<div class="author-image">
+			<img src={author.avatar.file_urlpath} alt={t('alt.avatarImage', $language)} />
+		</div>
+		<div class="author-name">
+			<h3>{author.name}</h3>
+		</div>
+	{/if}
+	<div class="button-group">
 		<button class="back long shadow" onclick={() => onBack()}>
-			<img src={forumBackImage} alt={t('action.cancel', $language)}/>
+			<img src={forumBackImage} alt={t('action.cancel', $language)} />
 		</button>
 		<button class="delete long shadow" onclick={() => onDeleted()}>
-			<img src={forumDeleteImage} alt={t('action.delete', $language)}/>
+			<img src={forumDeleteImage} alt={t('action.delete', $language)} />
 		</button>
 	</div>
 </dialog>
 
 <style>
-    .author-image {
-        width: 50%;
-        margin: 0 auto;
-        text-align: center;
-    }
+	.author-image {
+		width: 50%;
+		margin: 0 auto;
+		text-align: center;
+	}
 
-    .author-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-    }
+	.author-image img {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+	}
 
-    .author-name {
-        padding: var(--small-padding);
-        text-align: center;
-    }
+	.author-name {
+		padding: var(--small-padding);
+		text-align: center;
+	}
 
 	button.delete {
-		background-color: #FA002A;
+		background-color: #fa002a;
 		border-radius: var(--border-radius);
-		--box-shadow-color: #D90024;
+		--box-shadow-color: #d90024;
 	}
 
 	button.back {
 		background-color: #ffffff;
 		border-radius: var(--border-radius);
-		--box-shadow-color: #CCCCCC;
+		--box-shadow-color: #cccccc;
 	}
 
 	.button-group {

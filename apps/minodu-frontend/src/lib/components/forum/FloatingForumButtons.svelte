@@ -1,12 +1,14 @@
 <script lang="ts">
-	import type { ForumAuthor } from "$lib/apis/forum/models/forumAuthor";
-	import { ForumPostType, type Optional } from "$lib/types";
+	import type { ForumAuthor } from '$lib/apis/forum/models/forumAuthor';
+	import { ForumPostType, type Optional } from '$lib/types';
+	import { t } from '$lib/translations';
+	import { language } from '$lib/stores';
 
 	import createPostButton from '$lib/assets/forum-new-post-button.png';
 	import postTextIcon from '$lib/assets/forum-post-text.png';
 	import postImageIcon from '$lib/assets/forum-post-image.png';
 	import postAudioIcon from '$lib/assets/forum-post-audio.png';
-	import { fly } from "svelte/transition";
+	import { fly } from 'svelte/transition';
 
 	export let author: Optional<ForumAuthor>;
 
@@ -14,13 +16,15 @@
 	export let onAuthorSelect: () => void;
 	export let onPostTypeSelected: (type: ForumPostType) => void;
 
-	let typeDialog : HTMLDialogElement;
-	let showTypeDialog : boolean = false
+	let typeDialog: HTMLDialogElement;
+	let showTypeDialog: boolean = false;
 
-	function handlePostButtonClick(event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement; }) {
+	function handlePostButtonClick(
+		event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
+	) {
 		if (author) {
-			showTypeDialog = true
-			typeDialog.showModal()
+			showTypeDialog = true;
+			typeDialog.showModal();
 			// typeDialog.shio
 		} else {
 			onAuthorSelect();
@@ -29,15 +33,16 @@
 
 	function handleTypeButtonClick(type: ForumPostType) {
 		onPostTypeSelected(type);
-		showTypeDialog = true
-		typeDialog.close()
+		showTypeDialog = true;
+		typeDialog.close();
 	}
 
-
-	function handleDialogClicked(event: MouseEvent & { currentTarget: EventTarget & HTMLDialogElement; }) {
+	function handleDialogClicked(
+		event: MouseEvent & { currentTarget: EventTarget & HTMLDialogElement }
+	) {
 		if (event.target === typeDialog) {
-			showTypeDialog = true
-			typeDialog.close()
+			showTypeDialog = false;
+			typeDialog.close();
 		}
 	}
 </script>
@@ -46,24 +51,42 @@
 	<div class="floating-button">
 		<div class="content-width flex-layout">
 			{#if author}
-			<button class="big shadow author" onclick={onAvatarClicked}>
-				<img src={author.avatar.file_urlpath} alt="create new forum post" />
-			</button>
+				<button class="big shadow author" onclick={onAvatarClicked}>
+					<img src={author.avatar.file_urlpath} alt={t('alt.avatarOfUser', $language)} />
+				</button>
 			{/if}
 			<button class="big shadow" onclick={handlePostButtonClick}>
-				<img src={createPostButton} alt="create new forum post" />
+				<img src={createPostButton} alt={t('alt.createForumPost', $language)} />
 			</button>
 		</div>
 	</div>
 	<dialog bind:this={typeDialog} class="post-type-dialog" onclick={handleDialogClicked}>
 		{#if showTypeDialog}
-		<div class="post-type-menu" transition:fly={{ y:10, opacity: 0.0, duration: 300 }}>
-			<ul>
-				<li><button class="post-type shadow" onclick={() => handleTypeButtonClick(ForumPostType.AUDIO)}><img src={postAudioIcon} alt="Icon for audio posts"/></button></li>
-				<li><button class="post-type shadow" onclick={() => handleTypeButtonClick(ForumPostType.IMAGE)}><img src={postImageIcon} alt="Icon for photo posts"/></button></li>
-				<li><button class="post-type shadow" onclick={() => handleTypeButtonClick(ForumPostType.TEXT)}><img src={postTextIcon} alt="Icon for text posts"/></button></li>
-			</ul>
-		</div>
+			<div class="post-type-menu" transition:fly={{ y: 10, opacity: 0.0, duration: 300 }}>
+				<ul>
+					<li>
+						<button
+							class="post-type shadow"
+							onclick={() => handleTypeButtonClick(ForumPostType.AUDIO)}
+							><img src={postAudioIcon} alt={t('alt.iconAudioPost', $language)} /></button
+						>
+					</li>
+					<li>
+						<button
+							class="post-type shadow"
+							onclick={() => handleTypeButtonClick(ForumPostType.IMAGE)}
+							><img src={postImageIcon} alt={t('alt.iconImagePost', $language)} /></button
+						>
+					</li>
+					<li>
+						<button
+							class="post-type shadow"
+							onclick={() => handleTypeButtonClick(ForumPostType.TEXT)}
+							><img src={postTextIcon} alt={t('alt.iconTextPost', $language)} /></button
+						>
+					</li>
+				</ul>
+			</div>
 		{/if}
 	</dialog>
 </div>
@@ -93,9 +116,9 @@
 		height: 65px;
 		width: 65px;
 		pointer-events: auto;
-        background-color: #ffffff;
-        border-radius: var(--border-radius);
-        --box-shadow-color: #888888;
+		background-color: #ffffff;
+		border-radius: var(--border-radius);
+		--box-shadow-color: #888888;
 		padding: 3px;
 	}
 
@@ -129,9 +152,9 @@
 	button.post-type {
 		height: var(--button-size);
 		width: 140px;
-		background-color: #CC604B;
+		background-color: #cc604b;
 		border-radius: var(--border-radius);
-		--box-shadow-color: #8C4A3C;
+		--box-shadow-color: #8c4a3c;
 		margin-top: var(--small-padding);
 	}
 

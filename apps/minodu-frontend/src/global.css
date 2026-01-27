@@ -182,18 +182,18 @@ li {
 }
 
 dialog.overlay {
-	max-height: calc(100% - calc(4* var(--page-padding)));
+	max-height: calc(100% - calc(4 * var(--page-padding)));
 	max-width: var(--max-page-width);
 	padding: var(--page-padding);
 	border-radius: var(--border-radius);
 	border: none;
-	background-color: #FCF6E9;
-	--box-shadow-color: #9A711A;
+	background-color: #fcf6e9;
+	--box-shadow-color: #9a711a;
 	overflow: auto;
 	inset: var(--page-padding);
 }
 
 dialog.overlay::backdrop {
-  background-color: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(3px);
+	background-color: rgba(0, 0, 0, 0.3);
+	backdrop-filter: blur(3px);
 }
