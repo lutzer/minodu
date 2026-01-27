@@ -15,6 +15,7 @@
 	import { waitForAnimationFrame } from '$lib/utils';
 	import AuthorDeleteDialog from '$lib/components/forum/AuthorDeleteDialog.svelte';
 	import FloatingForumButtons from '$lib/components/forum/FloatingForumButtons.svelte';
+	import DeletePostDialog from '$lib/components/forum/DeletePostDialog.svelte';
 
 	let ttsPlayer: TextToSpeechPlayer;
 
@@ -24,17 +25,19 @@
 
 	let author: Optional<ForumAuthor> = undefined;
 
-	type DialogType = 'createAuthor' | 'logoutAuthor' | 'createPost';
+	type DialogType = 'createAuthor' | 'logoutAuthor' | 'createPost' | 'deletePost';
 
 	let visibleDialogs: Record<DialogType, boolean> = {
 		createAuthor: false,
 		logoutAuthor: false,
-		createPost: false
+		createPost: false,
+		deletePost: false
 	};
 
 	$: showFloatingButtons = !Object.values(visibleDialogs).some((v) => v);
 
-	let createPostType: ForumPostType = ForumPostType.TEXT;
+	let createPostType : ForumPostType = ForumPostType.TEXT;
+	let deletePostId : Optional<number>;
 
 	onMount(() => {
 		update(false);
@@ -75,7 +78,9 @@
 		showDialog('createPost');
 	}
 
-	async function deletePost(id: number) {
+	async function deletePost(id: Optional<number>) {
+		if (id == undefined)
+			return;
 		await ForumApi.deletePost(id);
 	}
 
@@ -96,10 +101,10 @@
 					{#each posts as post}
 						<li>
 							<ForumPostElement
-								{post}
+								post={post}
 								isOwn={author?.id == post.author.id}
-								onDeleteClicked={() => deletePost(post.id)}
-								{ttsPlayer}
+								onDeleteClicked={() => { showDialog('deletePost'); deletePostId = post.id; }}
+								ttsPlayer={ttsPlayer}
 							/>
 						</li>
 					{/each}
@@ -151,6 +156,12 @@
 			onPostCancelled={() => {
 				closeDialog('createPost');
 			}}
+		/>
+	{/if}
+	{#if visibleDialogs.deletePost}
+		<DeletePostDialog
+			onBack={() => closeDialog('deletePost')}
+			onDelete={() => {closeDialog('deletePost'); deletePost(deletePostId);}}
 		/>
 	{/if}
 </div>

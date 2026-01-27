@@ -5,6 +5,7 @@
 	import TextToSpeechPlayer from '../common/TextToSpeechPlayer.svelte';
 	import { language } from '$lib/stores';
 	import { t } from '$lib/translations';
+	import { format } from 'timeago.js';
 
 	import postDeleteButton from '$lib/assets/delete-forum-post.png';
 
@@ -26,7 +27,7 @@
 		<div class="post-header">
 			<div class="title">
 				<h3>{post.author.name}</h3>
-				<p>{post.created_at}</p>
+				<p class="date">{format(post.created_at + 'Z')}</p>
 			</div>
 			<div class="post-buttons">
 				{#if isOwn}
@@ -110,7 +111,7 @@
 		display: flex;
 		flex-direction: row;
 		justify-content: space-between;
-		margin-bottom: var(--medium-padding);
+		margin-bottom: var(--small-padding);
 		align-content: center;
 	}
 
@@ -119,9 +120,10 @@
 		margin-bottom: 2px;
 	}
 
-	.post-header p {
+	.post-header .date {
 		padding: 0;
 		margin: 0;
+		color: #949296;
 	}
 
 	.post-buttons {
@@ -132,19 +134,25 @@
 
 	.image {
 		width: 100%;
-		border-radius: var(--border-radius);
-		overflow: hidden;
 	}
 
 	.image > img {
 		width: 100%;
 		height: 100%;
 		object-fit: contain;
+		border-radius: var(--border-radius);
+		overflow: hidden;
 	}
 
 	.processing {
 		border-radius: var(--border-radius);
 		background-color: #fff8e5;
+		padding: var(--small-padding);
+	}
+
+	.processing-error {
+		border-radius: var(--border-radius);
+		background-color: #FA002A33;
 		padding: var(--small-padding);
 	}
 
