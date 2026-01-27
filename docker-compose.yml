@@ -34,8 +34,7 @@ services:
       - DB_PASSWORD=${MYSQL_PASSWORD}
       - DB_NAME=minodu
       - APP_PORT=3000
-      - APP_HOST=http://localhost:3000
-      - APP_FRONT=http://localhost
+      - APP_HOST=http://localhost/api/backend
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - AI_SERVICE_URL=http://minodu-ai-services:3002/services
     volumes:
