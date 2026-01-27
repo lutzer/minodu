@@ -4,8 +4,9 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { language } from '$lib/stores';
 	import { t } from '$lib/translations';
+	import type { Optional } from '$lib/types';
 
-	export let audioSource: string;
+	export let audioSource: Optional<string> = undefined;
 
 	let audioElement: HTMLAudioElement;
 	let isPlaying: boolean = false;

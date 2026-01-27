@@ -107,11 +107,11 @@ const translations: TranslationStrings = {
 		fr: 'Avatar',
 		kb: 'Ishusho'
 	},
-	'forum.yourName' : {
+	'forum.yourName': {
 		fr: 'Votre nom',
 		kb: 'Votre nom'
 	},
-	'forum.deleteAuthor' : {
+	'forum.deleteAuthor': {
 		fr: 'Supprimer le profil ?',
 		kb: 'Supprimer le profil ?'
 	},
@@ -178,6 +178,26 @@ const translations: TranslationStrings = {
 	'alt.speechBubble': {
 		fr: 'Deux personnes et une bulle de dialogue',
 		kb: "Abantu babiri n'igishushanyo cy'ikiganiro"
+	},
+	'alt.backForumPost': {
+		fr: 'retour',
+		kb: 'retour'
+	},
+	'alt.createForumPost': {
+		fr: 'Créer un nouveau message',
+		kb: 'Kora ubutumwa bushya'
+	},
+	'alt.iconAudioPost': {
+		fr: 'Icône pour les messages audio',
+		kb: 'Ishusho yo kohereza amajwi'
+	},
+	'alt.iconImagePost': {
+		fr: 'Icône pour les messages photo',
+		kb: 'Ishusho yo kohereza ifoto'
+	},
+	'alt.iconTextPost': {
+		fr: 'Icône pour les messages texte',
+		kb: 'Ishusho yo kohereza inyandiko'
 	}
 };
 
