@@ -161,8 +161,8 @@ async def transcribe_file(file_id: int, file_path: str, language: str):
 
     data = result.get()
     
-    if data["confidence"] < 0.8:
-        logger.warning("Transcription confidence too low: " + str(data))
+    if data["confidence"] < Config().transcribe_confidence_threshold:
+        logger.info("Transcription confidence too low: " + str(data))
     elif data["error"]:
         logger.error("Conversion Error: " + data["error"])
     else:
