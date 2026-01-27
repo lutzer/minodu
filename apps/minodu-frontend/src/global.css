@@ -151,6 +151,12 @@ li {
 		0px 4px 0px var(--box-shadow-color);
 }
 
+.shadow-active {
+	box-shadow:
+		2px 2px 0px var(--box-shadow-color),
+		0px 2px 0px var(--box-shadow-color);
+}
+
 .scroll-container {
 	position: fixed;
 	top: 0;

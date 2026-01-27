@@ -115,6 +115,10 @@ const translations: TranslationStrings = {
 		fr: 'Supprimer le profil ?',
 		kb: 'Supprimer le profil ?'
 	},
+	'forum.transcription': {
+		fr: 'Transcription',
+		kb: 'Transcription'
+	},
 
 	// Agriculture
 	'agriculture.noPosts': {
