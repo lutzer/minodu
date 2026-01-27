@@ -110,3 +110,7 @@ class Config:
     @property
     def app_dir(self) -> Path:
         return Path(__file__).parent / '..'
+    
+    @property
+    def transcribe_confidence_threshold(self) -> float:
+        return 0.70
