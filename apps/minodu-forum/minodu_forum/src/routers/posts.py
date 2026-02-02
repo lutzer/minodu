@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session, joinedload
 
 from ..database import get_db
@@ -28,9 +28,12 @@ class PostResponse(BaseModel):
     files: list[FileResponse]
 
 
+POST_MAX_TEXT_LENGTH = 5000
+
+
 class PostCreate(BaseModel):
     title: str
-    text: str
+    text: str = Field(max_length=POST_MAX_TEXT_LENGTH)
     parent_id: Optional[int] = None
 
 

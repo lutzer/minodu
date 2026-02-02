@@ -17,11 +17,8 @@
 		mediaDeviveAvailable = false;
 	});
 
-	$: {
-		blob;
-		if (!blob) {
-			reset();
-		}
+	$: if (!blob) {
+		reset();
 	}
 
 	async function prepareRecorder() {

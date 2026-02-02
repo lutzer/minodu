@@ -1,10 +1,8 @@
 <script lang="ts">
 	import { language } from '$lib/stores';
-	import type { Optional } from '$lib/types';
 	import { t } from '$lib/translations';
 	import forumBackImage from '$lib/assets/forum-back.png';
 	import forumDeleteImage from '$lib/assets/forum-delete.png';
-	import type { ForumAuthor } from '$lib/apis/forum/models/forumAuthor';
 	import { onMount } from 'svelte';
 
 	export let onDelete: () => void;

@@ -6,9 +6,6 @@
 	import ExplainPageButton from '$lib/components/common/ExplainPageButton.svelte';
 	import { language } from '$lib/stores';
 	import { t } from '$lib/translations';
-	import { onMount } from 'svelte';
-
-	let { children } = $props();
 </script>
 
 <div class="content-width">
@@ -39,8 +36,8 @@
 		<a href="/market" class="grid-link">{t('nav.market', $language)}</a>
 	</div>
 	<ExplainPageButton
-		audioFr={'https://audio-samples.github.io/samples/mp3/blizzard_unconditional/sample-0.mp3'}
-		audioKb={'https://audio-samples.github.io/samples/mp3/blizzard_unconditional/sample-1.mp3'}
+		audioFr="https://audio-samples.github.io/samples/mp3/blizzard_unconditional/sample-0.mp3"
+		audioKb="https://audio-samples.github.io/samples/mp3/blizzard_unconditional/sample-1.mp3"
 	/>
 </div>
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onDestroy, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import TextToSpeechPlayer from './TextToSpeechPlayer.svelte';
 	import ttsButton from '$lib/assets/forum-tts-button.png';
 	import ttsButtonActive from '$lib/assets/forum-tts-button-active.png';

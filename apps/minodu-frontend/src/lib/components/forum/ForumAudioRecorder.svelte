@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Optional } from '$lib/types';
-	import { onMount } from 'svelte';
 	import AudioPlayer from '../common/AudioPlayer.svelte';
 
 	export let blob: Optional<Blob>;
@@ -9,11 +8,8 @@
 	let audioPlayer: AudioPlayer;
 	let audioUrl: Optional<string>;
 
-	$: {
-		blob;
-		if (!blob) {
-			reset();
-		}
+	$: if (!blob) {
+		reset();
 	}
 
 	export async function startRecording() {
