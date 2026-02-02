@@ -16,6 +16,18 @@
 
 	let scrollContainer: HTMLDivElement;
 
+	import solIcon from '$lib/assets/agriculture-cat-sol-icon.png';
+	import autresIcon from '$lib/assets/agriculture-cat-autres-icon.png';
+	import elevageIcon from '$lib/assets/agriculture-cat-elevage-icon.png';
+	import plantesIcon from '$lib/assets/agriculture-cat-plantes-icon.png';
+
+	const categoryIcons: Record<string, string> = {
+		SOL: solIcon,
+		AUTRES: autresIcon,
+		ELEVAGE: elevageIcon,
+		PLANTES: plantesIcon
+	};
+
 	onMount(async () => {
 		posts = await BackendApi.getPosts();
 		categories = await BackendApi.getCategories();
@@ -53,7 +65,10 @@
 					<button
 						class={`color ${category.name}`}
 						class:selected={selectedCategoryId === category.id}
-						onclick={() => selectCategory(category.id)}>{category.name}</button
+						onclick={() => selectCategory(category.id)}>
+							<img src={categoryIcons[category.name]} alt="category icon for {category.name}"/>
+							<span>{category.name}</span>
+						</button
 					>
 				</li>
 			{/each}
@@ -79,16 +94,13 @@
 
 	#categories ul {
 		display: flex;
-		gap: var(--small-padding);
 		padding: var(--small-padding);
 		flex-wrap: wrap;
 		justify-content: space-between;
 	}
 
 	#categories li {
-		width: 22%;
-		flex-grow: 0;
-		flex-shrink: 0;
+		width: 23%;
 	}
 
 	#categories button {
@@ -97,8 +109,11 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		padding: var(--small-padding);
-		white-space: nowrap;
+		/* white-space: nowrap; */
 		height: 48px;
+		display: flex;
+		align-items: center;
+		gap: calc(var(--small-padding) * 0.5);
 	}
 
 	#categories button.selected {
@@ -107,10 +122,24 @@
 		box-shadow: none;
 	}
 
+	#categories button img {
+		width: auto;
+		height: 90%;
+	}
+
+	#categories button span {
+		white-space: normal;
+		word-wrap: break-word;
+		overflow-wrap: break-word;
+		min-width: 0;
+		font-size: 90%;
+		flex-grow: 1;
+	}
+
 	.post-container {
 		margin-top: var(--header-height);
-		padding: var(--page-padding);
-		margin-bottom: calc(var(--page-padding) + var(--button-size));
+		padding: 0 var(--page-padding);
+		margin-bottom: calc(var(--page-padding) + var(--button-size) + var(--medium-padding) * 2);
 		box-sizing: border-box;
 	}
 

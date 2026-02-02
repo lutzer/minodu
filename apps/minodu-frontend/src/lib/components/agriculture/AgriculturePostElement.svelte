@@ -8,6 +8,7 @@
 	import autresBackground from '$lib/assets/agriculture-cat-autres.png';
 	import elevageBackground from '$lib/assets/agriculture-cat-elevage.png';
 	import plantesBackground from '$lib/assets/agriculture-cat-plantes.png';
+
 	import { language } from '$lib/stores';
 	import { t } from '$lib/translations';
 
@@ -37,17 +38,21 @@
 					<h3>{post.title}</h3>
 					<h4>{post.author}</h4>
 				</div>
-				<div class="chat-button">
-					<button class="small" onclick={() => goto(`/agriculture/bot/${post.id}`)}>
-						<img src={chatbotButtonSmall} alt={t('alt.chatbotIcon', $language)} />
-					</button>
-				</div>
 			</div>
 		</div>
-		<div class="audioplayer">
-			<AudioPlayer audioSource={$language === 'kb' ? post.attachment_kb : post.attachment} />
+		<div class="horizontal-layout-center">
+			<div class="audioplayer">
+				<AudioPlayer audioSource={$language === 'kb' ? post.attachment_kb : post.attachment} />
+			</div>
+			<div class="chat-button">
+				<button class="small" onclick={() => goto(`/agriculture/bot/${post.id}`)}>
+					<img src={chatbotButtonSmall} alt={t('alt.chatbotIcon', $language)} />
+				</button>
+			</div>
 		</div>
-	</div>
+		
+		
+</div>
 </div>
 
 <style>
@@ -65,6 +70,12 @@
 	.horizontal-layout {
 		gap: var(--small-padding);
 		display: flex;
+	}
+
+	.horizontal-layout-center {
+		gap: var(--small-padding);
+		display: flex;
+		align-items: center;
 	}
 
 	.post-image {
@@ -87,19 +98,21 @@
 	}
 
 	.chat-button {
-		position: absolute;
-		top: var(--small-padding);
-		right: var(--small-padding);
+		flex-shrink: 0;
+		margin-bottom: -4px;
 	}
 
 	.title {
-		margin-right: 70px;
 		min-height: 70px;
 	}
 
+	.audioplayer {
+		flex-grow: 1;
+	}
+
 	.post.color {
-		background-position: 150% 100%;
-		background-size: contain;
+		background-position: 100% 120%;
+		background-size: 40%;
 		background-repeat: no-repeat;
 	}
 </style>
