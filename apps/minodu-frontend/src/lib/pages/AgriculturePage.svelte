@@ -12,7 +12,7 @@
 
 	let posts: BackendPost[] = [];
 	let categories: BackendCategory[] = [];
-	let selectedCategoryId: number | null = null;
+	let selectedCategoryIds: Set<number> = new Set();
 
 	let scrollContainer: HTMLDivElement;
 
@@ -31,15 +31,19 @@
 	onMount(async () => {
 		posts = await BackendApi.getPosts();
 		categories = await BackendApi.getCategories();
+		selectedCategoryIds = new Set(categories.map((c) => c.id));
 	});
 
-	function selectCategory(id: number) {
-		selectedCategoryId = selectedCategoryId === id ? null : id;
+	function toggleCategory(id: number) {
+		if (selectedCategoryIds.has(id)) {
+			selectedCategoryIds.delete(id);
+		} else {
+			selectedCategoryIds.add(id);
+		}
+		selectedCategoryIds = selectedCategoryIds;
 	}
 
-	$: filteredPosts = selectedCategoryId
-		? posts.filter((post) => post.category.id === selectedCategoryId)
-		: posts;
+	$: filteredPosts = posts.filter((post) => selectedCategoryIds.has(post.category.id));
 </script>
 
 <div class="forum-page">
@@ -64,12 +68,12 @@
 				<li>
 					<button
 						class={`color ${category.name}`}
-						class:selected={selectedCategoryId === category.id}
-						onclick={() => selectCategory(category.id)}>
-							<img src={categoryIcons[category.name]} alt="category icon for {category.name}"/>
-							<span>{category.name}</span>
-						</button
+						class:selected={selectedCategoryIds.has(category.id)}
+						onclick={() => toggleCategory(category.id)}
 					>
+						<img src={categoryIcons[category.name]} alt="category icon for {category.name}" />
+						<span>{category.name}</span>
+					</button>
 				</li>
 			{/each}
 		</ul>
@@ -117,9 +121,15 @@
 	}
 
 	#categories button.selected {
-		outline: 3px solid white;
+		/* outline: 3px solid white; */
 		/* outline-offset: -3px; */
-		box-shadow: none;
+		filter: none;
+		opacity: 1;
+	}
+
+	#categories button {
+		filter: grayscale(1);
+		opacity: 0.6;
 	}
 
 	#categories button img {
