@@ -16,9 +16,10 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 15s
-      timeout: 10s
-      retries: 10
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
       
    # Backend Service
   minodu-backend:
@@ -43,13 +44,14 @@ services:
       minodu-database:
         condition: service_healthy
       minodu-ai-services:
-        condition: service_healthy
+        condition: service_started
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000"]
-      interval: 15s
-      timeout: 10s
+      interval: 5s
+      timeout: 5s
       retries: 3
+      start_period: 15s
 
   # AI Services
   minodu-ai-services:
@@ -70,9 +72,10 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3002/api/services/"]
-      interval: 15s
-      timeout: 10s
+      interval: 5s
+      timeout: 5s
       retries: 3
+      start_period: 15s
 
   # Forum Service
   minodu-forum:
@@ -96,15 +99,16 @@ services:
       minodu-database:
         condition: service_healthy
       minodu-ai-services:
-        condition: service_healthy
+        condition: service_started
       minodu-forum-celery:
-        condition: service_healthy
+        condition: service_started
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3003/api/forum/"]
-      interval: 15s
-      timeout: 10s
+      interval: 5s
+      timeout: 5s
       retries: 3
+      start_period: 15s
 
   minodu-forum-celery:
     build:
@@ -123,10 +127,10 @@ services:
         condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "celery inspect ping --destination celery@$$HOSTNAME"]
-      interval: 15s
-      timeout: 10s
+      interval: 5s
+      timeout: 5s
       retries: 3
-      start_period: 5s
+      start_period: 15s
 
   redis:
     image: redis:alpine
@@ -135,9 +139,10 @@ services:
       - "6379:6379"
     healthcheck:
       test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
-      interval: 15s
-      timeout: 10s
+      interval: 5s
+      timeout: 5s
       retries: 3
+      start_period: 5s
 
    # Web Service [Frontend + Backoffice]
   minodu-web:
