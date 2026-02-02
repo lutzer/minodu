@@ -89,7 +89,7 @@
 	}
 
 	img {
-		width: auto;
+		width: 100%;
 		height: 100%;
 		object-fit: contain;
 		/* box-shadow: 3px 3px 3px #cccccc; */

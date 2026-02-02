@@ -36,8 +36,8 @@
 
 	$: showFloatingButtons = !Object.values(visibleDialogs).some((v) => v);
 
-	let createPostType : ForumPostType = ForumPostType.TEXT;
-	let deletePostId : Optional<number>;
+	let createPostType: ForumPostType = ForumPostType.TEXT;
+	let deletePostId: Optional<number>;
 
 	onMount(() => {
 		update(false);
@@ -46,7 +46,11 @@
 		eventSource.onmessage = (msg) => {
 			try {
 				let data = JSON.parse(msg.data);
-				if (data['topic'] === 'update') update();
+				if (data['topic'] === 'update') {
+					update();
+				} else if (data['topic'] === 'delete') {
+					noScrollUpdate();
+				}
 			} catch (e) {
 				console.error('Could not parse event', e);
 			}
@@ -68,6 +72,11 @@
 		});
 	}
 
+	async function noScrollUpdate() {
+		posts = await ForumApi.getPosts();
+		author = await ForumApi.checkToken();
+	}
+
 	async function logout() {
 		Storage.forumToken = undefined;
 		author = undefined;
@@ -79,8 +88,7 @@
 	}
 
 	async function deletePost(id: Optional<number>) {
-		if (id == undefined)
-			return;
+		if (id == undefined) return;
 		await ForumApi.deletePost(id);
 	}
 
@@ -101,10 +109,13 @@
 					{#each posts as post}
 						<li>
 							<ForumPostElement
-								post={post}
+								{post}
 								isOwn={author?.id == post.author.id}
-								onDeleteClicked={() => { showDialog('deletePost'); deletePostId = post.id; }}
-								ttsPlayer={ttsPlayer}
+								onDeleteClicked={() => {
+									showDialog('deletePost');
+									deletePostId = post.id;
+								}}
+								{ttsPlayer}
 							/>
 						</li>
 					{/each}
@@ -161,7 +172,10 @@
 	{#if visibleDialogs.deletePost}
 		<DeletePostDialog
 			onBack={() => closeDialog('deletePost')}
-			onDelete={() => {closeDialog('deletePost'); deletePost(deletePostId);}}
+			onDelete={() => {
+				closeDialog('deletePost');
+				deletePost(deletePostId);
+			}}
 		/>
 	{/if}
 </div>

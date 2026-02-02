@@ -130,10 +130,7 @@
 				</div>
 			{:else if postType == ForumPostType.AUDIO}
 				<div class="input-element-field">
-					<ForumAudioRecorder
-						bind:this={audioRecorder}
-						bind:blob={audioBlob}
-					/>
+					<ForumAudioRecorder bind:this={audioRecorder} bind:blob={audioBlob} />
 				</div>
 				<div class="input-button-group">
 					<button

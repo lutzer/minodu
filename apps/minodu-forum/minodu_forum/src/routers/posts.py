@@ -130,5 +130,5 @@ async def delete_file(
 
     db.delete(post)
     db.commit()
-    broadcast("update")
+    broadcast("delete")
     return {"msg": "Post deleted."}

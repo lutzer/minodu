@@ -25,7 +25,6 @@
 	function onMediaEnded() {
 		playing = false;
 	}
-
 </script>
 
 <div>
@@ -36,7 +35,7 @@
 
 <style>
 	.tts-button {
-		background-color: #EDCA82;
-		--box-shadow-color: #B8995C;
+		background-color: #edca82;
+		--box-shadow-color: #b8995c;
 	}
 </style>
