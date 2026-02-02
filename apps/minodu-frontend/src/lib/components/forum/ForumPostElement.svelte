@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount, afterUpdate } from 'svelte';
 	import type { ForumPost } from '$lib/apis/forum/models/forumPost';
 	import AudioPlayer from '../common/AudioPlayer.svelte';
 	import TextToSpeechButton from '../common/TextToSpeechButton.svelte';
@@ -8,11 +9,28 @@
 	import { format } from 'timeago.js';
 
 	import postDeleteButton from '$lib/assets/delete-forum-post.png';
+	import expandPostButton from '$lib/assets/forum-arrow-down.png';
 
 	export let ttsPlayer: TextToSpeechPlayer;
 	export let post: ForumPost;
 	export let isOwn: boolean;
 	export let onDeleteClicked: () => void;
+
+	const MAX_HEIGHT = 250;
+	let expanded = false;
+	let overflowing = false;
+	let contentHeight = 0;
+	let postMainEl: HTMLDivElement;
+
+	function checkOverflow() {
+		if (postMainEl) {
+			contentHeight = postMainEl.scrollHeight;
+			overflowing = contentHeight > MAX_HEIGHT;
+		}
+	}
+
+	onMount(() => checkOverflow());
+	afterUpdate(() => checkOverflow());
 </script>
 
 <div class="post shadow">
@@ -20,8 +38,6 @@
 		<div class="avatar-picture">
 			<img src={post.author.avatar.file_urlpath} alt={t('alt.avatarOfUser', $language)} />
 		</div>
-		
-			
 	</div>
 	<div class="post-content">
 		<div class="post-header">
@@ -36,41 +52,62 @@
 					</button>
 				{/if}
 				{#if post.text.length > 0}
-				<div class="tts-button small">
-					<TextToSpeechButton text={post.text} {ttsPlayer} />
-				</div>
+					<div class="tts-button small">
+						<TextToSpeechButton text={post.text} {ttsPlayer} />
+					</div>
 				{/if}
 			</div>
 		</div>
-		<div class="post-main">
+		<div
+			class="post-main"
+			class:truncated={overflowing}
+			class:collapsed={overflowing && !expanded}
+			bind:this={postMainEl}
+			style:max-height={overflowing
+				? expanded
+					? contentHeight + 'px'
+					: MAX_HEIGHT + 'px'
+				: 'none'}
+		>
 			{#if post.text.length > 0}
-			<div class="paragraph">
-				{post.text}
-			</div>
+				<div class="paragraph">
+					{post.text}
+				</div>
 			{/if}
 			<ul>
-			{#each post.files as file}
-				<li class="file">
-					{#if file.processing_state == 'processing'}
-						<div class="processing">{t('forum.processingFile', $language)}</div>
-					{:else if file.processing_state == 'error'}
-						<div class="processing-error">{t('forum.errorProcessingFile', $language)}</div>
-					{:else if file.content_type.startsWith('audio')}
-						<AudioPlayer audioSource={file.file_urlpath}></AudioPlayer>
-					{:else if file.content_type.startsWith('image')}
-						<div class="image">
-							<img src={file.file_urlpath} alt={t('alt.noDescription', $language)} />
-						</div>
-					{:else}
-						{file.id} - {file.filename} : {file.file_urlpath}
-					{/if}
-					{#if file.text.length > 0}
-					<p><b>{t('forum.transcription', $language)}:</b> <i>{file.text}</i></p>
-					{/if}
-				</li>
-			{/each}
+				{#each post.files as file}
+					<li class="file">
+						{#if file.processing_state == 'processing'}
+							<div class="processing">{t('forum.processingFile', $language)}</div>
+						{:else if file.processing_state == 'error'}
+							<div class="processing-error">{t('forum.errorProcessingFile', $language)}</div>
+						{:else if file.content_type.startsWith('audio')}
+							<AudioPlayer audioSource={file.file_urlpath}></AudioPlayer>
+						{:else if file.content_type.startsWith('image')}
+							<div class="image">
+								<img src={file.file_urlpath} alt={t('alt.noDescription', $language)} />
+							</div>
+						{:else}
+							{file.id} - {file.filename} : {file.file_urlpath}
+						{/if}
+						{#if file.text.length > 0}
+							<p><b>{t('forum.transcription', $language)}:</b> <i>{file.text}</i></p>
+						{/if}
+					</li>
+				{/each}
 			</ul>
 		</div>
+		{#if overflowing}
+			<div class="expand-button-container">
+				<button class="expand-button" onclick={() => (expanded = !expanded)}>
+					<img
+						src={expandPostButton}
+						alt={expanded ? 'collapse' : 'expand'}
+						class:rotated={expanded}
+					/>
+				</button>
+			</div>
+		{/if}
 	</div>
 </div>
 
@@ -152,12 +189,48 @@
 
 	.processing-error {
 		border-radius: var(--border-radius);
-		background-color: #FA002A33;
+		background-color: #fa002a33;
 		padding: var(--small-padding);
 	}
 
 	.delete-button {
-		background-color: #EDCA82;
-		--box-shadow-color: #B8995C;
+		background-color: #edca82;
+		--box-shadow-color: #b8995c;
+	}
+
+	.post-main.truncated {
+		position: relative;
+		overflow: hidden;
+		transition: max-height 0.3s ease;
+	}
+
+	.post-main.truncated.collapsed::after {
+		content: '';
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		height: 50px;
+		background: linear-gradient(to bottom, transparent, #eeeae1);
+		pointer-events: none;
+	}
+	.expand-button-container {
+		margin-bottom: calc(var(--page-padding) * -1.5);
+	}
+
+	.expand-button {
+		width: 100%;
+		padding: var(--small-padding);
+		height: var(--button-size);
+	}
+
+	.expand-button img {
+		width: auto;
+		height: 100%;
+		transition: transform 0.2s ease;
+	}
+
+	.expand-button img.rotated {
+		transform: rotate(180deg);
 	}
 </style>

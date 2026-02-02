@@ -25,7 +25,6 @@
 		audioUrl = undefined;
 	}
 
-
 	function handleCapture(e: Event) {
 		const target = e.target as HTMLInputElement;
 		const file = target.files?.[0];
@@ -38,28 +37,27 @@
 
 <div class="audio-recorder-container">
 	{#if audioUrl}
-	<div class="audio-preview">
-		<div class="audio-player">
-			<AudioPlayer audioSource={audioUrl} bind:this={audioPlayer}/>
+		<div class="audio-preview">
+			<div class="audio-player">
+				<AudioPlayer audioSource={audioUrl} bind:this={audioPlayer} />
+			</div>
 		</div>
-	</div>
 	{:else}
-	<input
-		bind:this={fileInput}
-		type="file"
-		accept="audio/*"
-		capture="environment"
-		onchange={(e) => handleCapture(e)}
-		style="display: none;"
-	/>
-	<div class="select-button">
-		<button onclick={() => fileInput.click()}>Record Audio</button>
-	</div>
+		<input
+			bind:this={fileInput}
+			type="file"
+			accept="audio/*"
+			capture="environment"
+			onchange={(e) => handleCapture(e)}
+			style="display: none;"
+		/>
+		<div class="select-button">
+			<button onclick={() => fileInput.click()}>Record Audio</button>
+		</div>
 	{/if}
 </div>
 
 <style>
-
 	.audio-recorder-container {
 		height: 120px;
 		display: flex;
