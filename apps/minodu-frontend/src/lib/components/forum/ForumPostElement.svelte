@@ -75,7 +75,7 @@
 				</div>
 			{/if}
 			<ul>
-				{#each post.files as file}
+				{#each post.files as file (file.id)}
 					<li class="file">
 						{#if file.processing_state == 'processing'}
 							<div class="processing">{t('forum.processingFile', $language)}</div>

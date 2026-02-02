@@ -19,9 +19,7 @@
 	let typeDialog: HTMLDialogElement;
 	let showTypeDialog: boolean = false;
 
-	function handlePostButtonClick(
-		event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
-	) {
+	function handlePostButtonClick() {
 		if (author) {
 			showTypeDialog = true;
 			typeDialog.showModal();

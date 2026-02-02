@@ -3,7 +3,9 @@
 	import { ForumApi } from '$lib/apis/forum/api';
 	import type { Optional } from '$lib/types';
 	import { ForumPostType } from '$lib/types';
+	import { HttpError } from '$lib/errors';
 	import { t } from '$lib/translations';
+	import { toast } from '$lib/toastStore';
 
 	import submitButton from '$lib/assets/forum-submit-post.png';
 	import deleteButton from '$lib/assets/forum-delete.png';
@@ -29,6 +31,7 @@
 	let image: Optional<File>;
 
 	let submitEnabled: boolean = false;
+	let submitting: boolean = false;
 
 	$: {
 		switch (postType) {
@@ -49,16 +52,60 @@
 	});
 
 	async function createPost(text: Optional<string>, audio: Optional<Blob>, image: Optional<File>) {
-		let post = await ForumApi.createPost({ title: '', text: text != undefined ? text : '' });
-		if (audio) {
-			await ForumApi.attachFile(post.id, audio, Config.language);
+		submitting = true;
+
+		let post;
+		try {
+			post = await ForumApi.createPost({ title: '', text: text != undefined ? text : '' });
+		} catch (e) {
+			toast.show(parseApiError(e, 'post'));
+			submitting = false;
+			return;
 		}
-		if (image) {
-			let imageBlob = new Blob([image], { type: image.type });
-			await ForumApi.attachFile(post.id, imageBlob, Config.language);
+
+		try {
+			if (audio) {
+				await ForumApi.attachFile(post.id, audio, Config.language);
+			}
+			if (image) {
+				let imageBlob = new Blob([image], { type: image.type });
+				await ForumApi.attachFile(post.id, imageBlob, Config.language);
+			}
+		} catch (e) {
+			await ForumApi.deletePost(post.id);
+			toast.show(parseApiError(e, 'file'));
+			submitting = false;
+			return;
 		}
+
+		submitting = false;
 		onPostSubmitted();
 		Storage.forumPostText = '';
+	}
+
+	function parseApiError(e: unknown, context: 'post' | 'file'): string {
+		if (e instanceof HttpError) {
+			try {
+				const body = JSON.parse(e.message);
+				if (Array.isArray(body.detail)) {
+					const hasStringTooLong = body.detail.some(
+						(err: { type?: string }) => err.type === 'string_too_long'
+					);
+					if (hasStringTooLong) {
+						return t('forum.errorTextTooLong', $language);
+					}
+				} else if (typeof body.detail === 'string') {
+					if (body.detail.includes('File size too large')) {
+						return t('forum.errorFileTooLarge', $language);
+					}
+				}
+			} catch {
+				// message is not JSON, fall through
+			}
+		}
+		return context === 'post'
+			? t('forum.errorCreatePost', $language)
+			: t('forum.errorFileUpload', $language);
 	}
 
 	function close() {
@@ -72,9 +119,7 @@
 		image = undefined;
 	}
 
-	function handleBackdropClick(
-		event: MouseEvent & { currentTarget: EventTarget & HTMLDivElement }
-	) {
+	function handleBackdropClick() {
 		close();
 	}
 </script>
@@ -91,14 +136,14 @@
 			{#if postType == ForumPostType.TEXT}
 				<div class="input-element-field">
 					<div class="input-textarea">
-						<textarea id="text" bind:value={text}></textarea>
+						<textarea id="text" bind:value={text} maxlength={5000}></textarea>
 					</div>
 				</div>
 				<div class="input-button-group">
 					<button
 						class="submit-button shadow"
 						onclick={() => createPost(text, undefined, undefined)}
-						disabled={!submitEnabled}
+						disabled={!submitEnabled || submitting}
 					>
 						<img src={submitButton} alt={t('alt.submitForumPost', $language)} />
 					</button>
@@ -114,7 +159,7 @@
 					<button
 						class="submit-button shadow"
 						onclick={() => createPost(undefined, undefined, image)}
-						disabled={!submitEnabled}
+						disabled={!submitEnabled || submitting}
 					>
 						<img src={submitButton} alt={t('alt.submitForumPost', $language)} />
 					</button>
@@ -136,7 +181,7 @@
 					<button
 						class="submit-button shadow"
 						onclick={() => createPost(undefined, audioBlob, undefined)}
-						disabled={!submitEnabled}
+						disabled={!submitEnabled || submitting}
 					>
 						<img src={submitButton} alt={t('alt.submitForumPost', $language)} />
 					</button>

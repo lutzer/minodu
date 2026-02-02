@@ -4,6 +4,7 @@
 	import type { BackendPost } from '$lib/apis/backend/models/backendPost';
 	import AgriculturePostElement from '$lib/components/agriculture/AgriculturePostElement.svelte';
 	import { onMount } from 'svelte';
+	import { SvelteSet } from 'svelte/reactivity';
 	import chatbotButton from '$lib/assets/chatbot-button.png';
 	import { goto } from '$app/navigation';
 	import FloatingButton from '$lib/components/common/FloatingButton.svelte';
@@ -12,7 +13,7 @@
 
 	let posts: BackendPost[] = [];
 	let categories: BackendCategory[] = [];
-	let selectedCategoryIds: Set<number> = new Set();
+	let selectedCategoryIds: Set<number> = new SvelteSet();
 
 	let scrollContainer: HTMLDivElement;
 
@@ -31,7 +32,7 @@
 	onMount(async () => {
 		posts = await BackendApi.getPosts();
 		categories = await BackendApi.getCategories();
-		selectedCategoryIds = new Set(categories.map((c) => c.id));
+		selectedCategoryIds = new SvelteSet(categories.map((c) => c.id));
 	});
 
 	function toggleCategory(id: number) {
@@ -51,7 +52,7 @@
 		<div class="post-container content-width">
 			{#if filteredPosts.length > 0}
 				<ul>
-					{#each filteredPosts as post}
+					{#each filteredPosts as post (post.id)}
 						<li>
 							<AgriculturePostElement {post} />
 						</li>
@@ -64,7 +65,7 @@
 	</div>
 	<div id="categories" class="content-width">
 		<ul>
-			{#each categories as category}
+			{#each categories as category (category.id)}
 				<li>
 					<button
 						class={`color ${category.name}`}
@@ -113,23 +114,19 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		padding: var(--small-padding);
-		/* white-space: nowrap; */
 		height: 48px;
 		display: flex;
 		align-items: center;
 		gap: calc(var(--small-padding) * 0.5);
+		box-shadow: 2px 2px 2px #00000033;
 	}
 
 	#categories button.selected {
-		/* outline: 3px solid white; */
-		/* outline-offset: -3px; */
 		filter: none;
-		opacity: 1;
 	}
 
 	#categories button {
 		filter: grayscale(1);
-		opacity: 0.6;
 	}
 
 	#categories button img {

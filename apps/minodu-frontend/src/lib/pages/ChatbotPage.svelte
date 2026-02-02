@@ -24,13 +24,10 @@
 		messages = Storage.chatMessages;
 	});
 
-	$: {
-		messages;
-		generating = isGenerating();
-		conversation = messages.reduce((acc, val) => {
-			return acc + '\n' + `Question: ${val.question}` + '\n' + `Answer: ${val.response}` + '\n';
-		}, '');
-	}
+	$: generating = messages.reduce((prev, val) => prev || !val.generated, false);
+	$: conversation = messages.reduce((acc, val) => {
+		return acc + '\n' + `Question: ${val.question}` + '\n' + `Answer: ${val.response}` + '\n';
+	}, '');
 
 	function updateGenerateState() {
 		Storage.chatMessages = messages;
@@ -61,7 +58,7 @@
 <div class="scroll-container">
 	<div class="chat-messages">
 		<ul>
-			{#each messages as msg}
+			{#each messages as msg, i (i)}
 				<li>
 					<BotMessageElement
 						message={msg}

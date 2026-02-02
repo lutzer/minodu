@@ -13,6 +13,7 @@
 	import marketIcon from '$lib/assets/market-icon.png';
 	import marketIconDisabled from '$lib/assets/market-icon-disabled.png';
 
+	import Toast from '$lib/components/common/Toast.svelte';
 	import '../global.css';
 
 	let { children } = $props();
@@ -26,6 +27,7 @@
 	<div id="content" class="content-width">
 		{@render children?.()}
 	</div>
+	<Toast />
 	<div id="footer">
 		<div class="menu-bar">
 			<FooterMenuButton

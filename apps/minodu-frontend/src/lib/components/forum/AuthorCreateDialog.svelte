@@ -42,7 +42,7 @@
 <dialog bind:this={dialog} class="shadow overlay">
 	<h2>{t('forum.createAuthor', $language)}</h2>
 	<ul class="avatar-list">
-		{#each avatarList as avatar}
+		{#each avatarList as avatar (avatar.id)}
 			<li>
 				<label for={`avatar-${avatar.id}`}>
 					<img src={avatar.file_urlpath} alt={t('alt.avatarImage', $language)} />

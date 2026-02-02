@@ -123,6 +123,22 @@ const translations: TranslationStrings = {
 		fr: 'Supprimer le message',
 		kb: 'Supprimer le message'
 	},
+	'forum.errorFileTooLarge': {
+		fr: 'Le fichier est trop volumineux (max 5 Mo)',
+		kb: 'Dosiye irenze urugero (max 5 Mo)'
+	},
+	'forum.errorFileUpload': {
+		fr: "Erreur lors de l'envoi du fichier",
+		kb: 'Ikosa mu kohereza dosiye'
+	},
+	'forum.errorTextTooLong': {
+		fr: 'Le texte est trop long (max 5000 caractères)',
+		kb: 'Inyandiko ni ndende cyane (max 5000)'
+	},
+	'forum.errorCreatePost': {
+		fr: 'Erreur lors de la création du message',
+		kb: 'Ikosa mu gukora ubutumwa'
+	},
 
 	// Agriculture
 	'agriculture.noPosts': {

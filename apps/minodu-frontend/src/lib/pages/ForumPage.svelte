@@ -106,7 +106,7 @@
 		<div class="post-container content-width">
 			{#if posts.length > 0}
 				<ul>
-					{#each posts as post}
+					{#each posts as post (post.id)}
 						<li>
 							<ForumPostElement
 								{post}

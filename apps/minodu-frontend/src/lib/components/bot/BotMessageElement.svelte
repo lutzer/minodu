@@ -23,10 +23,7 @@
 		if (!message.generated) generateResponse(message.question, conversation);
 	});
 
-	$: {
-		message;
-		error = message.response.trimStart().startsWith('[ERROR:');
-	}
+	$: error = message.response.trimStart().startsWith('[ERROR:');
 
 	export function stop() {
 		reader?.cancel();
