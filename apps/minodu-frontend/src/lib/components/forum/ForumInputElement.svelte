@@ -128,7 +128,7 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div class="post-overlay" onclick={handleBackdropClick}>
 	<div
-		class="create-post-container"
+		class="create-post-container content-width"
 		transition:fly={{ y: 200, duration: 300 }}
 		onclick={(e) => e.stopPropagation()}
 	>

@@ -3,10 +3,13 @@ export type Optional<T> = T | undefined;
 export type Language = 'fr' | 'kb';
 
 export type BotMessage = {
-	question: string;
-	response: string;
-	generated: boolean;
+	text: string;
+	type: BotMessageType;
 };
+
+export enum BotMessageType{
+	USER, BOT_GENERATING, BOT_FINISHED
+}
 
 export enum ForumPostType {
 	TEXT,

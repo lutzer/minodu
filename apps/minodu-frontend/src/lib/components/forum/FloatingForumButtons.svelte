@@ -18,12 +18,18 @@
 
 	let typeDialog: HTMLDialogElement;
 	let showTypeDialog: boolean = false;
+	let postButton: HTMLButtonElement;
 
 	function handlePostButtonClick() {
 		if (author) {
 			showTypeDialog = true;
+
 			typeDialog.showModal();
-			// typeDialog.shio
+			let buttonBB = postButton.getBoundingClientRect();
+			let dialogBB = typeDialog.getBoundingClientRect();
+			console.log(buttonBB, dialogBB)
+			typeDialog.style.right = `${window.innerWidth - buttonBB.right}px`;
+			typeDialog.style.bottom = `${window.innerHeight - buttonBB.top}px`;
 		} else {
 			onAuthorSelect();
 		}
@@ -53,7 +59,7 @@
 					<img src={author.avatar.file_urlpath} alt={t('alt.avatarOfUser', $language)} />
 				</button>
 			{/if}
-			<button class="big shadow" onclick={handlePostButtonClick}>
+			<button class="big shadow" bind:this={postButton} onclick={handlePostButtonClick}>
 				<img src={createPostButton} alt={t('alt.createForumPost', $language)} />
 			</button>
 		</div>
@@ -127,14 +133,14 @@
 
 	.post-type-dialog {
 		position: fixed;
-		bottom: calc(var(--footer-height) + var(--button-big-size) + var(--small-padding));
-		right: 0;
+		bottom: auto;
+		right: auto;
 		top: auto;
 		left: auto;
 		background: none;
 		border: none;
 		padding: 0;
-		margin: var(--small-padding);
+		margin: 0;
 		overflow: hidden;
 	}
 
@@ -143,7 +149,7 @@
 	}
 
 	.post-type-dialog ul {
-		padding: var(--page-padding);
+		padding: var(--medium-padding) 0;
 		text-align: right;
 	}
 

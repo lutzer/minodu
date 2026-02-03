@@ -48,7 +48,7 @@ class RAG:
             embedding_function=self.embeddings
         )
         
-        # Simple chain
+        # ask prompt
         if language == LanguageEnum.en:
             self.template = textwrap.dedent("""
                 You are a helpful AI assistant. Answer questions based on the provided context and conversation history. 
@@ -118,14 +118,61 @@ class RAG:
         
         self.prompt = ChatPromptTemplate.from_template(self.template)
         
-        # Create the chain
-        self.chain = (
+        # welcome prompt
+        if language == LanguageEnum.en:
+            self.welcome_template = textwrap.dedent("""
+                You are a helpful AI assistant. You are welcoming a new user to the converastion and provide a short summary
+                of the information that you can provide to them. Please present up to three follow up question the user could
+                ask to interact with you
+
+                ===== CONTEXT FROM VECTOR DATABASE =====
+                The following information has been retrieved from the knowledge base:
+
+                {context}
+
+                ===== END CONTEXT =====
+
+                Based on the context provided above, please provide a helpful, short and accurate response.
+            """)
+        elif language == LanguageEnum.fr:
+            self.welcome_template = textwrap.dedent("""
+            Vous êtes un assistant IA serviable. Vous accueillez un nouvel utilisateur dans la conversation et lui fournissez un bref résumé
+            des informations que vous pouvez lui fournir. Veuillez présenter jusqu'à trois questions de suivi que l'utilisateur pourrait
+
+            poser pour interagir avec vous.
+
+            ===== CONTEXTE DE LA BASE DE DONNÉES VECTORIELLE =====
+
+            Les informations suivantes ont été extraites de la base de connaissances :
+
+            {context}
+
+            ===== FIN DU CONTEXTE =====
+
+            En vous basant sur le contexte ci-dessus, veuillez fournir une réponse utile, concise et précise.                    
+            """)
+        else:
+            raise Exception("No Template for Language: " + str(language))
+
+        self.welcome_prompt = ChatPromptTemplate.from_template(self.welcome_template)
+
+        # Create the ask chain
+        self.ask_chain = (
             RunnableParallel({
                 "context": lambda x: self.get_retriever(x["source_id"]).invoke(x["question"]),
                 "question": lambda x: x["question"], 
                 "history": lambda x: x["history"]
             })
             | self.prompt
+            | self.llm
+            | StrOutputParser()
+        )
+
+        self.welcome_chain = (
+            RunnableParallel({
+                "context": lambda x: self.get_retriever(x["source_id"]).invoke(x["question"])
+            })
+            | self.welcome_prompt
             | self.llm
             | StrOutputParser()
         )
@@ -137,6 +184,9 @@ class RAG:
     def ask_streaming(self, request: RagRequestData) -> Iterator[str]:
         for chunk in self.chain.stream(asdict(request)):
             yield chunk
+
+    def welcome(self, source_id: int) -> Iterator[str]:
+        for chunk in self.chain.stream()
 
     def find_sources_for_text(self, query) -> str:
         search_kwargs = {
