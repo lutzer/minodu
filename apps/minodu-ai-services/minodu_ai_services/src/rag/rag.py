@@ -121,9 +121,9 @@ class RAG:
         # welcome prompt
         if language == LanguageEnum.en:
             self.welcome_template = textwrap.dedent("""
-                You are a helpful AI assistant. You are welcoming a new user to the converastion and provide a short summary
-                of the information that you can provide to them. Please present up to three follow up question the user could
-                ask to interact with you
+                You are a helpful AI assistant. Welcome a new user to the conversation.
+                First greet them briefly, then explain what topics and information are available in your knowledge base based on the context below.
+                Use a maximum of 600 characters and keep the language simple and easy to understand.
 
                 ===== CONTEXT FROM VECTOR DATABASE =====
                 The following information has been retrieved from the knowledge base:
@@ -132,24 +132,22 @@ class RAG:
 
                 ===== END CONTEXT =====
 
-                Based on the context provided above, please provide a helpful, short and accurate response.
+                Write a short welcome message that greets the user and briefly describes what information and topics you can help them with based on the context above. Do not use markdown syntax or any other structuring elements. Just plain text.
             """)
         elif language == LanguageEnum.fr:
             self.welcome_template = textwrap.dedent("""
-            Vous êtes un assistant IA serviable. Vous accueillez un nouvel utilisateur dans la conversation et lui fournissez un bref résumé
-            des informations que vous pouvez lui fournir. Veuillez présenter jusqu'à trois questions de suivi que l'utilisateur pourrait
+                    Vous êtes un assistant IA serviable. Accueillez un nouvel utilisateur dans la conversation.
+                    Saluez-le brièvement, puis expliquez quels sujets et informations sont disponibles dans votre base de connaissances en vous basant sur le contexte ci-dessous.
+                    Utilisez au maximum 600 caractères et gardez un langage simple et facile à comprendre.
 
-            poser pour interagir avec vous.
+                    ===== CONTEXTE PROVENANT DE LA BASE DE DONNÉES VECTORIELLE =====
+                    Les informations suivantes ont été extraites de la base de connaissances :
 
-            ===== CONTEXTE DE LA BASE DE DONNÉES VECTORIELLE =====
+                    {context}
 
-            Les informations suivantes ont été extraites de la base de connaissances :
+                    ===== FIN DU CONTEXTE =====
 
-            {context}
-
-            ===== FIN DU CONTEXTE =====
-
-            En vous basant sur le contexte ci-dessus, veuillez fournir une réponse utile, concise et précise.                    
+                    Rédigez un court message de bienvenue qui salue l'utilisateur et décrit brièvement les informations et les sujets sur lesquels vous pouvez l'aider en vous basant sur le contexte ci-dessus. N'utilisez pas de syntaxe Markdown ni aucun autre élément de structuration. Utilisez uniquement du texte brut.
             """)
         else:
             raise Exception("No Template for Language: " + str(language))
@@ -185,8 +183,8 @@ class RAG:
         for chunk in self.ask_chain.stream(asdict(request)):
             yield chunk
 
-    def welcome_streaming(self, source_id: int) -> Iterator[str]:
-        for chunk in self.welcome_chain.stream({'source_id' : source_id}):
+    def welcome_streaming(self, source_id: Optional[int] = None) -> Iterator[str]:
+        for chunk in self.welcome_chain.stream({'source_id': source_id, 'question': 'summary'}):
             yield chunk
 
     def find_sources_for_text(self, query) -> str:

@@ -5,7 +5,7 @@ export class Storage {
 	static readonly BOT_HISTORY_KEY = 'BOT_MESSAGE_HISTORY';
 	static readonly FORUM_POST_TEXT_KEY = 'FORUM_POST_TEXT';
 	static readonly LANGUAGE_KEY = 'APP_LANGUAGE';
-	static readonly BOT_MESSAGE_TEXT_KEY = "BOT_MESSAGE_KEY"
+	static readonly BOT_MESSAGE_TEXT_KEY = 'BOT_MESSAGE_KEY';
 
 	public static set forumToken(token: Optional<string>) {
 		if (token) localStorage.setItem(Storage.FORUM_TOKEN_KEY, token);

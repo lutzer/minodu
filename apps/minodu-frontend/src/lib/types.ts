@@ -7,8 +7,10 @@ export type BotMessage = {
 	type: BotMessageType;
 };
 
-export enum BotMessageType{
-	USER, BOT_GENERATING, BOT_FINISHED
+export enum BotMessageType {
+	USER,
+	BOT_GENERATING,
+	BOT_FINISHED
 }
 
 export enum ForumPostType {

@@ -15,6 +15,11 @@ type RagRequest = {
 	language: Language;
 };
 
+type RagWelcomeRequest = {
+	language: Language;
+	source_id?: number;
+};
+
 type TtsRespone = {
 	text: string;
 	confidence: number;
@@ -39,6 +44,21 @@ export class AiServicesApi {
 
 	public static async generateRagResponse(request: RagRequest): Promise<Response> {
 		const response = await fetch(`${AiServicesApi.API_PREFIX}/rag/ask`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(request)
+		});
+
+		if (!response.ok)
+			throw new HttpError({ code: response.status, message: await response.text() });
+
+		return response;
+	}
+
+	public static async generateWelcomeMessage(request: RagWelcomeRequest): Promise<Response> {
+		const response = await fetch(`${AiServicesApi.API_PREFIX}/rag/welcome/`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'

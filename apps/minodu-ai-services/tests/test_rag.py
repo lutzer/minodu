@@ -119,7 +119,17 @@ class TestRagAPI:
             "language": "en"
         }
         response = client.post(app.root_path + "/rag/welcome/", json=test_data)
-        assert response.status_code == 422
+        assert response.status_code == 200
+        assert len(response.text) > 0
+
+    def test_welcome_null_source_id(self):
+        test_data = {
+            "source_id": None,
+            "language": "en"
+        }
+        response = client.post(app.root_path + "/rag/welcome/", json=test_data)
+        assert response.status_code == 200
+        assert len(response.text) > 0
 
     def test_delete_document_error(self):
         response = client.delete(app.root_path + "/rag/documents/en/999")

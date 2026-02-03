@@ -66,7 +66,7 @@ async def rag_ask(request: RagRequest):
     )
 
 class RagWelcomeRequest(BaseModel):
-    source_id: int
+    source_id: Optional[int] = None
     language: LanguageEnum
 
 @app.post("/rag/welcome/")

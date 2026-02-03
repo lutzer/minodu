@@ -9,7 +9,7 @@
 	import { language } from '$lib/stores';
 	import { t } from '$lib/translations';
 
-	import botAvatarImage from '$lib/assets/chatbot-avatar.png'
+	import botAvatarImage from '$lib/assets/chatbot-avatar.png';
 
 	export let message: BotMessage;
 	export let ttsPlayer: TextToSpeechPlayer;
@@ -63,25 +63,28 @@
 	// }
 </script>
 
-<div class="bot-message shadow {message.type == BotMessageType.USER && "user"}">
+<div class="bot-message shadow {message.type == BotMessageType.USER ? 'user' : 'bot'}">
 	{#if message.type == BotMessageType.USER}
-	<div class="message-text">
-		<p>{message.text}</p>
-	</div>
-	<div class="message-side">
-		<TextToSpeechButton text={message.text} {ttsPlayer} />
-	</div>
+		<div class="message-text">
+			<p>{message.text}</p>
+		</div>
+		<div class="message-side">
+			<TextToSpeechButton text={message.text} {ttsPlayer} />
+		</div>
 	{:else}
-	<!-- <div class="chatbot-avatar"> 
+		<!-- <div class="chatbot-avatar"> 
 		<img src={botAvatarImage}/>
 	</div> -->
-	<div class="message-side">
-		<TextToSpeechButton text={message.text} {ttsPlayer} />
-	</div>
-	<div class="message-text">
-		<h2>Chatbot</h2>
-		<p>{message.text}</p>
-	</div>
+		<div class="message-side">
+			<div class="avatar-image">
+				<img src={botAvatarImage}/>
+			</div>
+			<TextToSpeechButton text={message.text} {ttsPlayer} />
+		</div>
+		<div class="message-text">
+			<h3>Mindou Bot</h3>
+			<p>{message.text}</p>
+		</div>
 	{/if}
 
 	<!-- <h3>{t('chatbot.question', $language)}</h3>
@@ -111,22 +114,40 @@
 		background-color: #d7ebe1;
 		border-radius: var(--border-radius);
 		margin-bottom: var(--medium-padding);
+		gap: var(--small-padding);
 		display: flex;
 	}
 
+	.bot-message.bot {
+		background-color: #e5f6ef;
+		--box-shadow-color: #b9cbc3;
+		margin-right: var(--medium-padding);
+	}
+
 	.bot-message.user {
-		background-color: #FFE9B3;
-		--box-shadow-color: #D9C38C;
+		background-color: #ffe9b3;
+		--box-shadow-color: #d9c38c;
 		margin-left: var(--medium-padding);
 	}
 
 	.bot-message .message-side {
 		flex-grow: 0;
+		text-align: center;
 	}
 
 	.bot-message .message-text {
 		flex-grow: 1;
-		align-self: center;
+		/* align-self: center; */
+	}
+
+	.avatar-image {
+		width: 50px;
+		margin-bottom: var(--small-padding);
+	}
+
+	.avatar-image img {
+		width: 100%;
+		height: auto;
 	}
 
 	/* .cursor {
