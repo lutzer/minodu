@@ -22,6 +22,8 @@
 	let scrollContainer: HTMLDivElement;
 
 	let posts: ForumPost[] = [];
+	let hasMore = false;
+	let isLoadingMore = false;
 
 	let author: Optional<ForumAuthor> = undefined;
 
@@ -40,16 +42,16 @@
 	let deletePostId: Optional<number>;
 
 	onMount(() => {
-		update(false);
+		initialLoad();
 
 		let eventSource = ForumApi.getEventSource();
 		eventSource.onmessage = (msg) => {
 			try {
 				let data = JSON.parse(msg.data);
 				if (data['topic'] === 'update') {
-					update();
+					onSseUpdate();
 				} else if (data['topic'] === 'delete') {
-					noScrollUpdate();
+					onSseDelete();
 				}
 			} catch (e) {
 				console.error('Could not parse event', e);
@@ -60,21 +62,98 @@
 		};
 	});
 
-	async function update(smoothScroll: boolean = true) {
-		posts = await ForumApi.getPosts();
+	async function initialLoad() {
+		const result = await ForumApi.getPostsPaginated();
+		posts = result.posts;
+		hasMore = result.has_more;
 		author = await ForumApi.checkToken();
 
 		await waitForAnimationFrame();
 
 		scrollContainer.scrollTo({
 			top: scrollContainer.scrollHeight,
-			behavior: smoothScroll ? 'smooth' : undefined
+			behavior: 'instant' as ScrollBehavior
 		});
 	}
 
-	async function noScrollUpdate() {
-		posts = await ForumApi.getPosts();
+	async function loadOlderPosts() {
+		if (!hasMore || isLoadingMore || posts.length === 0) return;
+
+		isLoadingMore = true;
+
+		const oldestId = posts[0].id;
+		const prevScrollHeight = scrollContainer.scrollHeight;
+
+		try {
+			const result = await ForumApi.getPostsPaginated(oldestId);
+			posts = [...result.posts, ...posts];
+			hasMore = result.has_more;
+
+			await waitForAnimationFrame();
+
+			// Preserve scroll position after prepending
+			const newScrollHeight = scrollContainer.scrollHeight;
+			scrollContainer.scrollTop += newScrollHeight - prevScrollHeight;
+		} finally {
+			isLoadingMore = false;
+		}
+	}
+
+	async function onSseUpdate() {
+		const result = await ForumApi.getPostsPaginated();
 		author = await ForumApi.checkToken();
+
+		// Append any new posts that we don't have yet
+		const lastKnownId = posts.length > 0 ? posts[posts.length - 1].id : 0;
+		const newPosts = result.posts.filter((p) => p.id > lastKnownId);
+
+		if (newPosts.length > 0) {
+			posts = [...posts, ...newPosts];
+
+			await waitForAnimationFrame();
+
+			scrollContainer.scrollTo({
+				top: scrollContainer.scrollHeight,
+				behavior: 'smooth'
+			});
+		}
+	}
+
+	async function onSseDelete() {
+		const result = await ForumApi.getPostsPaginated();
+		author = await ForumApi.checkToken();
+
+		// Reconcile: keep posts that still exist, maintaining older loaded posts
+		const latestIds = new Set(result.posts.map((p) => p.id));
+		posts = posts.filter((p) => {
+			// Keep posts that are older than the paginated window
+			if (result.posts.length > 0 && p.id < result.posts[0].id) return true;
+			// For posts in the paginated window, keep only if still present
+			return latestIds.has(p.id);
+		});
+	}
+
+	function onScroll() {
+		if (scrollContainer.scrollTop < 100 && hasMore && !isLoadingMore) {
+			loadOlderPosts();
+		}
+	}
+
+	async function onNewPost() {
+		const result = await ForumApi.getPostsPaginated();
+		const lastKnownId = posts.length > 0 ? posts[posts.length - 1].id : 0;
+		const newPosts = result.posts.filter((p) => p.id > lastKnownId);
+
+		if (newPosts.length > 0) {
+			posts = [...posts, ...newPosts];
+		}
+
+		await waitForAnimationFrame();
+
+		scrollContainer.scrollTo({
+			top: scrollContainer.scrollHeight,
+			behavior: 'smooth'
+		});
 	}
 
 	async function logout() {
@@ -102,8 +181,13 @@
 </script>
 
 <div class="forum-page">
-	<div class="scroll-container" bind:this={scrollContainer}>
+	<div class="scroll-container" bind:this={scrollContainer} on:scroll={onScroll}>
 		<div class="post-container content-width">
+			{#if isLoadingMore}
+				<div class="loading-more">
+					<span class="spinner"></span>
+				</div>
+			{/if}
 			{#if posts.length > 0}
 				<ul>
 					{#each posts as post (post.id)}
@@ -138,7 +222,7 @@
 		<AuthorCreateDialog
 			onCreated={() => {
 				closeDialog('createAuthor');
-				update();
+				onNewPost();
 			}}
 			onBack={() => {
 				closeDialog('createAuthor');
@@ -162,7 +246,7 @@
 			postType={createPostType}
 			onPostSubmitted={() => {
 				closeDialog('createPost');
-				update();
+				onNewPost();
 			}}
 			onPostCancelled={() => {
 				closeDialog('createPost');
@@ -194,5 +278,26 @@
 
 	.scroll-container {
 		background-color: #e2d0ac;
+	}
+
+	.loading-more {
+		display: flex;
+		justify-content: center;
+		padding: var(--small-padding);
+	}
+
+	.spinner {
+		width: 24px;
+		height: 24px;
+		border: 3px solid rgba(0, 0, 0, 0.15);
+		border-top-color: rgba(0, 0, 0, 0.5);
+		border-radius: 50%;
+		animation: spin 0.6s linear infinite;
+	}
+
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
 	}
 </style>

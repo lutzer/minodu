@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session, joinedload
 
@@ -42,6 +42,11 @@ class PostEdit(BaseModel):
     text: Optional[str] = None
 
 
+class PaginatedPostsResponse(BaseModel):
+    posts: list[PostResponse]
+    has_more: bool
+
+
 class ThreadResponse(BaseModel):
     id: int
     title: str
@@ -58,6 +63,29 @@ class ThreadResponse(BaseModel):
 async def get_posts(db: Session = Depends(get_db)):
     query = db.query(Post).join(Author).options(joinedload(Post.files))
     return query.all()
+
+
+@router.get("/paginated/", response_model=PaginatedPostsResponse)
+async def get_posts_paginated(
+    before: Optional[int] = Query(None),
+    limit: int = Query(20, ge=1, le=100),
+    db: Session = Depends(get_db),
+):
+    query = db.query(Post).join(Author).options(joinedload(Post.files))
+
+    if before is not None:
+        query = query.filter(Post.id < before)
+
+    # Get limit+1 to check if there are more posts
+    posts = query.order_by(Post.id.desc()).limit(limit + 1).all()
+
+    has_more = len(posts) > limit
+    posts = posts[:limit]
+
+    # Reverse to ascending order (oldest first)
+    posts.reverse()
+
+    return {"posts": posts, "has_more": has_more}
 
 
 @router.get("/threads", response_model=list[ThreadResponse])
