@@ -145,6 +145,68 @@ class TestPostsApi:
 
         assert response.status_code == 401
 
+    def test_paginated_returns_newest_posts_ascending(self, client):
+        auth_token = create_author(client)
+        for i in range(5):
+            create_post(client, auth_token, f"post_{i}")
+
+        response = client.get(app.root_path + "/posts/paginated/?limit=3")
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data["posts"]) == 3
+        # Should be the newest 3 posts in ascending order
+        assert data["posts"][0]["title"] == "post_2"
+        assert data["posts"][1]["title"] == "post_3"
+        assert data["posts"][2]["title"] == "post_4"
+        # IDs should be ascending
+        assert data["posts"][0]["id"] < data["posts"][1]["id"] < data["posts"][2]["id"]
+
+    def test_paginated_before_cursor(self, client):
+        auth_token = create_author(client)
+        posts = []
+        for i in range(5):
+            posts.append(create_post(client, auth_token, f"post_{i}"))
+
+        # Get posts before the last post
+        cursor = posts[4]["id"]
+        response = client.get(app.root_path + f"/posts/paginated/?before={cursor}&limit=2")
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data["posts"]) == 2
+        assert data["posts"][0]["title"] == "post_2"
+        assert data["posts"][1]["title"] == "post_3"
+
+    def test_paginated_has_more_true(self, client):
+        auth_token = create_author(client)
+        for i in range(5):
+            create_post(client, auth_token, f"post_{i}")
+
+        response = client.get(app.root_path + "/posts/paginated/?limit=3")
+        assert response.status_code == 200
+        data = response.json()
+        assert data["has_more"] is True
+
+    def test_paginated_has_more_false(self, client):
+        auth_token = create_author(client)
+        for i in range(3):
+            create_post(client, auth_token, f"post_{i}")
+
+        response = client.get(app.root_path + "/posts/paginated/?limit=5")
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data["posts"]) == 3
+        assert data["has_more"] is False
+
+    def test_paginated_limit_parameter(self, client):
+        auth_token = create_author(client)
+        for i in range(10):
+            create_post(client, auth_token, f"post_{i}")
+
+        response = client.get(app.root_path + "/posts/paginated/?limit=5")
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data["posts"]) == 5
+
     def test_delete_parent_restricted(self, client):
         auth_token = create_author(client)
         post = create_post(client, auth_token, "parent")
