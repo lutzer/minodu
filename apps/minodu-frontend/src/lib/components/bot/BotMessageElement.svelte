@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { AiServicesApi } from '$lib/apis/ai_services/api';
-	import type { BotMessage, Optional } from '$lib/types';
+	import { BotMessageType, type BotMessage, type Optional } from '$lib/types';
 	import { delay } from '$lib/utils';
 	import { onMount, tick } from 'svelte';
 	import TextToSpeechButton from '../common/TextToSpeechButton.svelte';
@@ -9,62 +9,82 @@
 	import { language } from '$lib/stores';
 	import { t } from '$lib/translations';
 
+	import botAvatarImage from '$lib/assets/chatbot-avatar.png'
+
 	export let message: BotMessage;
-	export let conversation: string;
 	export let ttsPlayer: TextToSpeechPlayer;
-	export let onResponseGenerated: Optional<() => void> = undefined;
 
-	let streaming: boolean = false;
-	let error: boolean = false;
+	// let streaming: boolean = false;
+	// let error: boolean = false;
 
-	let reader: Optional<ReadableStreamDefaultReader<Uint8Array<ArrayBuffer>>> = undefined;
+	// let reader: Optional<ReadableStreamDefaultReader<Uint8Array<ArrayBuffer>>> = undefined;
 
-	onMount(() => {
-		if (!message.generated) generateResponse(message.question, conversation);
-	});
+	// onMount(() => {
+	// 	if (!message.generated) generateResponse(message.question, conversation);
+	// });
 
-	$: error = message.response.trimStart().startsWith('[ERROR:');
+	// $: error = message.response.trimStart().startsWith('[ERROR:');
 
-	export function stop() {
-		reader?.cancel();
-		streaming = false;
-		onResponseGenerated?.();
-	}
+	// export function stop() {
+	// 	reader?.cancel();
+	// 	streaming = false;
+	// 	onResponseGenerated?.();
+	// }
 
-	async function generateResponse(question: string, conversation: string) {
-		streaming = true;
+	// async function generateResponse(question: string, conversation: string) {
+	// 	streaming = true;
 
-		let apiResponse = await AiServicesApi.generateRagResponse({
-			language: Config.language,
-			conversation: conversation,
-			question: question
-		});
+	// 	let apiResponse = await AiServicesApi.generateRagResponse({
+	// 		language: Config.language,
+	// 		conversation: conversation,
+	// 		question: question
+	// 	});
 
-		reader = apiResponse.body?.getReader();
+	// 	reader = apiResponse.body?.getReader();
 
-		if (!reader) throw Error('Could not initialize rag response reader');
+	// 	if (!reader) throw Error('Could not initialize rag response reader');
 
-		const decoder = new TextDecoder();
+	// 	const decoder = new TextDecoder();
 
-		while (streaming) {
-			const { done, value } = await reader.read();
-			if (done) break;
+	// 	while (streaming) {
+	// 		const { done, value } = await reader.read();
+	// 		if (done) break;
 
-			const text = decoder.decode(value, { stream: true });
-			message.response += text;
-			await tick();
-			await delay(1);
-		}
-		message.generated = true;
+	// 		const text = decoder.decode(value, { stream: true });
+	// 		message.response += text;
+	// 		await tick();
+	// 		await delay(1);
+	// 	}
+	// 	message.generated = true;
 
-		streaming = false;
-		reader = undefined;
-		onResponseGenerated?.();
-	}
+	// 	streaming = false;
+	// 	reader = undefined;
+	// 	onResponseGenerated?.();
+	// }
 </script>
 
-<div class="bot-message">
-	<h3>{t('chatbot.question', $language)}</h3>
+<div class="bot-message shadow {message.type == BotMessageType.USER && "user"}">
+	{#if message.type == BotMessageType.USER}
+	<div class="message-text">
+		<p>{message.text}</p>
+	</div>
+	<div class="message-side">
+		<TextToSpeechButton text={message.text} {ttsPlayer} />
+	</div>
+	{:else}
+	<!-- <div class="chatbot-avatar"> 
+		<img src={botAvatarImage}/>
+	</div> -->
+	<div class="message-side">
+		<TextToSpeechButton text={message.text} {ttsPlayer} />
+	</div>
+	<div class="message-text">
+		<h2>Chatbot</h2>
+		<p>{message.text}</p>
+	</div>
+	{/if}
+
+	<!-- <h3>{t('chatbot.question', $language)}</h3>
 	<p>
 		{message.question}
 		{#if message.question.length > 0}
@@ -82,17 +102,34 @@
 	</p>
 	{#if streaming}
 		<button onclick={stop}>{t('action.stop', $language)}</button>
-	{/if}
+	{/if} -->
 </div>
 
 <style>
 	.bot-message {
-		padding: 10px;
-		margin: 10px;
-		background-color: lightgray;
+		padding: var(--medium-padding);
+		background-color: #d7ebe1;
+		border-radius: var(--border-radius);
+		margin-bottom: var(--medium-padding);
+		display: flex;
 	}
 
-	.cursor {
+	.bot-message.user {
+		background-color: #FFE9B3;
+		--box-shadow-color: #D9C38C;
+		margin-left: var(--medium-padding);
+	}
+
+	.bot-message .message-side {
+		flex-grow: 0;
+	}
+
+	.bot-message .message-text {
+		flex-grow: 1;
+		align-self: center;
+	}
+
+	/* .cursor {
 		animation: blink 1s infinite;
 	}
 
@@ -111,9 +148,9 @@
 		color: white;
 		background-color: red;
 		padding: 5px;
-	}
+	} */
 
-	p {
+	/* p {
 		margin: 0 0 10px 0;
-	}
+	} */
 </style>

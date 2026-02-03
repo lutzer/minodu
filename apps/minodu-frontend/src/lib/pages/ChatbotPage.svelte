@@ -6,41 +6,54 @@
 	import TextToSpeechPlayer from '$lib/components/common/TextToSpeechPlayer.svelte';
 	import { Storage } from '$lib/storage';
 	import { language } from '$lib/stores';
-	import type { BotMessage } from '$lib/types';
+	import { BotMessageType, type BotMessage, type Optional } from '$lib/types';
 	import { onMount } from 'svelte';
 	import { t } from '$lib/translations';
+	import type { BackendPost } from '$lib/apis/backend/models/backendPost';
+	import BotInputElement from '$lib/components/bot/BotInputElement.svelte';
+	import { waitForAnimationFrame } from '$lib/utils';
 
-	let inputText: string = '';
+
+	import trashIcon from '$lib/assets/trash-icon-white.png';
+
+	export let post : Optional<BackendPost> = undefined;
+
 	let messages: BotMessage[] = [];
 	let ttsPlayer: TextToSpeechPlayer;
 	let conversation: string = '';
 	let generating = false;
-
-	let audioRecorder: AudioRecorder;
-	let audioBlob: Blob;
-	let audioRecording: boolean;
+	let scrollContainer : HTMLDivElement;
 
 	onMount(() => {
 		messages = Storage.chatMessages;
 	});
 
-	$: generating = messages.reduce((prev, val) => prev || !val.generated, false);
+	$: generating = messages.reduce((prev, val) => prev || val.type == BotMessageType.BOT_GENERATING, false);
 	$: conversation = messages.reduce((acc, val) => {
-		return acc + '\n' + `Question: ${val.question}` + '\n' + `Answer: ${val.response}` + '\n';
+		return acc + '\n' + (val.type == BotMessageType.USER ? + `USER: ${val.text}` : + `BOT: ${val.text}`) + '\n';
 	}, '');
 
 	function updateGenerateState() {
-		Storage.chatMessages = messages;
+		// Storage.chatMessages = messages;
 		generating = isGenerating();
 	}
 
 	function isGenerating(): boolean {
-		return messages.reduce((prev, val) => prev || !val.generated, false);
+		return messages.reduce((prev, val) => prev || val.type == BotMessageType.BOT_GENERATING, false);
 	}
 
-	function submitMessage() {
-		messages = [...messages, { question: inputText, response: '', generated: false }];
-		inputText = '';
+	async function submitMessage(message: string) {
+		messages = [...messages, { text: message, type: BotMessageType.USER }];
+		Storage.chatMessages = messages;
+
+		await waitForAnimationFrame();
+
+		scrollContainer.scrollTo({
+			top: scrollContainer.scrollHeight,
+			behavior: 'smooth'
+		});
+
+		console.log(messages)
 	}
 
 	function clearChat() {
@@ -48,73 +61,91 @@
 		messages = [];
 	}
 
-	async function transcribeAudio(blob: Blob) {
-		let response = await AiServicesApi.transcribeSpeech(blob, Config.language);
-		if (response.confidence > 0.6) inputText = response.text;
-		audioRecorder.reset();
-	}
+	// async function transcribeAudio(blob: Blob) {
+	// 	let response = await AiServicesApi.transcribeSpeech(blob, Config.language);
+	// 	if (response.confidence > 0.6) inputText = response.text;
+	// 	audioRecorder.reset();
+	// }
 </script>
 
-<div class="scroll-container">
-	<div class="chat-messages">
-		<ul>
-			{#each messages as msg, i (i)}
+<div class="chatbot-page">
+	<div class="scroll-container" bind:this={scrollContainer}>
+		<div class="message-container content-width">
+			<ul>
+				{#each messages as msg, i (i)}
 				<li>
 					<BotMessageElement
 						message={msg}
-						{conversation}
 						{ttsPlayer}
-						onResponseGenerated={updateGenerateState}
 					/>
 				</li>
-			{/each}
-		</ul>
-	</div>
-	<div class="chat-input">
-		<div class="input-block">
-			<div class="input-textarea">
-				<textarea class="input-text" bind:value={inputText}></textarea>
-			</div>
-		</div>
-		<div class="input-block">
-			<AudioRecorder
-				bind:this={audioRecorder}
-				bind:blob={audioBlob}
-				bind:recording={audioRecording}
-			/>
-			{#if !audioBlob && !audioRecording}
-				<button onclick={audioRecorder.startRecording}>{t('action.record', $language)}</button>
-			{:else if !audioBlob && audioRecording}
-				<button onclick={audioRecorder.stopRecording}>{t('action.stop', $language)}</button>
-			{:else}
-				<button onclick={audioRecorder.reset}>{t('action.cancel', $language)}</button>
-				<button onclick={() => transcribeAudio(audioBlob)}>{t('action.send', $language)}</button>
-			{/if}
-		</div>
-		<div class="input-block">
-			<button onclick={submitMessage} disabled={generating || inputText.length <= 3}
-				>{t('action.submit', $language)}</button
-			>
-			<button onclick={clearChat}>{t('action.clearChat', $language)}</button>
+				{/each}
+				{#if messages.length > 0}
+				<li>
+					<div class="reset-button-container">
+						<button class="reset-button long shadow" onclick={clearChat}>
+							<img src={trashIcon}/>
+							<span>Clear Chat</span>
+						</button>
+					</div>
+				</li>
+				{:else}
+				<li>
+					<p class="empty">Empty conversation</p>
+				</li>
+				{/if}
+			</ul>
 		</div>
 	</div>
+	<BotInputElement 
+		onMessageSubmitted={submitMessage}
+		enabled={!generating}/>
 	<TextToSpeechPlayer bind:this={ttsPlayer} />
 </div>
 
 <style>
-	.chat-input {
-		background-color: lightblue;
-		padding: 10px;
+
+	.message-container {
+		padding: var(--page-padding);
+		margin-bottom: calc(var(--page-padding) + var(--button-size));
+		box-sizing: border-box;
 	}
 
-	.chat-messages {
-		background-color: lightcyan;
-		padding: 10px;
+	.scroll-container {
+		background-color: #C3EED9;
 	}
 
-	.input-block {
-		background-color: lightgray;
-		margin: 10px;
-		padding: 10px;
+	.reset-button-container {
+		display: flex;
+		justify-content: center;
+		width: 100%;
 	}
+
+	.reset-button {
+		background-color: #CC604B;
+		--box-shadow-color: #8C4A3C;
+		margin: var(--small-padding);
+		padding: 0 var(--small-padding);
+		display: flex;
+		color: white;
+		width:160px;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.reset-button img {
+		width: 30px;
+		height: 30px;
+	}
+
+	.reset-button span {
+		flex-grow: 1;
+		text-align: center;
+	}
+
+	.empty {
+		text-align: center;
+		margin: var(--page-padding);
+	}
+
 </style>
