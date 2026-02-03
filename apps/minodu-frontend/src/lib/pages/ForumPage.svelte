@@ -103,13 +103,21 @@
 		const result = await ForumApi.getPostsPaginated();
 		author = await ForumApi.checkToken();
 
-		// Append any new posts that we don't have yet
+		const freshById = new Map(result.posts.map((p) => [p.id, p]));
 		const lastKnownId = posts.length > 0 ? posts[posts.length - 1].id : 0;
-		const newPosts = result.posts.filter((p) => p.id > lastKnownId);
+		let hasNewPosts = false;
 
+		// Update existing posts that fall within the fetched window
+		posts = posts.map((p) => freshById.get(p.id) ?? p);
+
+		// Append any new posts
+		const newPosts = result.posts.filter((p) => p.id > lastKnownId);
 		if (newPosts.length > 0) {
 			posts = [...posts, ...newPosts];
+			hasNewPosts = true;
+		}
 
+		if (hasNewPosts) {
 			await waitForAnimationFrame();
 
 			scrollContainer.scrollTo({
