@@ -65,6 +65,32 @@ async def rag_ask(request: RagRequest):
         }
     )
 
+class RagWelcomeRequest(BaseModel):
+    source_id: int
+    language: LanguageEnum
+
+@app.post("/rag/welcome/")
+async def rag_ask(request: RagWelcomeRequest):
+    rag = RAG(language=request.language)
+
+    def generate_stream():
+        try:
+            for chunk in rag.welcome_streaming(request.source_id):
+                yield chunk
+        except Exception as e:
+            logging.error(f"Error in RAG streaming: {e}", exc_info=True)
+            yield f"\n\n[ERROR: {str(e)}]"
+
+    return StreamingResponse(
+        generate_stream(),
+        media_type="text/plain; charset=utf-8",
+        headers={
+            'Cache-Control': 'no-cache',
+            'X-Accel-Buffering': 'no',
+            'Transfer-Encoding': 'chunked'
+        }
+    )
+
 class RagSourceRequest(BaseModel):
     query: str
     language: LanguageEnum
@@ -72,6 +98,7 @@ class RagSourceRequest(BaseModel):
 class RagSourceResponse(BaseModel):
     document: Optional[Any]
     score: float
+
 
 @app.post("/rag/sources", response_model=RagSourceResponse)
 async def extract_sources(request: RagSourceRequest):

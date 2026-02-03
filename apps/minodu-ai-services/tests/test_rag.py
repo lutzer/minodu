@@ -90,6 +90,37 @@ class TestRagAPI:
         assert not is_in_documents
 
 
+    def test_welcome_returns_200(self):
+        test_data = {
+            "source_id": 1,
+            "language": "en"
+        }
+        response = client.post(app.root_path + "/rag/welcome/", json=test_data)
+        assert response.status_code == 200
+
+    def test_welcome_returns_data(self):
+        test_data = {
+            "source_id": 1,
+            "language": "en"
+        }
+        response = client.post(app.root_path + "/rag/welcome/", json=test_data)
+        assert len(response.text) > 0
+
+    def test_welcome_invalid_language(self):
+        test_data = {
+            "source_id": 1,
+            "language": "invalid"
+        }
+        response = client.post(app.root_path + "/rag/welcome/", json=test_data)
+        assert response.status_code == 422
+
+    def test_welcome_missing_source_id(self):
+        test_data = {
+            "language": "en"
+        }
+        response = client.post(app.root_path + "/rag/welcome/", json=test_data)
+        assert response.status_code == 422
+
     def test_delete_document_error(self):
         response = client.delete(app.root_path + "/rag/documents/en/999")
         assert response.status_code != 200

@@ -179,14 +179,15 @@ class RAG:
 
     
     def ask(self, request: RagRequestData) -> str:
-        return self.chain.invoke(asdict(request))
+        return self.ask_chain.invoke(asdict(request))
     
     def ask_streaming(self, request: RagRequestData) -> Iterator[str]:
-        for chunk in self.chain.stream(asdict(request)):
+        for chunk in self.ask_chain.stream(asdict(request)):
             yield chunk
 
-    def welcome(self, source_id: int) -> Iterator[str]:
-        for chunk in self.chain.stream()
+    def welcome_streaming(self, source_id: int) -> Iterator[str]:
+        for chunk in self.welcome_chain.stream({'source_id' : source_id}):
+            yield chunk
 
     def find_sources_for_text(self, query) -> str:
         search_kwargs = {
