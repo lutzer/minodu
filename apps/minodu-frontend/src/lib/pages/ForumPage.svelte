@@ -66,7 +66,8 @@
 		const result = await ForumApi.getPostsPaginated();
 		posts = result.posts;
 		hasMore = result.has_more;
-		author = await ForumApi.checkToken();
+		
+		await login();
 
 		await waitForAnimationFrame();
 
@@ -101,7 +102,6 @@
 
 	async function onSseUpdate() {
 		const result = await ForumApi.getPostsPaginated();
-		author = await ForumApi.checkToken();
 
 		const freshById = new Map(result.posts.map((p) => [p.id, p]));
 		const lastKnownId = posts.length > 0 ? posts[posts.length - 1].id : 0;
@@ -129,7 +129,6 @@
 
 	async function onSseDelete() {
 		const result = await ForumApi.getPostsPaginated();
-		author = await ForumApi.checkToken();
 
 		// Reconcile: keep posts that still exist, maintaining older loaded posts
 		const latestIds = new Set(result.posts.map((p) => p.id));
@@ -167,6 +166,10 @@
 	async function logout() {
 		Storage.forumToken = undefined;
 		author = undefined;
+	}
+
+	async function login() {
+		author = await ForumApi.checkToken(Storage.forumToken);
 	}
 
 	async function createPost(type: ForumPostType) {
@@ -230,7 +233,7 @@
 		<AuthorCreateDialog
 			onCreated={() => {
 				closeDialog('createAuthor');
-				onNewPost();
+				login();
 			}}
 			onBack={() => {
 				closeDialog('createAuthor');

@@ -127,7 +127,7 @@ export class ForumApi {
 	}
 
 	public static async checkToken(
-		token: string = Storage.forumToken
+		token: string
 	): Promise<Optional<ForumAuthor>> {
 		if (!token) {
 			return undefined;
