@@ -125,6 +125,7 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+    restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "celery inspect ping --destination celery@$$HOSTNAME"]
       interval: 5s
@@ -137,6 +138,7 @@ services:
     command: redis-server --maxmemory 32mb
     ports:
       - "6379:6379"
+    restart: unless-stopped
     healthcheck:
       test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
       interval: 5s
