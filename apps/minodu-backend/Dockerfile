@@ -16,6 +16,9 @@ RUN npm run build
 # Étape d'exécution
 FROM node:18-alpine
 
+RUN apt-get update -y && apt upgrade -y && apt-get clean -y
+RUN apt-get install curl -y
+
 WORKDIR /app
 
 COPY package*.json ./
