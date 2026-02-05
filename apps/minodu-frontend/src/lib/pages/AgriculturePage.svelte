@@ -71,8 +71,10 @@
 						class={`color ${category.name}`}
 						class:selected={selectedCategoryIds.has(category.id)}
 						onclick={() => toggleCategory(category.id)}
-					>
+					>	
+						{#if category.name}
 						<img src={categoryIcons[category.name]} alt="category icon for {category.name}" />
+						{/if}
 						<span>{category.name}</span>
 					</button>
 				</li>
