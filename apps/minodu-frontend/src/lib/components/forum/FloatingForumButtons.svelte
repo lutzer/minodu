@@ -139,7 +139,7 @@
 		left: auto;
 		background: none;
 		border: none;
-		padding: 0;
+		padding: 4px;
 		margin: 0;
 		overflow: hidden;
 	}

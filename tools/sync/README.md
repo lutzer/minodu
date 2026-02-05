@@ -8,4 +8,4 @@ Syncs the online backend with the local one
 
 ## Run
 
-* run python script: `poetry run python sync.py http://minodu.chickenkiller.com:3000/v1/files/minodu_backend_backup.zip --destination=test --user=minodu_user --password=password`
+* run python script: `poetry run python sync.py -h`
