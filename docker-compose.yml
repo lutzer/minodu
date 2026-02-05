@@ -16,7 +16,7 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
@@ -48,7 +48,7 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/v1"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 3
       start_period: 15s
@@ -72,7 +72,7 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3002/api/services/"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 3
       start_period: 15s
@@ -105,7 +105,7 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3003/api/forum/"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 3
       start_period: 15s
@@ -128,7 +128,7 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "celery inspect ping --destination celery@$$HOSTNAME"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 3
       start_period: 15s
@@ -141,7 +141,7 @@ services:
     restart: unless-stopped
     healthcheck:
       test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 3
       start_period: 5s
@@ -161,6 +161,11 @@ services:
       - minodu-ai-services
       - minodu-backend
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost/ && curl -f http://localhost:8080 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
 volumes:
   shared-data:
