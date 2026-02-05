@@ -186,7 +186,8 @@ class RAG:
             yield chunk
 
     def welcome(self, source_id: int) -> Iterator[str]:
-        for chunk in self.chain.stream()
+        for chunk in self.welcome_chain.stream():
+            yield chunk
 
     def find_sources_for_text(self, query) -> str:
         search_kwargs = {
