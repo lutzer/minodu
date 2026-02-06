@@ -11,7 +11,7 @@ from ..config import Config
 
 logger = logging.getLogger(__name__)
 
-TRANSCRIBE_TIMEOUT = 60.0
+TRANSCRIBE_TIMEOUT = 120.0
 
 @dataclasses.dataclass
 class TranscriptionResult:
