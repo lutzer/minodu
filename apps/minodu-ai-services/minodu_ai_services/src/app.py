@@ -31,16 +31,19 @@ logger = logging.getLogger(__name__)
 # Initialize FastAPI app with root_path prefix
 app = FastAPI(root_path=api_prefix)
 
+
 @app.get("/")
 async def root():
     return {"message": "Minodu Service API"}
 
 ### RAG API ###
 
+
 class RagRequest(BaseModel):
     conversation: str
     language: LanguageEnum
     question: str
+
 
 @app.post("/rag/ask")
 async def rag_ask(request: RagRequest):
@@ -65,13 +68,16 @@ async def rag_ask(request: RagRequest):
         }
     )
 
+
 class RagSourceRequest(BaseModel):
     query: str
     language: LanguageEnum
 
+
 class RagSourceResponse(BaseModel):
     document: Optional[Any]
     score: float
+
 
 @app.post("/rag/sources", response_model=RagSourceResponse)
 async def extract_sources(request: RagSourceRequest):
@@ -84,30 +90,48 @@ async def extract_sources(request: RagSourceRequest):
         score=score
     )
 
+
 class RagDocumentRequest(BaseModel):
     document: Optional[Any]
     score: float
 
-@app.post("/rag/documents/")
-async def add_document(file: UploadFile, language: LanguageEnum = Form(...), source_id: int = Form(...)):
+
+class AddDocumentResponse(BaseModel):
+    message: str
+    summary: Optional[str] = None
+
+
+@app.post("/rag/documents/", response_model=AddDocumentResponse)
+async def add_document(
+    file: UploadFile,
+    language: LanguageEnum = Form(...),
+    source_id: int = Form(...),
+    generate_summary: bool = Form(default=True)
+):
     rag = RAG(language=language)
-    store = DocumentStore(rag.vectorstore, rag.chroma_client)
+    store = DocumentStore(rag.vectorstore, rag.chroma_client, language=language)
+    temp_file_path = None
 
     try:
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
+        suffix = os.path.splitext(file.filename)[1] if file.filename else ".pdf"
+        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as temp_file:
             content = await file.read()
             temp_file.write(content)
             temp_file_path = temp_file.name
-            store.add_file(temp_file_path, source_id)
+
+        summary = store.add_file(
+            temp_file_path, source_id, generate_summary=generate_summary
+        )
+
+        return AddDocumentResponse(message="Document added", summary=summary)
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Could not add document: {str(e)}")
-    
-    finally:
-        # Clean up the temporary file
-        os.unlink(temp_file_path)
 
-    return "Document added"
+    finally:
+        if temp_file_path and os.path.exists(temp_file_path):
+            os.unlink(temp_file_path)
+
 
 @app.delete("/rag/documents/{language}/{source_id}")
 async def delete_documents(source_id: int, language: LanguageEnum):
@@ -125,11 +149,26 @@ async def delete_documents(source_id: int, language: LanguageEnum):
 
     return "Document deleted"
 
+
+class DocumentSummaryResponse(BaseModel):
+    source_id: int
+    summary: Optional[str] = None
+
+
+@app.get("/rag/documents/{language}/{source_id}/summary", response_model=DocumentSummaryResponse)
+async def get_document_summary(source_id: int, language: LanguageEnum):
+    rag = RAG(language=language)
+    store = DocumentStore(rag.vectorstore, rag.chroma_client)
+    summary = store.get_document_summary(source_id)
+    return DocumentSummaryResponse(source_id=source_id, summary=summary)
+
 ### WEATHER LLM ###
+
 
 class WeatherRequest(BaseModel):
     language: LanguageEnum
     sensor_data: WeatherLLM.SensorData
+
 
 @app.post("/weather/text")
 async def weather_text(request: WeatherRequest):
@@ -156,18 +195,20 @@ async def weather_text(request: WeatherRequest):
 
 ### SPEECH TO TEXT API ###
 
+
 class SttResponse(BaseModel):
     text: str
     confidence: float
+
 
 @app.post("/stt/transcribe", response_model=SttResponse)
 async def stt_transcribe(file: UploadFile, language: str = Form(...)):
     transcriber = SttTranscriber(language=language)
 
     content = await file.read()
-    
+
     data = io.BytesIO(content)
-  
+
     result = transcriber.transcribe_file_buffer(data, file.filename)
 
     return SttResponse(
@@ -184,14 +225,15 @@ class TtsRequest(BaseModel):
     return_header: bool = True
     format: str = "wav"
 
+
 @app.post("/tts/synthesize")
 async def synthesize_speech(request: TtsRequest):
     try:
         generator = SpeechGenerator(request.language)
-        
+
         if request.format == "wav":
             def generate_audio():
-                try: 
+                try:
                     if request.return_header:
                         header = SpeechGenerator.create_wav_header(generator.samplerate(), generator.channels())
                         yield header
@@ -201,7 +243,7 @@ async def synthesize_speech(request: TtsRequest):
                 except Exception as e:
                     logging.error(f"Error in tts streaming: {e}", exc_info=True)
                     yield f"\n\n[ERROR: {str(e)}]"
-            
+
             return StreamingResponse(
                 generate_audio(),
                 media_type="audio/wav",
@@ -218,7 +260,7 @@ async def synthesize_speech(request: TtsRequest):
             def generate_audio():
                 for audio_chunk in generator.synthesize(request.text, SpeechGenerator.AudioFormat.MP3):
                     yield audio_chunk
-            
+
             return StreamingResponse(
                 generate_audio(),
                 media_type="audio/mpeg",
@@ -231,6 +273,6 @@ async def synthesize_speech(request: TtsRequest):
             )
         else:
             raise Exception("Unsupported format, only supports: wav and mp3")
-    
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Speech synthesis failed: {str(e)}")
