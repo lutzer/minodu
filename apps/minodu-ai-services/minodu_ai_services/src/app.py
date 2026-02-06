@@ -90,66 +90,6 @@ async def extract_sources(request: RagSourceRequest):
         score=score
     )
 
-
-class RagDocumentRequest(BaseModel):
-    document: Optional[Any]
-    score: float
-
-
-class AddDocumentResponse(BaseModel):
-    message: str
-    summary: Optional[str] = None
-
-
-@app.post("/rag/documents/", response_model=AddDocumentResponse)
-async def add_document(
-    file: UploadFile,
-    language: LanguageEnum = Form(...),
-    source_id: int = Form(...),
-    generate_summary: bool = Form(default=True)
-):
-    rag = RAG(language=language)
-    store = DocumentStore(rag.vectorstore, rag.chroma_client, language=language)
-    temp_file_path = None
-
-    try:
-        suffix = os.path.splitext(file.filename)[1] if file.filename else ".pdf"
-        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as temp_file:
-            content = await file.read()
-            temp_file.write(content)
-            temp_file_path = temp_file.name
-
-        summary = store.add_file(
-            temp_file_path, source_id, generate_summary=generate_summary
-        )
-
-        return AddDocumentResponse(message="Document added", summary=summary)
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Could not add document: {str(e)}")
-
-    finally:
-        if temp_file_path and os.path.exists(temp_file_path):
-            os.unlink(temp_file_path)
-
-
-@app.delete("/rag/documents/{language}/{source_id}")
-async def delete_documents(source_id: int, language: LanguageEnum):
-
-    rag = RAG(language=language)
-
-    store = DocumentStore(rag.vectorstore, rag.chroma_client)
-
-    try:
-        store.delete_document_by_id(source_id)
-    except DocumentStoreException as e:
-        raise HTTPException(status_code=404, detail=f"Could not delete document: {str(e)}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Could not delete document: {str(e)}")
-
-    return "Document deleted"
-
-
 class DocumentSummaryResponse(BaseModel):
     source_id: int
     summary: Optional[str] = None
