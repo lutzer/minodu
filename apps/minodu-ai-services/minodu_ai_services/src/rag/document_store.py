@@ -1,50 +1,66 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.document_loaders.text import TextLoader
 import glob
 import os
 
+from ..vars import LanguageEnum
+from .summarizer import DocumentSummarizer
+
+
 class DocumentStoreException(Exception):
     pass
 
+
 CHUNK_SIZE = 500
 
+
 class DocumentStore:
-    def __init__(self, vectorstore, chroma_client):
+    def __init__(self, vectorstore, chroma_client, language: LanguageEnum = None):
         self.vectorstore = vectorstore
         self.chroma_client = chroma_client
         self.collection_name = vectorstore._collection_name
+        self.language = language
         self.text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=CHUNK_SIZE,
             chunk_overlap=int(CHUNK_SIZE * 0.1)
         )
-    
-    def add_text_documents(self, texts, metadatas=None):
+
+    def add_text_documents(self, texts, metadatas=None, summary: Optional[str] = None):
         """Add raw text documents"""
         if isinstance(texts, str):
             texts = [texts]
-        
+
         # Split documents into chunks
         chunks = []
         chunk_metadatas = []
-        
+        global_chunk_index = 0
+
         for i, text in enumerate(texts):
             text_chunks = self.text_splitter.split_text(text)
             chunks.extend(text_chunks)
-            
+
             # Create metadata for each chunk
             base_metadata = metadatas[i] if metadatas else {"source": f"doc_{i}"}
             for j, chunk in enumerate(text_chunks):
                 chunk_metadata = base_metadata.copy()
-                chunk_metadata["chunk_id"] = j
+                chunk_metadata["chunk_id"] = global_chunk_index
+                if global_chunk_index == 0 and summary:
+                    chunk_metadata["summary"] = summary
                 chunk_metadatas.append(chunk_metadata)
-        
+                global_chunk_index += 1
+
         self.vectorstore.add_texts(texts=chunks, metadatas=chunk_metadatas)
         print(f"Added {len(chunks)} chunks from {len(texts)} documents")
-    
-    def add_file(self, file_path, source_id : int = -1):
-        """Add a single file"""
+
+    def add_file(
+        self,
+        file_path: str,
+        source_id: int = -1,
+        generate_summary: bool = True
+    ) -> Optional[str]:
+        """Add a single file. Returns the generated summary if enabled."""
         if file_path.endswith('.pdf'):
             loader = PyPDFLoader(file_path)
         elif file_path.endswith('.txt'):
@@ -61,13 +77,28 @@ class DocumentStore:
             content = doc.page_content.strip()
             if content:
                 texts.append(content)
-                metadatas.append({"source": os.path.basename(file_path), "page": i, "source_id": source_id})
+                metadatas.append({
+                    "source": os.path.basename(file_path),
+                    "page": i,
+                    "source_id": source_id
+                })
 
         if not texts:
-            raise DocumentStoreException(f"No extractable text found in {os.path.basename(file_path)}")
+            raise DocumentStoreException(
+                f"No extractable text found in {os.path.basename(file_path)}"
+            )
 
-        self.add_text_documents(texts, metadatas)
-    
+        # Generate summary if enabled and language is set
+        summary = None
+        if generate_summary and self.language:
+            full_text = "\n\n".join(texts)
+            summarizer = DocumentSummarizer(self.language)
+            summary = summarizer.summarize(full_text)
+            print(f"Generated summary: {summary[:50]}...")
+
+        self.add_text_documents(texts, metadatas, summary=summary)
+        return summary
+
     def add_directory(self, directory_path, extension="pdf"):
         """Add all files from a directory"""
         files = glob.glob(f"{directory_path}/*.{extension}")
@@ -78,15 +109,16 @@ class DocumentStore:
     def list_documents(self, limit: int = None) -> List[Dict]:
         """List all documents in the vector store with their metadata"""
         collection = self.chroma_client.get_collection(self.collection_name)
-        
+
         # Get all documents
         results = collection.get(
             include=["metadatas", "documents"],
             limit=limit
         )
-        
+
         documents = []
-        for i, (doc_id, metadata, content) in enumerate(zip(results['ids'], results['metadatas'], results['documents'])):
+        for i, (doc_id, metadata, content) in enumerate(
+                zip(results['ids'], results['metadatas'], results['documents'])):
             doc_info = {
                 'id': doc_id,
                 'metadata': metadata,
@@ -94,9 +126,9 @@ class DocumentStore:
                 'content_length': len(content)
             }
             documents.append(doc_info)
-        
+
         return documents
-    
+
     def delete_chunk(self, doc_id: str):
         """Delete a document by its ID"""
         try:
@@ -109,37 +141,47 @@ class DocumentStore:
     def delete_document_by_id(self, id: int):
         collection = self.chroma_client.get_collection(self.collection_name)
         results = collection.get(
-                where={"source_id": id},
-                include=["metadatas"]
-            )
+            where={"source_id": id},
+            include=["metadatas"]
+        )
 
         if not results['ids']:
             raise DocumentStoreException(f"No documents found with source_id: {id}")
-        
+
         collection.delete(where={"source_id": id})
 
         print(f"Deleted {len(results['ids'])} chunks for source_id:{id}")
-    
+
     def delete_document(self, document_name: str):
         """Delete all documents from a specific source"""
         collection = self.chroma_client.get_collection(self.collection_name)
-        
+
         # First, get all documents with this source
         results = collection.get(
             where={"source": document_name},
             include=["metadatas"]
         )
-        
+
         if not results['ids']:
             raise DocumentStoreException(f"No documents found with source: {document_name}")
-        
+
         # Delete all documents with this source
         collection.delete(where={"source": document_name})
-        
+
         deleted_count = len(results['ids'])
         return deleted_count
-            
 
     def delete_all_documents(self):
         self.chroma_client.delete_collection(name=self.collection_name)
         print("Deleted all documents")
+
+    def get_document_summary(self, source_id: int) -> Optional[str]:
+        """Get the summary for a document by its source_id"""
+        collection = self.chroma_client.get_collection(self.collection_name)
+        results = collection.get(
+            where={"$and": [{"source_id": source_id}, {"chunk_id": 0}]},
+            include=["metadatas"]
+        )
+        if results["metadatas"]:
+            return results["metadatas"][0].get("summary")
+        return None
