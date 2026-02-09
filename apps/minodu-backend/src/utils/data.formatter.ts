@@ -29,6 +29,7 @@ export abstract class DataFormater {
         phone: user?.phone,
         role: this.getRole(user.role),
         status: this.getUserStatus(user.status),
+        isContactPerson: user.isContactPerson,
         lastConnexion: user.lastConnexion
       }
     }
@@ -77,6 +78,7 @@ export abstract class DataFormater {
       return {
         id: category.id,
         name: category.name,
+        nameKb: category.nameKb,
         image: category.image? BaseConfig.getFileUrl(category.image): BaseConfig.getFileUrl("default-img.png")
       }
     }

@@ -8,7 +8,7 @@ export class PostTag extends BaseEntity {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({ type: 'varchar', length: 60, nullable: true })
   name: string;
 
   @Column({ type: 'varchar', length: 255})

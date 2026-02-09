@@ -1,11 +1,12 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Weather } from './entities/weather.entity';
 import { SyncWeatherDto } from './dto/sync-weather.dto';
-import { AiService } from 'src/ai/ai.service';
 import { Workbook } from 'exceljs';
 import { Response } from 'express';
+import axios from 'axios';
+import { LoggerService } from 'src/logs/logger.service';
 
 @Injectable()
 export class WeatherService {
@@ -13,7 +14,7 @@ export class WeatherService {
   constructor(
     @InjectRepository(Weather)
     private readonly weatherRepository: Repository<Weather>,
-    private readonly aiService:AiService
+    private readonly loggerService: LoggerService
   ) { }
 
   async sync(syncWeatherDto: SyncWeatherDto) {
@@ -35,12 +36,36 @@ export class WeatherService {
         weather.indice_uv = syncWeatherDto.uv;
         weather.battery = syncWeatherDto.battery;
         weather.time = syncWeatherDto.time ? syncWeatherDto.time : new Date().toISOString();
-        weather.description = await this.aiService.interpretWeather(JSON.stringify(syncWeatherDto))
-        weather.save();
+        await weather.save();
+
+        setImmediate(async () => {
+          try {
+            const description = await this.interpretWeather(JSON.stringify(syncWeatherDto));
+            if (description) {
+              weather.description = description
+              await this.weatherRepository.update(weather.id, { description });
+              this.loggerService.log(`Weather ${weather.id} updated with AI description`);
+            }
+          } catch (error) {
+            this.loggerService.error(error,WeatherService.name);
+          }
+        });
       }
 
     } catch (error) {
-      // throw new ConflictException(`La donnée méteo existe déja !}`);
+      throw error;
+    }
+  }
+
+  async interpretWeather(data: string): Promise<any> {
+    try {
+      const response = await axios.post(`${process.env.AI_SERVICE_URL}/weather/text`, {
+        language: 'fr',
+        sensor_data: data
+      });
+      return response.data;
+    } catch (error) {
+      this.loggerService.error(error.response?.data || error.message, WeatherService.name)
       throw error;
     }
   }

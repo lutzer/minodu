@@ -7,13 +7,15 @@ import { UserStatus } from './entities/user_status.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Role } from 'src/roles/entities/role.entity';
 import { userStatus } from './entities/user_status.enum';
+import { LoggerService } from 'src/logs/logger.service';
 
 @Injectable()
 export class UserStatusService {
 
   constructor(
     @InjectRepository(UserStatus)
-    private userStatusRepository: Repository<UserStatus>
+    private readonly userStatusRepository: Repository<UserStatus>,
+    private readonly loggerService: LoggerService
   ) { }
 
   create(createUserStatusDto: CreateUserStatusDto) {
@@ -77,28 +79,18 @@ export class UserStatusService {
     }
   }
 
-  async createStatuses() {
-    try {
-      const userState0 = await this.userStatusRepository.findOne({ where: { name: userStatus.ACTIVE } });
-      if (!userState0) {
-        const newUserState0 = new UserStatus();
-        newUserState0.name = userStatus.ACTIVE;
-        await newUserState0.save();
-      }
+  async createDefaultStatuses() {
+    const rolesToCreate = [
+      { name: userStatus.ACTIVE },
+      { name: userStatus.BLOCKED },
+    ];
 
-      const userState1 = await this.userStatusRepository.findOne({ where: { name: userStatus.BLOCKED } });
-      if (!userState1) {
-        const newUserState1 = new UserStatus();
-        newUserState1.name = userStatus.BLOCKED;
-        await newUserState1.save();
-      }
-      
+    try {
+      // Upsert will insert new roles or skip/update if they exist
+      await this.userStatusRepository.upsert(rolesToCreate, ['name']);
       return true;
     } catch (error) {
-      if (error.code === '11000' || error.code === '23505') {
-        return true;
-      }
-      console.log('UserStatus.create.default.error', error);
+      this.loggerService.error(error, UserStatusService.name);
       return false;
     }
   }

@@ -4,7 +4,8 @@ import {
   Get,
   Param,
   Patch,
-  Req,
+  Post,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -15,13 +16,16 @@ import {
 } from '@nestjs/swagger';
 import { UsersService } from './user.service';
 import { UpdatePwdDto, UpdateUserDto } from './dto/update-user.dto';
-import { AdminGuard } from 'src/auth/guards/admin.guard';
-import { UserGuard } from 'src/auth/guards/user.guard';
 import { User } from 'src/auth/decorators/user.decorator';
 import { userRole } from 'src/roles/entities/user_role.enum';
+import { RolesGuard } from 'src/auth/guards/role.guard';
+import { Roles } from 'src/auth/decorators/role.decorator';
+import { Throttle } from '@nestjs/throttler';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @ApiTags('User')
 @ApiBearerAuth()
+@UseGuards(RolesGuard)
 @Controller({
   path: 'users',
   version: "1"
@@ -29,13 +33,14 @@ import { userRole } from 'src/roles/entities/user_role.enum';
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
+  @Roles(userRole.ADMIN)
   @ApiOperation({ summary: 'Users list', description: 'All users list' })
   @Get()
   findAll() {
     return this.usersService.findAll();
   }
 
-  @UseGuards(AdminGuard)
+  @Roles(userRole.ADMIN)
   @ApiOperation({
     summary: 'User dashboard',
     description: 'Get the current admin dashboard',
@@ -45,7 +50,7 @@ export class UsersController {
     return this.usersService.getAdminDashboard(user.id);
   }
 
-  @UseGuards(AdminGuard)
+  @Roles(userRole.ADMIN, userRole.USER)
   @ApiOperation({
     summary: 'User details',
     description: 'Get the current user account details',
@@ -55,6 +60,7 @@ export class UsersController {
     return this.usersService._findOne(user.id);
   }
 
+  @Roles(userRole.ADMIN)
   @ApiOperation({ summary: 'User infos', description: 'Given user infos' })
   @ApiParam({ type: Number, name: 'id', description: 'Isuer ID' })
   @Get(':id')
@@ -62,6 +68,21 @@ export class UsersController {
     return this.usersService._findOne(+id);
   }
 
+  @ApiOperation({ summary: 'User infos', description: 'Given user infos' })
+  @ApiParam({ type: Number, name: 'id', description: 'Isuer ID' })
+  @Get('contact-person')
+  findContactPerson() {
+    return this.usersService.findContactPerson();
+  }
+
+  @Roles(userRole.ADMIN)
+  @ApiOperation({summary: "Create User", description: "Create new user"})
+  @Post()
+  signUp(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.create(createUserDto);
+  }
+
+  @Roles(userRole.ADMIN, userRole.USER)
   @ApiOperation({
     summary: 'Update current user data',
     description: 'Update given User data',
@@ -71,7 +92,7 @@ export class UsersController {
     return this.usersService.updateCurrentUser(updateUserDto, user);
   }
 
-  @UseGuards(AdminGuard)
+  @Roles(userRole.ADMIN)
   @ApiOperation({
     summary: 'Update user data',
     description: 'Update given User data',
@@ -82,13 +103,14 @@ export class UsersController {
     return this.usersService.updateUser(updateUserDto, id);
   }
 
-  @Patch('password')
+  @Roles(userRole.ADMIN, userRole.USER)
+  @Put('password')
   @ApiOperation({
     summary: 'Modifiy password',
     description: 'Modifiy user password',
   })
-  changePwd(@User() user, @Body() updatePwdDto: UpdatePwdDto) {
-    return this.usersService.changePwd(updatePwdDto, user);
+  changePassword(@User() user, @Body() updatePwdDto: UpdatePwdDto) {
+   this.usersService.changePwd(updatePwdDto, user.id);
   }
 
 }

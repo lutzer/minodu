@@ -8,12 +8,10 @@ import { Public } from './auth/decorators/public.decorator';
 import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 import { BaseConfig } from './utils/common.util';
 import { PostService } from './posts/post.service';
-import { PostTagService } from './post_tags/post-tag.service';
 import { ProductsService } from './products/product.service';
+import { Throttle } from '@nestjs/throttler/dist/throttler.decorator';
 
-@Controller({
-  version: "1"
-})
+@Controller()
 export class AppController {
   constructor(
     private readonly appService: AppService,
@@ -24,9 +22,9 @@ export class AppController {
     private readonly postService: PostService,
     private readonly productsService: ProductsService,
   ) {
-    this.userStatusService.createStatuses();
-    this.rolesService.createRoles();
-    // this.usersService.createDefaultAdmin();
+    this.userStatusService.createDefaultStatuses();
+    this.rolesService.createDefaultRoles();
+    this.usersService.createDefaultAdmin();
     this.configurationService.createDefaultConfiguration();
   }
 
@@ -38,6 +36,7 @@ export class AppController {
    * @param res - The response object used to send the file to the client.
    * @returns The file is sent back to the client.
    */
+  @Throttle({ default: { limit: 50, ttl: 60000 } }) // Max 5 tentatives par 10 minute
   @Public()
   @ApiOperation({
     summary: "Download a file",

@@ -3,7 +3,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Weather } from './entities/weather.entity';
 import { WeatherController } from './weather.controller';
 import { WeatherService } from './weather.service';
-import { AiService } from 'src/ai/ai.service';
 
 @Module({
   imports: [
@@ -12,7 +11,7 @@ import { AiService } from 'src/ai/ai.service';
     ])
   ],
   controllers: [WeatherController],
-  providers: [WeatherService, AiService],
+  providers: [WeatherService],
   exports: [WeatherService]
 })
 export class WeatherModule {}

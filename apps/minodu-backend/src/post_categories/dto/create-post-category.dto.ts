@@ -6,7 +6,12 @@ export class CreatePostCategoryDto {
     @IsString()
     @IsNotEmpty()
     name: string;
-  
+
+    @ApiProperty({ type: String, name: 'nameKb', description: "Category name in Kabye" })
+    @IsString()
+    @IsNotEmpty()
+    nameKb: string;
+
     @ApiProperty({
       type: String,
       name: 'image',

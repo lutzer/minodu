@@ -1,14 +1,16 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Put } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ProductDemandService } from './demand.service';
-import { AdminGuard } from 'src/auth/guards/admin.guard';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { CreateProductDemandDto } from './dto/create-product-demand.dto';
 import { UpdateProductDemandDto } from './dto/update-product-demand.dto';
+import { RolesGuard } from 'src/auth/guards/role.guard';
+import { Roles } from 'src/auth/decorators/role.decorator';
+import { userRole } from 'src/roles/entities/user_role.enum';
 
 @ApiTags("Product demand")
 @ApiBearerAuth()
-@UseGuards(AdminGuard)
+@UseGuards(RolesGuard)
 @Controller({
   path: 'product-demands',
   version: "1"
@@ -18,6 +20,7 @@ export class ProductDemandController {
     private readonly productDemandService: ProductDemandService,
   ) { }
 
+  @Roles(userRole.ADMIN)
   @ApiOperation({ summary: "Create ProductDemand", description: "Create a new Product's Demand" })
   @Post()
   create(@Body() createProductDemandDto: CreateProductDemandDto) {
@@ -31,7 +34,7 @@ export class ProductDemandController {
     return this.productDemandService.findAll();
   }
 
-  @Public()
+  @Roles(userRole.ADMIN)
   @ApiOperation({ summary: "Archived ProductDemand list", description: "All archived ProductDemand list" })
   @Get('archived')
   findAllArchived() {
@@ -59,24 +62,28 @@ export class ProductDemandController {
     return this.productDemandService.findOne(+id);
   }
 
+  @Roles(userRole.ADMIN)
   @ApiOperation({ summary: "Archive ProductDemand", description: "Archive a satisfied ProductDemand" })
   @Put(':id/archive')
   archive(@Param('id') id: string) {
     return this.productDemandService.archive(+id);
   }
 
+  @Roles(userRole.ADMIN)
   @ApiOperation({ summary: "Unarchive ProductDemand", description: "Unarchive a ProductDemand" })
   @Put(':id/unarchive')
   unarchive(@Param('id') id: string) {
     return this.productDemandService.unarchive(+id);
   }
 
+  @Roles(userRole.ADMIN)
   @ApiOperation({ summary: "Update ProductDemand", description: "Update given ProductDemand infos" })
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateProductDemandDto: UpdateProductDemandDto) {
     return this.productDemandService.update(+id, updateProductDemandDto);
   }
 
+  @Roles(userRole.ADMIN)
   @ApiOperation({ summary: "Remove ProductDemand", description: "Remove the given ProductDemand" })
   @Delete(':id')
   remove(@Param('id') id: string) {

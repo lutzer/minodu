@@ -3,15 +3,17 @@ import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nes
 import { ProductCategoriesService } from './product_category.service';
 import { CreateProductCategoryDto } from './dto/create-product-category.dto';
 import { UpdateProductCategoryDto } from './dto/update-product-category.dto';
-import { AdminGuard } from 'src/auth/guards/admin.guard';
 import { BaseConfig } from 'src/utils/common.util';
 import { diskStorage } from 'multer';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Public } from 'src/auth/decorators/public.decorator';
+import { RolesGuard } from 'src/auth/guards/role.guard';
+import { Roles } from 'src/auth/decorators/role.decorator';
+import { userRole } from 'src/roles/entities/user_role.enum';
 
 @ApiTags("Product categories")
 @ApiBearerAuth()
-@UseGuards(AdminGuard)
+@UseGuards(RolesGuard)
 @Controller({
   path: 'product-categories',
   version: "1"
@@ -21,6 +23,7 @@ export class ProductCategoriesController {
     private readonly productCategoryService: ProductCategoriesService,
   ) { }
 
+  @Roles(userRole.ADMIN)
   @ApiOperation({ summary: "Create Category", description: "Create a new Category" })
   @ApiConsumes('multipart/form-data', 'application/json')
   @Post()
@@ -44,10 +47,15 @@ export class ProductCategoriesController {
   @UseInterceptors(
     FileInterceptor('image', {
       storage: diskStorage({
-        destination: BaseConfig.setFilePath,
+        destination: (req, file, cb) => {
+        BaseConfig.setFilePath(req, file, cb);
+        },
         filename: BaseConfig.editFileName,
       }),
       fileFilter: BaseConfig.fileFilter,
+      limits: {
+          fileSize: 5 * 1024 * 1024, // Limit to 5 MB
+        }
     }),
   )
   create(@Body() createProductCategoryDto: CreateProductCategoryDto,
@@ -64,12 +72,14 @@ export class ProductCategoriesController {
     return this.productCategoryService.findAll();
   }
 
+  @Public()
   @ApiOperation({ summary: "Category infos", description: "Category infos by given ID" })
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.productCategoryService._findOne(+id);
   }
 
+  @Roles(userRole.ADMIN)
   @ApiOperation({ summary: "Update Category", description: "Update given category infos" })
   @ApiConsumes('multipart/form-data', 'application/json')
   @ApiBody({
@@ -92,10 +102,15 @@ export class ProductCategoriesController {
   @UseInterceptors(
     FileInterceptor('image', {
       storage: diskStorage({
-        destination: BaseConfig.setFilePath,
+        destination: (req, file, cb) => {
+        BaseConfig.setFilePath(req, file, cb);
+        },
         filename: BaseConfig.editFileName,
       }),
       fileFilter: BaseConfig.fileFilter,
+      limits: {
+          fileSize: 5 * 1024 * 1024, // Limit to 5 MB
+        }
     }),
   )
   @Patch(':id')
@@ -105,6 +120,7 @@ export class ProductCategoriesController {
     return this.productCategoryService.update(+id, updateProductCategoryDto);
   }
 
+  @Roles(userRole.ADMIN)
   @ApiOperation({ summary: "Remove Category", description: "Remove the given Category" })
   @Delete(':id')
   remove(@Param('id') id: string) {

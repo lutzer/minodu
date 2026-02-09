@@ -25,20 +25,26 @@ services:
       context: ./apps/minodu-backend
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "${APP_PORT}:3000"
     environment:
-      - DB_HOST=minodu-database
-      - DB_PORT=3306
-      - DB_USERNAME=${MYSQL_USER}
-      - DB_PASSWORD=${MYSQL_PASSWORD}
-      - DB_NAME=minodu
-      - APP_PORT=3000
-      - APP_HOST=http://localhost:3000
-      - APP_FRONT=http://localhost
-      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
-      - AI_SERVICE_URL=http://minodu-ai-services:3002/services
+      DB_HOST: "${DB_HOST}"
+      DB_PORT: "${DB_PORT}"
+      DB_USERNAME: "${DB_USERNAME}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+      DB_NAME: "${DB_NAME}"
+      APP_PORT: "${APP_PORT}"
+      APP_HOST: "${APP_HOST}"
+      APP_FRONT: "${APP_FRONT}"
+      JWT_SECRET: "${JWT_SECRET}"
+      ADMIN_PHONE: "${ADMIN_PHONE}"
+      ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
+      FORUM_URL: "${FORUM_URL}"
+      FORUM_ADMIN_PASSWORD: "${FORUM_ADMIN_PASSWORD}"
+      AI_SERVICE_URL: "${AI_SERVICE_URL}"
     volumes:
       - ./data/minodu-backend:/app/data
+      - ./data/minodu-backend:/app/logs
+      - /var/log/nginx:/app/server/logs
     depends_on:
       minodu-database:
         condition: service_healthy
@@ -149,6 +155,8 @@ services:
     ports:
       - "80:80"      # Frontend (80 on RPI/8088 on local)
       - "8080:8080"  # Backoffice
+    volumes:
+      - log-data:/var/log/nginx
     depends_on:
       - minodu-forum
       - minodu-ai-services
