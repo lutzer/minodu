@@ -45,7 +45,7 @@
 		<p class={isError ? 'error' : ''}>
 			{message.text}
 			{#if !message.final}
-			<span class="cursor">|</span>
+			<span class="cursor">...</span>
 			{/if}
 		</p>
 		{#if !message.final}
@@ -103,18 +103,7 @@
 	}
 
 	.cursor {
-		animation: blink 1s infinite;
-	}
-
-	@keyframes blink {
-		0%,
-		50% {
-			opacity: 1;
-		}
-		51%,
-		100% {
-			opacity: 0;
-		}
+		color: gray;
 	}
 
 	p.error {

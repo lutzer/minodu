@@ -24,7 +24,8 @@
 	let scrollContainer: HTMLDivElement;
 
 	onMount(() => {
-		if (post === undefined) messages = Storage.chatMessages;
+		if (post === undefined) 
+			messages = Storage.chatMessages;
 	});
 
 	afterUpdate(() => {
@@ -82,7 +83,7 @@
 	}
 
 	async function requestAnswer(question: string, conversation: string) {
-		let response = { text: '...', type: BotMessageType.BOT, final: false };
+		let response = { text: '', type: BotMessageType.BOT, final: false };
 		messages = [...messages, response];
 
 		let apiResponse = await AiServicesApi.generateRagResponse({
@@ -107,7 +108,7 @@
 			response.text += text;
 			messages = messages;
 			await tick();
-			await delay(50);
+			await delay(200);
 		}
 
 		response.final = true;
