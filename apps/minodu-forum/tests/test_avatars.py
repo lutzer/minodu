@@ -34,7 +34,7 @@ def test_get_static_uploaded_avatar(client):
     response = client.get(app.root_path + "/static/avatars/" + avatars[0]["filename"])
 
     assert response.status_code == 200
-    assert "image/jpeg" in response.headers["content-type"]
+    assert "image/png" in response.headers["content-type"]
     assert len(response.content) > 0
 
 def test_get_static_uploaded_avatar_urlpath(client):

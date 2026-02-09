@@ -16,11 +16,14 @@ body {
 	--border-radius: 10px;
 	--footer-height: 100px;
 	--header-height: 80px;
-	--button-size: 52px;
+	--button-size: 48px;
+	--max-page-width: 700px;
+	--input-color-bg: #ffffff;
+	--button-big-size: 68px;
 }
 
 .input-textarea {
-	background: #d9d9d9;
+	background: var(--input-color-bg);
 	border-radius: var(--border-radius);
 	height: 140px;
 	padding: var(--small-padding);
@@ -43,8 +46,9 @@ textarea:focus {
 }
 
 .input-text {
-	background: none;
-	border: 1px;
+	background: var(--input-color-bg);
+	border-radius: var(--border-radius);
+	padding: var(--small-padding);
 }
 
 input[type='text'] {
@@ -52,6 +56,9 @@ input[type='text'] {
 	resize: none;
 	border: none;
 	background: none;
+	font-family: 'Signika', sans-serif;
+	font-size: 20px;
+	font-weight: 200;
 }
 
 input[type='text']:focus {
@@ -59,10 +66,18 @@ input[type='text']:focus {
 	box-shadow: none;
 }
 
+h2 {
+	margin: 0;
+	font-weight: 400;
+	font-size: 20px;
+	margin-bottom: var(--small-padding);
+	text-align: center;
+}
+
 h3 {
 	margin: 0;
 	font-weight: 400;
-	font-size: 16px;
+	font-size: 18px;
 	margin-bottom: var(--small-padding);
 }
 
@@ -73,13 +88,17 @@ h4 {
 	margin-bottom: var(--small-padding);
 }
 
+p {
+	margin: 0;
+}
+
 .paragraph:not(:first-of-type) {
 	margin-top: 10px;
 }
 
 .content-width {
 	width: 100%;
-	max-width: 700px;
+	max-width: var(--max-page-width);
 	margin: 0 auto;
 }
 
@@ -89,6 +108,7 @@ button {
 	width: var(--button-size);
 	height: var(--button-size);
 	padding: 0;
+	border-radius: var(--border-radius);
 }
 
 button:disabled {
@@ -97,13 +117,18 @@ button:disabled {
 }
 
 button.big {
-	width: 72px;
-	height: 72px;
+	width: var(--button-big-size);
+	height: var(--button-big-size);
 }
 
 button.small {
-	width: 58px;
-	height: 58px;
+	width: 40px;
+	height: 40px;
+}
+
+button.long {
+	width: 90px;
+	height: 48px;
 }
 
 button img {
@@ -128,6 +153,12 @@ li {
 	box-shadow:
 		4px 4px 0px var(--box-shadow-color),
 		0px 4px 0px var(--box-shadow-color);
+}
+
+.shadow-active {
+	box-shadow:
+		2px 2px 0px var(--box-shadow-color),
+		0px 2px 0px var(--box-shadow-color);
 }
 
 .scroll-container {
@@ -158,4 +189,26 @@ li {
 .color.ELEVAGE {
 	background-color: #f9d9b8;
 	--box-shadow-color: #d9b38c;
+}
+
+.color {
+	background-color: #adaadb;
+	--box-shadow-color: #72708f;
+}
+
+dialog.overlay {
+	max-height: calc(100% - calc(4 * var(--page-padding)));
+	max-width: var(--max-page-width);
+	padding: var(--page-padding);
+	border-radius: var(--border-radius);
+	border: none;
+	background-color: #fcf6e9;
+	--box-shadow-color: #9a711a;
+	overflow: auto;
+	inset: var(--page-padding);
+}
+
+dialog.overlay::backdrop {
+	background-color: rgba(0, 0, 0, 0.3);
+	backdrop-filter: blur(3px);
 }

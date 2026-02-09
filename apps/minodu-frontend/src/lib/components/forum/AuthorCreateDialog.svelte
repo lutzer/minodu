@@ -5,28 +5,33 @@
 	import { language } from '$lib/stores';
 	import type { Optional } from '$lib/types';
 	import { t } from '$lib/translations';
+	import forumBackImage from '$lib/assets/forum-back.png';
+	import forumAcceptImage from '$lib/assets/forum-accept.png';
+	import { onMount } from 'svelte';
 
 	export let onCreated: () => void;
-
-	export function open() {
-		dialog?.showModal();
-		loadAvatars();
-	}
+	export let onBack: () => void;
 
 	let dialog: HTMLDialogElement;
-	let name: string;
+	let name: string = '';
+	let selectedAvatar: Optional<number>;
 	let avatarList: ForumAvatar[] = [];
+
+	$: inputIsValid = name.length >= 3 && selectedAvatar !== undefined;
+
+	onMount(() => {
+		dialog?.showModal();
+		loadAvatars();
+	});
 
 	async function loadAvatars() {
 		avatarList = await ForumApi.getAvatars();
 	}
 
-	async function createAuthor(name: string, avatar: Optional<number>) {
+	async function createAuthor(name: string, avatar: number) {
 		try {
 			let response = await ForumApi.createAuthor({ name: name, avatar: avatar });
 			Storage.forumToken = response.token;
-			name = '';
-			dialog?.close();
 			onCreated();
 		} catch (e) {
 			window.alert(e);
@@ -34,37 +39,96 @@
 	}
 </script>
 
-<dialog bind:this={dialog}>
+<dialog bind:this={dialog} class="shadow overlay">
 	<h2>{t('forum.createAuthor', $language)}</h2>
-	<div class="form-row">
-		<label for="name">{t('forum.name', $language)}</label>
-		<input id="name" maxlength="64" type="text" bind:value={name} />
-	</div>
-	<div class="avatar-list">
-		{#each avatarList as avatar}
-			<label for={`avatar-${avatar.id}`}>{t('forum.avatar', $language)}</label>
-			<input type="radio" id={`avatar-${avatar.id}`} name="avatar" value={`avatar-${avatar.id}`} />
+	<ul class="avatar-list">
+		{#each avatarList as avatar (avatar.id)}
+			<li>
+				<label for={`avatar-${avatar.id}`}>
+					<img src={avatar.file_urlpath} alt={t('alt.avatarImage', $language)} />
+				</label>
+				<input
+					type="radio"
+					id={`avatar-${avatar.id}`}
+					name="avatar"
+					value={avatar.id}
+					bind:group={selectedAvatar}
+				/>
+			</li>
 		{/each}
+	</ul>
+	<div class="input-text">
+		<input
+			id="name"
+			maxlength="64"
+			type="text"
+			bind:value={name}
+			placeholder={t('forum.yourName', $language)}
+		/>
 	</div>
-	<button onclick={() => dialog?.close()}>{t('action.cancel', $language)}</button>
-	<button onclick={() => createAuthor(name, undefined)}>{t('action.ok', $language)}</button>
+	<div class="button-group">
+		<button class="back long shadow" onclick={() => onBack()}>
+			<img src={forumBackImage} alt={t('action.cancel', $language)} />
+		</button>
+		<button
+			class="accept long shadow"
+			onclick={() => createAuthor(name, selectedAvatar!)}
+			disabled={!inputIsValid}
+		>
+			<img src={forumAcceptImage} alt={t('action.ok', $language)} />
+		</button>
+	</div>
 </dialog>
 
 <style>
-	.form-row {
+	.avatar-list {
 		display: flex;
+		flex-wrap: wrap;
+		gap: var(--small-padding);
 		align-items: center;
-		margin-bottom: 15px;
+		justify-content: center;
+		margin: var(--medium-padding) 0;
 	}
 
-	.form-row label {
-		width: 80px;
-		margin-right: 10px;
-	}
-
-	.form-row input {
-		background-color: lightgray;
+	.avatar-list li {
+		width: 28%;
+		max-width: 150px;
+		min-width: 60px;
+		border-radius: var(--border-radius);
 		padding: 5px;
-		flex: 1;
+		background-color: #ffffff;
+	}
+
+	.avatar-list li input[type='radio'] {
+		display: none;
+	}
+
+	.avatar-list li:has(input[type='radio']:checked) {
+		background-color: #37cc84;
+	}
+
+	.avatar-list img {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+	}
+
+	button.accept {
+		background-color: #37cc84;
+		border-radius: var(--border-radius);
+		--box-shadow-color: #25b86e;
+	}
+
+	button.back {
+		background-color: #ffffff;
+		border-radius: var(--border-radius);
+		--box-shadow-color: #cccccc;
+	}
+
+	.button-group {
+		display: flex;
+		padding: var(--medium-padding) 0;
+		justify-content: space-between;
+		gap: var(--medium-padding);
 	}
 </style>

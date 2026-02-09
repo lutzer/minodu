@@ -43,15 +43,18 @@ def create_avatar_table():
     ]
 
     with get_db_session() as db:
-          # Drop all existing avatar entries
-        db.query(Avatar).delete()
-        db.commit()
-
+        # iterate over all image files in folder
         for image_path in avatar_images:
             image_name = os.path.basename(image_path)
             # Extract ID from filename pattern avatar-<n>.png
             match = re.match(r'avatar-(\d+)\.\w+$', image_name)
             if match:
                 avatar_id = int(match.group(1))
-                db.add(Avatar(id=avatar_id, filename=image_name))
+                avatar = db.query(Avatar).filter(Avatar.id == avatar_id).first()
+                if avatar == None:
+                    # create new avatar
+                    db.add(Avatar(id=avatar_id, filename=image_name))
+                else:
+                    # update filename of existing entry
+                    avatar.filename = image_name
         db.commit()

@@ -1,0 +1,66 @@
+<script lang="ts">
+	import { language } from '$lib/stores';
+	import { t } from '$lib/translations';
+	import forumBackImage from '$lib/assets/forum-back.png';
+	import forumDeleteImage from '$lib/assets/forum-delete.png';
+	import { onMount } from 'svelte';
+
+	export let onDelete: () => void;
+	export let onBack: () => void;
+
+	let dialog: HTMLDialogElement;
+
+	onMount(() => {
+		dialog?.showModal();
+	});
+</script>
+
+<dialog bind:this={dialog} class="shadow overlay">
+	<h2>{t('forum.deletePost', $language)}</h2>
+	<div class="button-group">
+		<button class="back long shadow" onclick={() => onBack()}>
+			<img src={forumBackImage} alt={t('action.cancel', $language)} />
+		</button>
+		<button class="delete long shadow" onclick={() => onDelete()}>
+			<img src={forumDeleteImage} alt={t('action.delete', $language)} />
+		</button>
+	</div>
+</dialog>
+
+<style>
+	.author-image {
+		width: 50%;
+		margin: 0 auto;
+		text-align: center;
+	}
+
+	.author-image img {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+	}
+
+	.author-name {
+		padding: var(--small-padding);
+		text-align: center;
+	}
+
+	button.delete {
+		background-color: #fa002a;
+		border-radius: var(--border-radius);
+		--box-shadow-color: #d90024;
+	}
+
+	button.back {
+		background-color: #ffffff;
+		border-radius: var(--border-radius);
+		--box-shadow-color: #cccccc;
+	}
+
+	.button-group {
+		display: flex;
+		padding: var(--medium-padding) 0;
+		justify-content: space-between;
+		gap: var(--medium-padding);
+	}
+</style>

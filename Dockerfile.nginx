@@ -37,7 +37,5 @@ RUN mkdir -p /usr/share/nginx/html/backoffice
 COPY --from=frontend-builder /app/build /usr/share/nginx/html/frontend
 # Copy backoffice build  
 COPY --from=backoffice-builder /app/dist/minodu-backoffice/browser /usr/share/nginx/html/backoffice
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:80/ || exit 1
+
 EXPOSE 80 8080

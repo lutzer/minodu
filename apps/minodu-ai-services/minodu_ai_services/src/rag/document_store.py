@@ -8,14 +8,16 @@ import os
 class DocumentStoreException(Exception):
     pass
 
+CHUNK_SIZE = 500
+
 class DocumentStore:
     def __init__(self, vectorstore, chroma_client):
         self.vectorstore = vectorstore
         self.chroma_client = chroma_client
         self.collection_name = vectorstore._collection_name
         self.text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000,
-            chunk_overlap=200
+            chunk_size=CHUNK_SIZE,
+            chunk_overlap=int(CHUNK_SIZE * 0.1)
         )
     
     def add_text_documents(self, texts, metadatas=None):

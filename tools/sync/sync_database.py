@@ -2,6 +2,13 @@
 """
 Script to download a zip file, extract SQL dump, and merge into existing database.
 Supports MySQL, PostgreSQL, and SQLite databases.
+
+Usage:
+    # Full import (drops and recreates tables from dump schema):
+    python sync_database.py <url> --destination <path> --user <user> --password <pass>
+
+    # Data-only import (inserts into existing TypeORM-created tables):
+    python sync_database.py <url> --destination <path> --user <user> --password <pass> --data-only
 """
 
 import hashlib
@@ -9,6 +16,7 @@ import os
 import sys
 import subprocess
 import argparse
+import re
 import pymysql
 import shutil
 from pathlib import Path
@@ -54,10 +62,63 @@ def download_and_extract(url, extract_to, download_path='./download.zip', keep_f
             os.remove(download_path)
         return False
 
-def import_mysql(sql_file, host, database, user, password, port=3306):
+def filter_data_only_statements(sql_content):
+    """
+    Filter SQL content to only include data-related statements.
+    Keeps: INSERT, DELETE, SET statements
+    Removes: DROP, CREATE, ALTER, LOCK, UNLOCK statements
+    """
+    # Split by semicolons while preserving the structure
+    statements = sql_content.split(';')
+    filtered_statements = []
+
+    # Patterns for statements to KEEP
+    keep_patterns = [
+        r'^\s*INSERT\s+',
+        r'^\s*DELETE\s+',
+        r'^\s*SET\s+',
+        r'^\s*/\*!\d+\s+SET\s+',  # MySQL conditional SET statements
+    ]
+
+    # Patterns for statements to SKIP
+    skip_patterns = [
+        r'^\s*DROP\s+',
+        r'^\s*CREATE\s+',
+        r'^\s*ALTER\s+',
+        r'^\s*LOCK\s+',
+        r'^\s*UNLOCK\s+',
+        r'^\s*/\*!\d+\s+ALTER\s+',  # MySQL conditional ALTER statements
+    ]
+
+    for statement in statements:
+        statement_stripped = statement.strip()
+        if not statement_stripped:
+            continue
+
+        # Check if statement should be skipped
+        should_skip = False
+        for pattern in skip_patterns:
+            if re.match(pattern, statement_stripped, re.IGNORECASE):
+                should_skip = True
+                break
+
+        if should_skip:
+            continue
+
+        # Check if statement should be kept
+        for pattern in keep_patterns:
+            if re.match(pattern, statement_stripped, re.IGNORECASE):
+                filtered_statements.append(statement_stripped)
+                break
+
+    return filtered_statements
+
+
+def import_mysql(sql_file, host, database, user, password, port=3306, data_only=False):
     """Import SQL dump into MySQL database using PyMySQL."""
-    print(f"Importing into MySQL database '{database}'...")
-    
+    mode = "data-only" if data_only else "full"
+    print(f"Importing into MySQL database '{database}' ({mode} mode)...")
+
     try:
         # Connect to MySQL
         connection = pymysql.connect(
@@ -68,32 +129,55 @@ def import_mysql(sql_file, host, database, user, password, port=3306):
             database=database,
             charset='utf8mb4'
         )
-        
+
         cursor = connection.cursor()
-        
-        # Read and execute SQL file
+
+        # Read SQL file
         with open(sql_file, 'r', encoding='utf-8') as f:
             sql_content = f.read()
-        
-        # Split by semicolons and execute each statement
-        statements = sql_content.split(';')
-        
-        for i, statement in enumerate(statements):
-            statement = statement.strip()
-            if statement:
-                try:
-                    cursor.execute(statement)
-                except Exception as e:
-                    print(f"Warning on statement {i+1}: {e}")
-                    # Continue with other statements
-        
+
+        if data_only:
+            # Filter to only data statements (INSERT, DELETE, SET)
+            print("Filtering SQL to data-only statements...")
+
+            # Disable foreign key checks for data import
+            cursor.execute("SET FOREIGN_KEY_CHECKS=0")
+            cursor.execute("SET UNIQUE_CHECKS=0")
+            cursor.execute("SET SQL_MODE='NO_AUTO_VALUE_ON_ZERO'")
+
+            statements = filter_data_only_statements(sql_content)
+
+            for i, statement in enumerate(statements):
+                if statement:
+                    try:
+                        cursor.execute(statement)
+                    except Exception as e:
+                        print(f"Warning on statement {i+1}: {e}")
+                        # Continue with other statements
+
+            # Re-enable checks
+            cursor.execute("SET FOREIGN_KEY_CHECKS=1")
+            cursor.execute("SET UNIQUE_CHECKS=1")
+        else:
+            # Full import - split by semicolons and execute each statement
+            statements = sql_content.split(';')
+
+            for i, statement in enumerate(statements):
+                statement = statement.strip()
+                if statement:
+                    try:
+                        cursor.execute(statement)
+                    except Exception as e:
+                        print(f"Warning on statement {i+1}: {e}")
+                        # Continue with other statements
+
         connection.commit()
         cursor.close()
         connection.close()
-        
+
         print("Import successful!")
         return True
-        
+
     except Exception as e:
         print(f"Error during import: {e}")
         return False
@@ -148,7 +232,10 @@ def main():
     parser.add_argument('--user', required=True, help='Database user')
     parser.add_argument('--password', required=True, help='Database password')
     parser.add_argument('--keep_file', default=True, help='Keep downloaded file')
-    
+    parser.add_argument('--data-only', action='store_true', dest='data_only',
+                        help='Import only data (INSERT statements), skip schema changes. '
+                             'Use this when TypeORM creates the schema with synchronize: true')
+
     args = parser.parse_args()
 
     download_path = Path.cwd() / "download.zip"
@@ -173,7 +260,7 @@ def main():
         return 1
     
     # import sql dump
-    if not import_mysql(sql_file, args.host, args.database, args.user, args.password, args.port):
+    if not import_mysql(sql_file, args.host, args.database, args.user, args.password, args.port, args.data_only):
         cleanup(extract_dir)
         return 1
 
