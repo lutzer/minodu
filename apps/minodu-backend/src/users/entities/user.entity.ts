@@ -14,13 +14,13 @@ export class User extends BaseEntity {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, length: 60 })
   fullname: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, length: 60 })
   gender: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, length: 60 })
   phone: string;
 
   @Exclude({ toPlainOnly: true })
@@ -35,6 +35,9 @@ export class User extends BaseEntity {
 
   @OneToMany(() => ProductOffer, (productOffer) => productOffer.user)
   productOffers: ProductOffer[];
+
+  @Column({ type: 'boolean', default: false })
+  isContactPerson: boolean;
 
   @OneToMany(() => UserSession, (userSession) => userSession.user)
   sessions: UserSession[];

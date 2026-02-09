@@ -22,8 +22,9 @@ export interface BackupResult {
 
 @Injectable()
 export class BackupService {
-  private readonly tempDir = path.join(process.cwd(), 'temp');
+  private readonly dumpFileName = 'db_dump.sql';
   private readonly backupFileName = 'minodu_backend_backup.zip';
+  private readonly tempDir = BaseConfig.getFilePath(this.backupFileName);
 
   constructor(
     private readonly logger: LoggerService
@@ -85,7 +86,7 @@ export class BackupService {
       const files = await fse.readdir(this.tempDir);
       
       for (const file of files) {
-        if (file.endsWith('.zip') || file.endsWith('.sql')) {
+        if (file.endsWith('.zip') || file===this.dumpFileName) {
           const filePath = path.join(this.tempDir, file);
           await fse.remove(filePath);
           this.logger.log(`Deleted old backup: ${file}`);
@@ -100,8 +101,7 @@ export class BackupService {
    * Create MySQL database dump
    */
   private async createDatabaseDump(): Promise<string> {
-    const dumpFileName = `db_dump.sql`;
-    const dumpPath = path.join(this.tempDir, dumpFileName);
+    const dumpPath = path.join(this.tempDir, this.dumpFileName);
 
     // Get database configuration from environment variables
     const dbConfig = {
@@ -158,12 +158,7 @@ export class BackupService {
       const output = fs.createWriteStream(backupPath);
     
       // Define specific files and directories to include
-      const itemsToBackup = [
-            path.join(this.tempDir, '*.sql'),
-            path.join(this.tempDir, 'audios'),
-            path.join(this.tempDir, 'images'),
-            path.join(this.tempDir, 'docs'),
-        ];
+      const itemsToBackup = [this.dumpFileName, 'audios/*', 'images/*', 'docs/*'];
       const archive = archiver('zip', {
         zlib: { level: 9 } // Maximum compression
       });
@@ -180,10 +175,13 @@ export class BackupService {
       archive.pipe(output);
 
       // Add all files from temp directory to zip
-      archive.glob('**/*', {
-            cwd: this.tempDir,
-            ignore: [this.backupFileName]
-        });
+      itemsToBackup.forEach(pattern => {
+          archive.glob(pattern, { cwd: this.tempDir });
+      });
+      // archive.glob('**/*', {
+      //       cwd: this.tempDir,
+      //       ignore: [this.backupFileName, 'minodu.sql', 'logs']
+      //   });
 
       archive.finalize();
     });

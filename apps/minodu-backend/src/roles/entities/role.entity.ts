@@ -9,7 +9,7 @@ export class Role extends BaseEntity {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, length: 60 })
   name: string;
 
   @OneToMany(() => User, (user) => user.role)

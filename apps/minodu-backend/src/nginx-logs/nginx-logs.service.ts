@@ -23,9 +23,13 @@ export class NginxLogsService {
 
   async readRawLogs(
     type: string = 'default',
-    lines: number = 500
+    lines: number
   ): Promise<string> {
     const logPath = this.getLogPath(type);
+
+    if(!lines || isNaN(lines) || lines <= 0) {
+      lines = 500; // Default to 500 lines
+    }
 
     try {
       // Check if file exists

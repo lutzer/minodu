@@ -56,7 +56,7 @@ export class ConfigurationService {
         newConfig.location = "0.00,0.00"
         newConfig.whatsapp_link = null
         newConfig.station_link = null
-        await newConfig.save();
+        await this.configurationRepository.save(newConfig);
       }
 
     } catch (error) {

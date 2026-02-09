@@ -11,9 +11,11 @@ import { ProductsModule } from 'src/products/product.module';
 import { PostModule } from 'src/posts/post.module';
 import { ConfigurationModule } from 'src/configuration/configuration.module';
 import { PostCategoryModule } from 'src/post_categories/post-category.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forFeature([
       Role,
       UserStatus,

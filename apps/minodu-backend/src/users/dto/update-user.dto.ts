@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsBooleanString,
   IsNotEmpty,
   IsNumberString,
   IsOptional,
@@ -22,6 +23,11 @@ export class UpdateUserDto {
   @IsNumberString()
   @IsOptional()
   phone: string;
+
+  @ApiProperty({ type: String, name: 'isContactPerson', description: "User is the community contact person?" })
+  @IsBooleanString()
+  @IsOptional()
+  isContactPerson: string;
 }
 
 export class UpdatePwdDto {

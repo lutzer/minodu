@@ -6,6 +6,7 @@ import { PostTag } from './entities/post_tag.entity';
 import { Post } from 'src/posts/entities/post.entity';
 import { CreatePostTagDto } from './dto/create-post-tag.dto';
 import { UpdatePostTagDto } from './dto/update-post-tag..dto';
+import { BaseConfig } from 'src/utils/common.util';
 
 @Injectable()
 export class PostTagService {
@@ -86,8 +87,10 @@ export class PostTagService {
     try {
       const one = await this.findOne(id);
       one.name = updatePostTagDto.name;
-      if(updatePostTagDto.image)
+      if(updatePostTagDto.image){
+        await BaseConfig.deleteFile(one.image);
         one.image = updatePostTagDto.image;
+      }
       return one.save();
     } catch (error) {
       console.log('Tag.update.error', error);

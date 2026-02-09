@@ -84,8 +84,10 @@ export class PostResourceService {
     try {
       const one = await this.findOne(id);
       one.name = updatePostResourceDto.name;
-      if(updatePostResourceDto.image)
-      one.image = updatePostResourceDto.image;
+      if(updatePostResourceDto.image){
+        await BaseConfig.deleteFile(one.image);
+        one.image = updatePostResourceDto.image;
+      }
       return one.save();
     } catch (error) {
       console.log('PostResource.update.error', error);

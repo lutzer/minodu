@@ -1,5 +1,5 @@
 export const NGINX_LOG_PATHS = {
-  ACCESS_LOG: '/var/log/nginx/access.log',
-  ERROR_LOG: '/var/log/nginx/error.log',
-  DEFAULT_LOG: '/var/log/nginx/nginx.log'
+  ACCESS_LOG: '/app/server/logs/access.log',
+  ERROR_LOG: '/app/server/logs/error.log',
+  DEFAULT_LOG: '/app/server/logs/access.log'
 };

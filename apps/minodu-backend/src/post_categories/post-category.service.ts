@@ -18,6 +18,7 @@ export class PostCategoryService {
     try {
       const category = new PostCategory();
       category.name = createPostCategoryDto.name.toUpperCase();
+      category.nameKb = createPostCategoryDto.nameKb.toUpperCase();
       category.image = createPostCategoryDto.image;
       return category.save();
     } catch (error) {
@@ -73,6 +74,7 @@ export class PostCategoryService {
     try {
       const one = await this.findOne(id);
       one.name = updatePostCategoryDto.name;
+      one.nameKb = updatePostCategoryDto.nameKb;
       if(updatePostCategoryDto.image)
         one.image = updatePostCategoryDto.image;
       return one.save();
