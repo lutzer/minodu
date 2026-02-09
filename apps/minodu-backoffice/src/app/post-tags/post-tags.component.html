@@ -1,11 +1,27 @@
 <div class="page-header d-print-none">
+  <div class="container-xl">
+    <div class="row g-2 align-items-center">
+      <div class="col">
+        <h2 class="page-title">Les tags</h2>
+      </div>
+      <div class="col-auto ms-auto d-print-none">
+        <div class="btn-list">
+          <button class="btn btn-primary" (click)="openAddModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-plus"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
+            Ajouter
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
     <div class="container-xl">
       <div class="row g-2 align-items-center">
         <div class="col">
           <!-- Page pre-title -->
-          <h2 class="page-title">
+          <!-- <h2 class="page-title">
             Les tags
-          </h2>
+          </h2> -->
           <div class="page-pretitle mt-1">
 
           </div>
@@ -41,10 +57,10 @@
                       <span class="dropdown">
                         <button class="btn dropdown-toggle align-text-top" data-bs-boundary="viewport" data-bs-toggle="dropdown">Actions</button>
                         <div class="dropdown-menu dropdown-menu-end">
-                          <a class="dropdown-item" href="#">
+                          <a class="dropdown-item" href="#" (click)="openEditModal(tag, $event)">
                             Modifier
                           </a>
-                          <a class="dropdown-item text-danger" href="#">
+                          <a class="dropdown-item text-danger" href="#" (click)="confirmDelete(tag.id, $event)">
                             Supprimer
                           </a>
                         </div>
@@ -55,7 +71,7 @@
               </table>
             </div>
             <div class="card-footer d-flex align-items-center">
-              <p class="m-0 text-secondary">Affichage de <span>1</span> à <span>{{tags?.length}}</span> de <span>{{tags?.length}}</span> éléments</p>
+              <p class="m-0 text-secondary">Affichage de <span>1</span> à <span>{{tags.length}}</span> de <span>{{tags.length}}</span> éléments</p>
               <ul class="pagination m-0 ms-auto">
                 <li class="page-item disabled">
                   <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
@@ -77,4 +93,62 @@
         </div>
     </div>
     </div>
+</div>
+
+
+<!-- Feedback utilisateur -->
+<div *ngIf="successMessage" class="alert alert-success mt-2">{{successMessage}}</div>
+<div *ngIf="errorMessage" class="alert alert-danger mt-2">{{errorMessage}}</div>
+
+<!-- Modale formulaire (ajout/édition) -->
+<div class="modal fade" id="modal-tag" tabindex="-1" aria-labelledby="modalTagLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form [formGroup]="form" (ngSubmit)="submitForm()">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTagLabel">{{modalTitle}}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="closeModal()"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="tagName" class="form-label">Nom du tag</label>
+            <input id="tagName" type="text" class="form-control" formControlName="name" [class.is-invalid]="form.get('name')?.invalid && form.get('name')?.touched">
+            <div class="invalid-feedback" *ngIf="form.get('name')?.invalid && form.get('name')?.touched">Le nom est requis.</div>
+          </div>
+          <div *ngIf="currentImageUrl" class="mb-3">
+            <img [src]="currentImageUrl" style="width: 150px; height: 150px; object-fit: cover; border-radius: 8px;">
+          </div>
+          <div class="mb-3">
+            <label [for]="fileInputId" class="form-label">Image (optionnelle)</label>
+            <input [id]="fileInputId" type="file" class="form-control" (change)="onFileChange($event)">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeModal()">Annuler</button>
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid || isSubmitting">
+            {{selectedTag ? 'Modifier' : 'Ajouter'}}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modale de suppression -->
+<div class="modal fade" id="modal-delete-tag" tabindex="-1" aria-labelledby="modalDeleteTagLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalDeleteTagLabel">Confirmer la suppression</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="closeModal('delete')"></button>
+      </div>
+      <div class="modal-body">
+        Voulez-vous vraiment supprimer ce tag ? Cette action est irréversible.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeModal('delete')">Annuler</button>
+        <button type="button" class="btn btn-danger" (click)="deleteTag()" [disabled]="isDeleting">Supprimer</button>
+      </div>
+    </div>
+  </div>
 </div>

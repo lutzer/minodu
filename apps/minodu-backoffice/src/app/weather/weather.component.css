@@ -1,0 +1,16 @@
+.weather-row {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* espace contrôlé entre label et valeur */
+}
+
+.weather-row strong {
+  min-width: 190px; /* largeur fixe des labels */
+  font-weight: 600;
+  color: #495057;
+}
+
+.weather-row span {
+  font-weight: 500;
+  color: #212529;
+}

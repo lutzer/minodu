@@ -26,6 +26,14 @@ export class UserService {
       );
   }
 
+  updateUser(id: number, data: { fullName: string, gender: string, phone: string, isContactPerson?: string | boolean }): Observable<any> {
+    return this.http.patch(`${API_URL}users/${id}`, data, httpOptions);
+  }
+
+  createUser(data: { fullName: string, phone: string, gender: string, password: string, isContactPerson?: string | boolean }): Observable<any> {
+    return this.http.post(`${API_URL}users`, data, httpOptions);
+  }
+
   getUser(id: string): Observable<any> {
     return this.http.get(`${API_URL}users/${id}`, 
       httpOptions

@@ -1,74 +1,78 @@
 <div class="page-header d-print-none">
-    <div class="container-xl">
-      <div class="row g-2 align-items-center">
-        <div class="col">
-          <!-- Page pre-title -->
-
-          <h2 class="page-title">
-            Les produits
-          </h2>
-          <div class="page-pretitle mt-1">
-
-          </div>
-        </div>
-        <!-- Page title actions -->
-        <div class="col-auto ms-auto d-print-none">
-          <div class="btn-list">
-            <a href="#" class="btn btn-primary d-none d-sm-inline-block" data-bs-toggle="modal" data-bs-target="#modal-add-product">
-              <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
-            <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-plus"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>            Ajouter
-            </a>
-            <a href="#" class="btn btn-primary d-sm-none btn-icon" data-bs-toggle="modal" data-bs-target="#modal-add-product" aria-label="Create new report">
-              <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
-            <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-plus"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>            </a>
-          </div>
+  <div class="container-xl">
+    <div class="row g-2 align-items-center">
+      <div class="col">
+        <h2 class="page-title">
+          Les produits
+        </h2>
+        <div class="page-pretitle mt-1">
         </div>
       </div>
-      </div>
-      </div>
-
-      <div class="page-body">
-      <div class="container-xl">
-      <div class="row row-deck row-cards">
-        <div *ngFor="let product of products; let i = index" class="col-sm-6 col-lg-4" >
-            <div class="card card-sm">
-                      <a href="#" class="d-block"><img src="{{product.image}}" class="card-img-top object-fit-cover" height="250"></a>
-                      <div class="ribbon bg-green h4">{{product.price}} FCFA / {{product.salesUnit}}</div>
-                      <div class="card-body">
-                        <div class="col-12 d-flex">
-                        <div class="col d-flex align-items-center">
-                          <div>
-                            <div>{{product.name}}</div>
-                            <div class="text-secondary">{{product.category.name}}</div>
-                            <div class="mt-2">{{product.description}}</div>
-                          </div>
-                        </div>
-                        <div class="col-auto">
-                            <div class="dropdown">
-                            <a href="#" class="btn-action" data-bs-toggle="dropdown" aria-expanded="false">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M12 19m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M12 5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path></svg>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-end" style="">
-                                <a href="#" class="dropdown-item">Modifier</a>
-                                <a href="#" class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#modal-delete">Supprimer</a>
-                            </div>
-                            </div>
-                        </div>
-                        </div>
-                      </div>
-            </div>
+      <div class="col-auto ms-auto d-print-none">
+        <div class="btn-list">
+          <a href="#" class="btn btn-primary d-none d-sm-inline-block" data-bs-toggle="modal" data-bs-target="#modal-add-product" (click)="openAddModal()">
+          <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-plus"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>            
+          Ajouter
+          </a>
+          <a href="#" class="btn btn-primary d-sm-none btn-icon" data-bs-toggle="modal" data-bs-target="#modal-add-product" (click)="openAddModal()" aria-label="Create new report">
+          <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-plus"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>            
+          </a>
         </div>
+      </div>
     </div>
-    </div>
+  </div>
 </div>
 
+<div class="page-body">
+  <div class="container-xl">
+    <!-- Loading state -->
+    <div *ngIf="loading" class="d-flex justify-content-center py-5">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Chargement...</span>
+      </div>
+    </div>
 
+    <!-- Products grid -->
+    <div *ngIf="!loading" class="row row-deck row-cards">
+      <div *ngFor="let product of products; let i = index" class="col-sm-6 col-lg-4" >
+        <div class="card card-sm">
+          <a class="d-block"><img src="{{product.image}}" class="card-img-top object-fit-cover" height="250"></a>
+          <div class="ribbon bg-green h4">{{product.price}} FCFA / {{product.salesUnit}}</div>
+          <div class="card-body">
+            <div class="col-12 d-flex">
+              <div class="col d-flex align-items-center">
+                <div>
+                  <div>{{product.name}}</div>
+                  <div class="text-secondary">{{product.category.name}}</div>
+                  <div class="mt-2">{{product.description}}</div>
+                </div>
+              </div>
+              <div class="col-auto">
+                <div class="dropdown">
+                  <a href="#" class="btn-action" data-bs-toggle="dropdown" aria-expanded="false">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"></path><path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M12 19m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path><path d="M12 5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path></svg>
+                  </a>
+                  <div class="dropdown-menu dropdown-menu-end">
+                    <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-add-product" (click)="editProduct(product)">Modifier</a>
+                    <a href="#" class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#modal-delete" (click)="confirmDelete(product)">Supprimer</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Add/Edit Product -->
 <div class="modal modal-blur fade" id="modal-add-product" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-      <form [formGroup]="addProductForm" (ngSubmit)="onSubmit()" class="card">
+  <div class="modal-dialog modal-lg" role="document">
+    <form [formGroup]="addProductForm" (ngSubmit)="onSubmit()" class="card">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Nouveau produit agricole</h5>
+          <h5 class="modal-title">{{ getModalTitle() }}</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -76,44 +80,55 @@
             <label class="form-label">Nom</label>
             <input type="text" class="form-control" formControlName="name" placeholder="Nom du produit">
             <div *ngIf="addProductForm.get('name')?.invalid && isFormSubmitted" class="mt-2 text-danger">
-                <p *ngIf="addProductForm.get('name')?.errors?.['required']">
-                    * Le nom du produit est requis.
-                </p>
+              <p *ngIf="addProductForm.get('name')?.errors?.['required']">
+                * Le nom du produit est requis.
+              </p>
             </div>
           </div>
           <div class="mb-3">
-              <label class="form-label">Description</label>
-              <textarea formControlName="description" class="form-control" rows="3"></textarea>
-              <div *ngIf="addProductForm.get('description')?.invalid && isFormSubmitted" class="mt-2 text-danger">
-                  <p *ngIf="addProductForm.get('description')?.errors?.['required']">
-                      * La description du produit est requise.
-                  </p>
-              </div>
+            <label class="form-label">Description</label>
+            <textarea formControlName="description" class="form-control" rows="3"></textarea>
+            <div *ngIf="addProductForm.get('description')?.invalid && isFormSubmitted" class="mt-2 text-danger">
+              <p *ngIf="addProductForm.get('description')?.errors?.['required']">
+                * La description du produit est requise.
+              </p>
+            </div>
           </div>
           <div class="mb-3">
-              <label class="form-label">catégorie</label>
-              <select class="form-select" formControlName="category">
-                  <option *ngFor="let category of categories" value="{{category.id}}">{{category.name}}</option>
-              </select>
-              <div *ngIf="addProductForm.get('category')?.invalid && isFormSubmitted" class="mt-2 text-danger">
-                  <p *ngIf="addProductForm.get('category')?.errors?.['required']">
-                      * La catégorie du produit est requise.
-                  </p>
-              </div>
+            <label class="form-label">Catégorie</label>
+            <select class="form-select" formControlName="category">
+              <option value="">Sélectionner une catégorie</option>
+              <option *ngFor="let category of categories" value="{{category.id}}">{{category.name}}</option>
+            </select>
+            <div *ngIf="addProductForm.get('category')?.invalid && isFormSubmitted" class="mt-2 text-danger">
+              <p *ngIf="addProductForm.get('category')?.errors?.['required']">
+                * La catégorie du produit est requise.
+              </p>
+            </div>
           </div>
           <div class="mb-3">
-              <div class="form-label">Image</div>
-              <input formControlName="image" type="file" class="form-control" accept="image/*" (change)="onFileChange($event)">
+            <div class="form-label">Image {{ isEditMode ? '(optionnelle)' : '' }}</div>
+            
+            <!-- File input toujours visible -->
+            <input [id]="fileInputId" formControlName="image" type="file" class="form-control mb-3" accept="image/*" (change)="onFileChange($event)">
+            
+            <!-- Afficher l'image existante -->
+            <div *ngIf="currentImageUrl">
+              <div class="position-relative">
+                <img [src]="currentImageUrl" alt="Image actuelle" style="width: 150px; height: 150px; object-fit: cover; border-radius: 8px;">
+              </div>
+              <small class="form-text text-muted d-block mt-2">Formats acceptés: JPG, PNG, GIF</small>
+            </div>
+            
+            <small *ngIf="!currentImageUrl" class="form-text text-muted">Formats acceptés: JPG, PNG, GIF</small>
           </div>
-        </div>
-        <div class="modal-body">
           <div class="row">
             <div class="col-lg-6">
               <div class="mb-3">
                 <label class="form-label">Prix</label>
                 <div class="input-group mb-2">
-                <input formControlName="price" type="number" class="form-control">
-                <span class="input-group-text">F CFA</span>
+                  <input formControlName="price" type="number" class="form-control">
+                  <span class="input-group-text">F CFA</span>
                 </div>
               </div>
             </div>
@@ -123,54 +138,61 @@
                 <input formControlName="sales-unit" type="text" placeholder="Bol, Sac, Bassine ..." class="form-control">
                 <div *ngIf="addProductForm.get('sales-unit')?.invalid && isFormSubmitted" class="mt-2 text-danger">
                   <p *ngIf="addProductForm.get('sales-unit')?.errors?.['required']">
-                      * L'unité de vente du produit est requise.
+                    * L'unité de vente du produit est requise.
                   </p>
                 </div>
               </div>
             </div>
-            
           </div>
         </div>
         <div class="mb-3">
-              @if (isFormSubmitted && isAdded) {
-                  <div class="alert alert-success mb-25" role="alert">
-                      Les nouveau produit a été ajouté avec succès.
-                  </div>
-                  }
-                  @if (isFormSubmitted && errorMessage) {
-                    <div class="alert alert-danger mb-25" role="alert">
-                        {{ errorMessage }}
-                    </div>
-              }
+          @if (isFormSubmitted && isAdded) {
+            <div class="alert alert-success mb-25" role="alert">
+              Le nouveau produit a été ajouté avec succès.
+            </div>
+          }
+          @if (isFormSubmitted && isUpdated) {
+            <div class="alert alert-success mb-25" role="alert">
+              Le produit a été modifié avec succès.
+            </div>
+          }
+          @if (isFormSubmitted && errorMessage) {
+            <div class="alert alert-danger mb-25" role="alert">
+              {{ errorMessage }}
+            </div>
+          }
         </div>
         <div class="modal-footer">
           <a href="#" class="btn btn-link link-secondary" data-bs-dismiss="modal">
             Annuler
           </a>
           <div class="text-end ms-auto">
-              <button [disabled]="isSubmitting" type="submit" class="btn btn-primary">
-                <div *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2" style="width: 1.3rem; height: 1.3rem;"></div>
-                <span [class.opacity-7]="isSubmitting">Soumettre</span>
-              </button>
+            <button [disabled]="isSubmitting" type="submit" class="btn btn-primary">
+              <div *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2" style="width: 1.3rem; height: 1.3rem;"></div>
+              <span [class.opacity-7]="isSubmitting">{{ getSubmitButtonText() }}</span>
+            </button>
           </div>
         </div>
       </div>
-      </form>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Delete Product -->
+<div class="modal modal-blur fade" id="modal-delete" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="modal-title">Cette action est irréversible</div>
+        <div>La suppression entraînera la perte irréversible des informations de ce produit "{{ productToDelete?.name }}". Êtes-vous certain de vouloir continuer ?</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-link link-secondary me-auto" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-danger" [disabled]="isDeleting" (click)="deleteProduct()">
+          <div *ngIf="isDeleting" class="spinner-border spinner-border-sm me-2" style="width: 1rem; height: 1rem;"></div>
+          <span [class.opacity-7]="isDeleting">Oui, Supprimer</span>
+        </button>
+      </div>
     </div>
   </div>
-
-
-    <div class="modal modal-blur fade" id="modal-delete" tabindex="-1" role="dialog" aria-hidden="true">
-      <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-body">
-            <div class="modal-title">Cette action est irréversible</div>
-            <div>La suppression entraînera la perte irréversible des informations de ce produit. Êtes-vous certain de vouloir continuer ?</div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-link link-secondary me-auto" data-bs-dismiss="modal">Annuler</button>
-            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Oui, Supprimer</button>
-          </div>
-        </div>
-      </div>
-    </div>
+</div>

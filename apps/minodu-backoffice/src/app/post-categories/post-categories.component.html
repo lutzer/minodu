@@ -1,11 +1,27 @@
 <div class="page-header d-print-none">
+  <div class="container-xl">
+    <div class="row g-2 align-items-center">
+      <div class="col">
+        <h2 class="page-title">Les catégories</h2>
+      </div>
+      <div class="col-auto ms-auto d-print-none">
+        <div class="btn-list">
+          <button class="btn btn-primary" (click)="openAddModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-plus"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
+            Ajouter
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
     <div class="container-xl">
       <div class="row g-2 align-items-center">
         <div class="col">
           <!-- Page pre-title -->
-          <h2 class="page-title">
+          <!-- <h2 class="page-title">
             Les catégories
-          </h2>
+          </h2> -->
           <div class="page-pretitle mt-1">
 
           </div>
@@ -28,6 +44,7 @@
                       <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-sm icon-thick" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 15l6 -6l6 6" /></svg>
                     </th>
                     <th>Nom</th>
+                    <th>Nom (Kabyè)</th>
                     <th></th>
                   </tr>
                 </thead>
@@ -35,14 +52,15 @@
                   <tr *ngFor="let category of categories; let i = index">
                     <td><span class="text-secondary">{{i+1}}</span></td>
                     <td>{{category.name}}</td>
+                    <td>{{category.nameKb || '-'}}</td>
                     <td class="text-end">
                       <span class="dropdown">
                         <button class="btn dropdown-toggle align-text-top" data-bs-boundary="viewport" data-bs-toggle="dropdown">Actions</button>
                         <div class="dropdown-menu dropdown-menu-end">
-                          <a class="dropdown-item" href="#">
+                          <a class="dropdown-item" href="#" (click)="openEditModal(category, $event)">
                             Modifier
                           </a>
-                          <a class="dropdown-item text-danger" href="#">
+                          <a class="dropdown-item text-danger" href="#" (click)="confirmDelete(category.id, $event)">
                             Supprimer
                           </a>
                         </div>
@@ -53,7 +71,7 @@
               </table>
             </div>
             <div class="card-footer d-flex align-items-center">
-              <p class="m-0 text-secondary">Affichage de <span>1</span> à <span>{{categories?.length}}</span> de <span>{{categories?.length}}</span> éléments</p>
+              <p class="m-0 text-secondary">Affichage de <span>1</span> à <span>{{categories.length}}</span> de <span>{{categories.length}}</span> éléments</p>
               <ul class="pagination m-0 ms-auto">
                 <li class="page-item disabled">
                   <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
@@ -75,4 +93,72 @@
         </div>
     </div>
     </div>
+</div>
+
+<!-- Feedback utilisateur -->
+<div *ngIf="successMessage" class="alert alert-success mt-2">{{successMessage}}</div>
+<div *ngIf="errorMessage" class="alert alert-danger mt-2">{{errorMessage}}</div>
+
+<!-- Modale formulaire (ajout/édition) -->
+<div class="modal fade" id="modal-category" tabindex="-1" aria-labelledby="modalCategoryLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form [formGroup]="form" (ngSubmit)="submitForm()">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalCategoryLabel">{{modalTitle}}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="closeModal()"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="categoryName" class="form-label">Nom de la catégorie</label>
+            <input id="categoryName" type="text" class="form-control" formControlName="name" [class.is-invalid]="form.get('name')?.invalid && form.get('name')?.touched">
+            <div class="invalid-feedback" *ngIf="form.get('name')?.invalid && form.get('name')?.touched">Le nom est requis.</div>
+          </div>
+          <div class="mb-3">
+            <label for="categoryNameKb" class="form-label">Nom de la catégorie en kabyè</label>
+            <input id="categoryNameKb" type="text" class="form-control" formControlName="nameKb" [class.is-invalid]="form.get('nameKb')?.invalid && form.get('nameKb')?.touched">
+            <div class="invalid-feedback" *ngIf="form.get('nameKb')?.invalid && form.get('nameKb')?.touched">Le nom en kabyè est requis.</div>
+          </div>
+          <div class="mb-3">
+            <label for="categoryImage" class="form-label">Image (optionnelle)</label>
+            
+            <!-- Afficher l'image existante -->
+            <div *ngIf="currentImageUrl" class="mb-3">
+              <div class="position-relative">
+                <img [src]="currentImageUrl" alt="Image actuelle" style="width: 150px; height: 150px; object-fit: cover; border-radius: 8px;">
+              </div>
+            </div>
+
+            <!-- File input toujours visible -->
+            <input [id]="fileInputId" type="file" class="form-control" (change)="onFileChange($event)">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeModal()">Annuler</button>
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid || isSubmitting">
+            {{selectedCategory ? 'Modifier' : 'Ajouter'}}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modale de suppression -->
+<div class="modal fade" id="modal-delete-category" tabindex="-1" aria-labelledby="modalDeleteCategoryLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalDeleteCategoryLabel">Confirmer la suppression</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="closeModal('delete')"></button>
+      </div>
+      <div class="modal-body">
+        Voulez-vous vraiment supprimer cette catégorie ? Cette action est irréversible.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeModal('delete')">Annuler</button>
+        <button type="button" class="btn btn-danger" (click)="deleteCategory()" [disabled]="isDeleting">Supprimer</button>
+      </div>
+    </div>
+  </div>
 </div>

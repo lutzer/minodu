@@ -1,0 +1,322 @@
+<div class="page-header d-print-none">
+  <div class="container-xl">
+    <div class="row g-2 align-items-center">
+      <div class="col">
+        <h2 class="page-title">Demandes de produits</h2>
+      </div>
+      <div class="col-auto ms-auto d-print-none">
+        <div class="btn-list">
+          <a href="#" class="btn btn-primary d-none d-sm-inline-block" data-bs-toggle="modal" data-bs-target="#modal-add-demand" (click)="openAddModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-plus"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14"/><path d="M5 12l14 0"/></svg>
+            Ajouter
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page-body">
+  <div class="container-xl">
+    <!-- Onglets de navigation -->
+    <div class="row mb-3">
+      <div class="col-12">
+        <ul class="nav nav-tabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <a class="nav-link" [class.active]="activeTab === 'active'" 
+               (click)="switchTab('active')" 
+               style="cursor: pointer;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon me-2">
+                <path d="M9 11l3 3l8 -8"></path>
+                <path d="M20 12v6a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h9"></path>
+              </svg>
+              Demandes actives
+              <span class="badge text-white bg-primary ms-2">{{ productDemands.length }}</span>
+            </a>
+          </li>
+          <li class="nav-item" role="presentation">
+            <a class="nav-link" [class.active]="activeTab === 'archived'" 
+               (click)="switchTab('archived')" 
+               style="cursor: pointer;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon me-2">
+                <path d="M3 4m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"></path>
+                <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10"></path>
+                <path d="M10 12l4 0"></path>
+              </svg>
+              Demandes archivées
+              <span class="badge text-white bg-secondary ms-2">{{ archivedDemands.length }}</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Contenu des onglets -->
+    <div class="row row-deck row-cards">
+      <div class="col-12">
+        <!-- Demandes actives -->
+        <div *ngIf="activeTab === 'active'" class="card">
+          <div class="table-responsive">
+            <table class="table card-table table-vcenter text-nowrap datatable">
+              <thead>
+                <tr>
+                  <th class="w-1">No.</th>
+                  <th>Produit</th>
+                  <th>Quantité</th>
+                  <th>Partenaire</th>
+                  <th>Date limite</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngIf="loading">
+                  <td colspan="6" class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                      <span class="visually-hidden">Chargement...</span>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngIf="!loading && productDemands.length === 0">
+                  <td colspan="6" class="text-center py-4 text-muted">
+                    Aucune demande active
+                  </td>
+                </tr>
+                <tr *ngFor="let demand of productDemands; let i = index">
+                  <td><span class="text-secondary">{{i+1}}</span></td>
+                  <td>{{ demand.product.name }}</td>
+                  <td>{{demand.quantity}} / {{demand.product.salesUnit}}</td>
+                  <td>{{demand.partner.name}}</td>
+                  <td>{{demand.deadline | date:'dd/MM/yyyy'}}</td>
+                  <td class="text-end">
+                    <span class="dropdown">
+                      <button class="btn dropdown-toggle align-text-top" data-bs-boundary="viewport" data-bs-toggle="dropdown">Actions</button>
+                      <div class="dropdown-menu dropdown-menu-end">
+                        <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-add-demand" (click)="editDemand(demand)">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler me-2">
+                            <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"></path>
+                            <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"></path>
+                            <path d="M16 5l3 3"></path>
+                          </svg>
+                          Modifier
+                        </a>
+                        <a href="#" class="dropdown-item text-success" data-bs-toggle="modal" data-bs-target="#modal-archive" (click)="confirmArchive(demand)">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler me-2">
+                            <path d="M3 4m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"></path>
+                            <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10"></path>
+                            <path d="M10 12l4 0"></path>
+                          </svg>
+                          Archiver
+                        </a>
+                        <a href="#" class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#modal-delete" (click)="confirmDelete(demand)">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler me-2">
+                            <path d="M4 7l16 0"></path>
+                            <path d="M10 11l0 6"></path>
+                            <path d="M14 11l0 6"></path>
+                            <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
+                            <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
+                          </svg>
+                          Supprimer
+                        </a>
+                      </div>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card-footer d-flex align-items-center">
+            <p class="m-0 text-secondary">Affichage de <span>1</span> à <span>{{productDemands.length}}</span> de <span>{{productDemands.length}}</span> éléments</p>
+          </div>
+        </div>
+
+        <!-- Demandes archivées -->
+        <div *ngIf="activeTab === 'archived'" class="card">
+          <div class="table-responsive">
+            <table class="table card-table table-vcenter text-nowrap datatable">
+              <thead>
+                <tr>
+                  <th class="w-1">No.</th>
+                  <th>Produit</th>
+                  <th>Quantité</th>
+                  <th>Partenaire</th>
+                  <th>Date limite</th>
+                  <th>Date d'archivage</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngIf="loadingArchived">
+                  <td colspan="7" class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                      <span class="visually-hidden">Chargement...</span>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngIf="!loadingArchived && archivedDemands.length === 0">
+                  <td colspan="7" class="text-center py-4 text-muted">
+                    Aucune demande archivée
+                  </td>
+                </tr>
+                <tr *ngFor="let demand of archivedDemands; let i = index">
+                  <td><span class="text-secondary">{{i+1}}</span></td>
+                  <td>{{ demand.product.name }}</td>
+                  <td>{{demand.quantity}} / {{demand.product.salesUnit}}</td>
+                  <td>{{demand.partner.name}}</td>
+                  <td>{{demand.deadline | date:'dd/MM/yyyy'}}</td>
+                  <td>
+                    <span class="badge text-white bg-secondary">
+                      {{demand.archivedAt | date:'dd/MM/yyyy'}}
+                    </span>
+                  </td>
+                  <td class="text-end">
+                    <span class="dropdown">
+                      <button class="btn dropdown-toggle align-text-top" data-bs-boundary="viewport" data-bs-toggle="dropdown">Actions</button>
+                      <div class="dropdown-menu dropdown-menu-end">
+                        <a href="#" class="dropdown-item text-primary" (click)="unarchiveDemand(demand); $event.preventDefault()">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler me-2">
+                            <path d="M9 13l-4 -4l4 -4m-4 4h11a4 4 0 0 1 0 8h-1"></path>
+                          </svg>
+                          Désarchiver
+                        </a>
+                        <a href="#" class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#modal-delete" (click)="confirmDelete(demand)">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler me-2">
+                            <path d="M4 7l16 0"></path>
+                            <path d="M10 11l0 6"></path>
+                            <path d="M14 11l0 6"></path>
+                            <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
+                            <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
+                          </svg>
+                          Supprimer
+                        </a>
+                      </div>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card-footer d-flex align-items-center">
+            <p class="m-0 text-secondary">Affichage de <span>1</span> à <span>{{archivedDemands.length}}</span> de <span>{{archivedDemands.length}}</span> éléments</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Ajout/Édition Demande -->
+<div class="modal modal-blur fade" id="modal-add-demand" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <form [formGroup]="addDemandForm" (ngSubmit)="onSubmit()" class="card">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ getModalTitle() }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Produit</label>
+            <select class="form-select" formControlName="productId">
+              <option value="">Sélectionner un produit</option>
+              <option *ngFor="let product of products" [value]="product.id">{{ product.name }}</option>
+            </select>
+            <div *ngIf="addDemandForm.get('productId')?.invalid && isFormSubmitted" class="mt-2 text-danger">
+              <p>* Le produit est requis.</p>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Quantité 
+              <span *ngIf="getSelectedProductUnit()" class="text-muted">
+                (en {{ getSelectedProductUnit() }})
+              </span>
+            </label>
+            <div class="input-group">
+              <input type="number" class="form-control" formControlName="quantity" 
+                    min="1" placeholder="Quantité demandée">
+              <span *ngIf="getSelectedProductUnit()" class="input-group-text">
+                {{ getSelectedProductUnit() }}
+              </span>
+            </div>
+            <div *ngIf="addDemandForm.get('quantity')?.invalid && isFormSubmitted" class="mt-2 text-danger">
+              <p *ngIf="addDemandForm.get('quantity')?.errors?.['required']">* La quantité est requise.</p>
+              <p *ngIf="addDemandForm.get('quantity')?.errors?.['min']">* La quantité doit être supérieure à 0.</p>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Partenaire</label>
+            <select class="form-select" formControlName="partnerId">
+              <option value="">Sélectionner un partenaire</option>
+              <option *ngFor="let partner of partners" [value]="partner.id">{{ partner.name }}</option>
+            </select>
+            <div *ngIf="addDemandForm.get('partnerId')?.invalid && isFormSubmitted" class="mt-2 text-danger">
+              <p>* Le partenaire est requis.</p>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Date limite</label>
+            <input type="date" class="form-control" formControlName="deadline" placeholder="Date limite">
+            <div *ngIf="addDemandForm.get('deadline')?.invalid && isFormSubmitted" class="mt-2 text-danger">
+              <p>* La date limite est requise.</p>
+            </div>
+          </div>
+          <div class="mb-3">
+            <div *ngIf="isFormSubmitted && isAdded" class="alert alert-success mb-2" role="alert">
+              Nouvelle demande ajoutée avec succès.
+            </div>
+            <div *ngIf="isFormSubmitted && isUpdated" class="alert alert-success mb-2" role="alert">
+              Demande modifiée avec succès.
+            </div>
+            <div *ngIf="isFormSubmitted && errorMessage" class="alert alert-danger mb-2" role="alert">
+              {{ errorMessage }}
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <a href="#" class="btn btn-link link-secondary" data-bs-dismiss="modal">Annuler</a>
+          <button [disabled]="isSubmitting" type="submit" class="btn btn-primary">
+            <div *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2" style="width: 1.3rem; height: 1.3rem;"></div>
+            <span [class.opacity-7]="isSubmitting">{{ getSubmitButtonText() }}</span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal d'archivage -->
+<div class="modal modal-blur fade" id="modal-archive" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="modal-title">Archiver cette demande</div>
+        <div>Vous confirmez que cette demande a été satisfaite et souhaitez l'archiver ?</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-link link-secondary me-auto" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-success" [disabled]="isArchiving" (click)="archiveDemand()">
+          <div *ngIf="isArchiving" class="spinner-border spinner-border-sm me-2" style="width: 1rem; height: 1rem;"></div>
+          <span [class.opacity-7]="isArchiving">Oui, Archiver</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de suppression -->
+<div class="modal modal-blur fade" id="modal-delete" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="modal-title">Cette action est irréversible</div>
+        <div>La suppression entraînera la perte irréversible de cette demande. Êtes-vous certain de vouloir continuer ?</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-link link-secondary me-auto" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-danger" [disabled]="isDeleting" (click)="deleteDemand()">
+          <div *ngIf="isDeleting" class="spinner-border spinner-border-sm me-2" style="width: 1rem; height: 1rem;"></div>
+          <span [class.opacity-7]="isDeleting">Oui, Supprimer</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

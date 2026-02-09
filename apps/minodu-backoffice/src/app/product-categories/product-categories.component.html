@@ -1,19 +1,20 @@
 <div class="page-header d-print-none">
-    <div class="container-xl">
-      <div class="row g-2 align-items-center">
-        <div class="col">
-          <!-- Page pre-title -->
-          <h2 class="page-title">
-            Les catégories
-          </h2>
-          <div class="page-pretitle mt-1">
-
-          </div>
+  <div class="container-xl">
+    <div class="row g-2 align-items-center">
+      <div class="col">
+        <h2 class="page-title">Les catégories</h2>
+      </div>
+      <div class="col-auto ms-auto d-print-none">
+        <div class="btn-list">
+          <a href="#" class="btn btn-primary d-none d-sm-inline-block" data-bs-toggle="modal" data-bs-target="#modal-add-category" (click)="openAddModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-plus"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14"/><path d="M5 12l14 0"/></svg>
+            Ajouter
+          </a>
         </div>
-
       </div>
-      </div>
-      </div>
+    </div>
+  </div>
+    <div class="container-xl">
 
       <div class="page-body">
       <div class="container-xl">
@@ -39,12 +40,8 @@
                       <span class="dropdown">
                         <button class="btn dropdown-toggle align-text-top" data-bs-boundary="viewport" data-bs-toggle="dropdown">Actions</button>
                         <div class="dropdown-menu dropdown-menu-end">
-                          <a class="dropdown-item" href="#">
-                            Modifier
-                          </a>
-                          <a class="dropdown-item text-danger" href="#">
-                            Supprimer
-                          </a>
+                          <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-add-category" (click)="editCategory(category)">Modifier</a>
+                          <a href="#" class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#modal-delete" (click)="confirmDelete(category)">Supprimer</a>
                         </div>
                       </span>
                     </td>
@@ -75,4 +72,68 @@
         </div>
     </div>
     </div>
+</div>
+
+<!-- Modal Ajout/Édition Catégorie -->
+<div class="modal modal-blur fade" id="modal-add-category" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <form [formGroup]="addCategoryForm" (ngSubmit)="onSubmit()" class="card">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ getModalTitle() }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Nom</label>
+            <input type="text" class="form-control" formControlName="name" placeholder="Nom de la catégorie">
+            <div *ngIf="addCategoryForm.get('name')?.invalid && isFormSubmitted" class="mt-2 text-danger">
+              <p *ngIf="addCategoryForm.get('name')?.errors?.['required']">* Le nom de la catégorie est requis.</p>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Image (optionnelle)</label>
+            <input type="file" class="form-control" (change)="onFileChange($event)" accept="image/*">
+          </div>
+          <div class="mb-3">
+            <div *ngIf="isFormSubmitted && isAdded" class="alert alert-success mb-2" role="alert">
+              Nouvelle catégorie ajoutée avec succès.
+            </div>
+            <div *ngIf="isFormSubmitted && isUpdated" class="alert alert-success mb-2" role="alert">
+              Catégorie modifiée avec succès.
+            </div>
+            <div *ngIf="isFormSubmitted && errorMessage" class="alert alert-danger mb-2" role="alert">
+              {{ errorMessage }}
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <a href="#" class="btn btn-link link-secondary" data-bs-dismiss="modal">Annuler</a>
+          <button [disabled]="isSubmitting" type="submit" class="btn btn-primary">
+            <div *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2" style="width: 1.3rem; height: 1.3rem;"></div>
+            <span [class.opacity-7]="isSubmitting">{{ getSubmitButtonText() }}</span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal de suppression -->
+<div class="modal modal-blur fade" id="modal-delete" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="modal-title">Cette action est irréversible</div>
+        <div>La suppression entraînera la perte irréversible des informations de ce produit "{{ categoryToDelete?.name }}". Êtes-vous certain de vouloir continuer ?</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-link link-secondary me-auto" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-danger" [disabled]="isDeleting" (click)="deleteCategory()">
+          <div *ngIf="isDeleting" class="spinner-border spinner-border-sm me-2" style="width: 1rem; height: 1rem;"></div>
+          <span [class.opacity-7]="isDeleting">Oui, Supprimer</span>
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

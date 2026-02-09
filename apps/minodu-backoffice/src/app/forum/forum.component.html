@@ -1,0 +1,214 @@
+<div class="page-header d-print-none">
+    <div class="container-xl">
+      <div class="row g-2 align-items-center">
+        <div class="col">
+          <h2 class="page-title">Forum</h2>
+          <div class="page-pretitle mt-1">Discussions et entrées du forum</div>
+        </div>
+      </div>
+    </div>
+</div>
+
+<div class="page-body">
+  <div class="container-xl">
+    <!-- Messages d'erreur et succès -->
+    <div class="row">
+      <div class="col-12">
+        <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 8v4" /><path d="M12 16v.01" /></svg>
+          <div>{{ errorMessage }}</div>
+          <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+        </div>
+        <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M9 12l2 2l4 -4" /></svg>
+          <div>{{ successMessage }}</div>
+          <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="row row-deck row-cards">
+      <!-- <div class="mb-3 col-12 col-md-4">
+        <input type="text" class="form-control" placeholder="Rechercher par titre ou auteur..." [(ngModel)]="searchTerm" (ngModelChange)="currentPage = 1">
+      </div> -->
+
+      <div class="col-12">
+        <div class="card">
+          <div class="table-responsive">
+            <table class="table card-table table-vcenter text-nowrap datatable">
+              <thead>
+                <tr>
+                  <th class="w-1">No.</th>
+                  <th>Titre</th>
+                  <th>Auteur</th>
+                  <!-- <th>Date</th> -->
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let post of paginatedPosts; let i = index">
+                  <td><span class="text-secondary">{{ (currentPage - 1) * pageSize + i + 1 }}</span></td>
+                  <td>
+                    <a href="#" (click)="viewForum(post, $event)" class="text-reset text-decoration-none">
+                      {{ post.title }}
+                    </a>
+                  </td>
+                  <td>{{ post.author.name }}</td>
+                  <!-- <td>{{ post.createdAt ? (post.createdAt | date: 'short') : '-' }}</td> -->
+                  <td class="text-end">
+                    <button class="btn btn-icon btn-ghost-primary btn-sm" 
+                            (click)="viewForum(post, $event)"
+                            title="Visualiser">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-eye"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" /></svg>
+                    </button>
+                    <button class="btn btn-icon btn-ghost-danger btn-sm" 
+                            (click)="confirmDelete(post.id, $event)"
+                            title="Supprimer">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-trash"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v1" /></svg>
+                    </button>
+                  </td>
+                </tr>
+                <tr *ngIf="paginatedPosts.length === 0 && !loading">
+                  <td colspan="5" class="text-center text-secondary py-4">
+                    Aucune entrée du forum trouvée
+                  </td>
+                </tr>
+                <tr *ngIf="loading">
+                  <td colspan="5" class="text-center text-secondary py-4">
+                    <span class="spinner-border spinner-border-sm" role="status"></span> Chargement...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <div class="card-footer d-flex align-items-center">
+            <p class="text-secondary">
+              Affichage de {{ paginatedPosts.length === 0 ? 0 : (currentPage - 1) * pageSize + 1 }} à {{ Math.min(currentPage * pageSize, filteredPosts.length) }} sur {{ filteredPosts.length }} entrées
+            </p>
+            <ul class="pagination m-0 ms-auto">
+              <li class="page-item" [class.disabled]="currentPage === 1">
+                <a class="page-link" href="#" (click)="previousPage(); $event.preventDefault()" [class.disabled]="currentPage === 1">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 6l-6 6l6 6" /></svg>
+                  Précédent
+                </a>
+              </li>
+              <li class="page-item" *ngFor="let page of [].constructor(totalPages); let i = index" [class.active]="i + 1 === currentPage">
+                <a class="page-link" href="#" (click)="currentPage = i + 1; $event.preventDefault()" [class.active]="i + 1 === currentPage">
+                  {{ i + 1 }}
+                </a>
+              </li>
+              <li class="page-item" [class.disabled]="currentPage === totalPages">
+                <a class="page-link" href="#" (click)="nextPage(); $event.preventDefault()" [class.disabled]="currentPage === totalPages">
+                  Suivant
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l6 6l-6 6" /></svg>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete confirmation modal -->
+<div class="modal modal-blur fade" id="delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      <!-- <div class="modal-status bg-danger"></div> -->
+      <div class="modal-body text-center py-4">
+        <!-- <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-danger icon-lg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 9v6" /><path d="M9 12h6" /></svg> -->
+        <h3>Êtes-vous sûr?</h3>
+        <div class="text-secondary">Vous êtes sur le point de supprimer cette entrée du forum. Cette action est irréversible.</div>
+      </div>
+      <div class="modal-footer">
+        <div class="w-100">
+          <div class="row">
+            <div class="col"><a href="#" class="btn btn-white w-100" data-bs-dismiss="modal">Annuler</a></div>
+            <div class="col"><a href="#" class="btn btn-danger w-100" (click)="deletePost()" data-bs-dismiss="modal">Supprimer</a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- View forum details modal -->
+<div class="modal modal-blur fade" id="view-forum-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content" *ngIf="selectedPost">
+      <button type="button" class="btn-close" (click)="closeViewModal($event)" aria-label="Close"></button>
+      
+      <div class="modal-body">
+        <!-- Avatar -->
+        <div class="text-center mb-4">
+          <img *ngIf="selectedPost.author.avatar.file_urlpath" 
+               [src]="selectedPost.author.avatar.file_urlpath" 
+               [alt]="selectedPost.author.name" 
+               class="rounded-circle" 
+               style="width: 80px; height: 80px; object-fit: cover;">
+          <div *ngIf="!selectedPost.author.avatar.file_urlpath" 
+               class="rounded-circle d-inline-flex align-items-center justify-content-center bg-light" 
+               style="width: 80px; height: 80px; border: 2px solid #e0e0e0;">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon text-secondary" width="48" height="48" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/></svg>
+          </div>
+        </div>
+
+        <!-- Titre -->
+        <h2 class="mb-3 text-center">{{ selectedPost.title }}</h2>
+
+        <!-- Métadonnées (Author, Date) -->
+        <div class="d-flex justify-content-center align-items-center gap-3 mb-4 text-secondary flex-wrap">
+          <small *ngIf="selectedPost.author"><strong>{{ selectedPost.author.name }}</strong></small>
+          <span *ngIf="selectedPost.author">•</span>
+          <small>{{ selectedPost.created_at | date: 'medium' }}</small>
+        </div>
+
+        <!-- Contenu textuel -->
+        <div class="mb-4">
+          <div class="border-top pt-3">
+            <p class="text-muted">{{ selectedPost.text }}</p>
+          </div>
+        </div>
+
+        <!-- Fichiers media -->
+        <div *ngIf="selectedPost.files && selectedPost.files.length > 0" class="mb-4">
+          <h5 class="mb-3">Fichiers attachés</h5>
+          <div class="row gap-3">
+            <div *ngFor="let file of selectedPost.files" class="col-12">
+              <!-- Lecteur audio -->
+              <div *ngIf="isAudio(file)">
+                <small class="text-secondary d-block mb-2">{{ file.filename }}</small>
+                <audio controls class="w-100" style="max-width: 100%; height: 40px;">
+                  <source [src]="file.file_urlpath" [type]="file.content_type">
+                  Votre navigateur ne supporte pas l'élément audio.
+                </audio>
+              </div>
+
+              <!-- Image -->
+              <div *ngIf="isImage(file)" class="text-center mb-2">
+                <img [src]="file.file_urlpath" [alt]="selectedPost.title" 
+                     class="img-fluid rounded" style="max-height: 300px; object-fit: cover;">
+              </div>
+
+              <!-- Autres fichiers -->
+              <div *ngIf="!isAudio(file) && !isImage(file)">
+                <a [href]="file.file_urlpath" target="_blank" class="btn btn-sm btn-outline-primary">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  {{ file.filename }}
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-white" (click)="closeViewModal($event)">Fermer</button>
+        <button type="button" class="btn btn-danger" (click)="deleteFromModal()">Supprimer</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -31,6 +31,151 @@
     </div>
 </div>
 
+<!-- Modal édition post -->
+<div class="modal fade" id="modal-report" tabindex="-1" aria-labelledby="modalReportLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form [formGroup]="form" (ngSubmit)="submitForm()">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalReportLabel">Modifier la publication</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="closeModal()"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <!-- Auteur -->
+            <div class="col-12">
+              <div class="mb-3">
+                <label for="postAuthor" class="form-label">Auteur</label>
+                <input id="postAuthor" type="text" class="form-control" formControlName="author" [class.is-invalid]="form.get('author')?.invalid && form.get('author')?.touched">
+                <div class="invalid-feedback" *ngIf="form.get('author')?.invalid && form.get('author')?.touched">L'auteur est requis.</div>
+              </div>
+            </div>
+
+            <!-- Catégorie -->
+            <div class="col-12">
+              <div class="mb-3">
+                <label for="postCategory" class="form-label">Catégorie</label>
+                <select id="postCategory" class="form-select" formControlName="idCategory" [class.is-invalid]="form.get('idCategory')?.invalid && form.get('idCategory')?.touched">
+                  <option [value]="''">Sélectionner une catégorie</option>
+                  <option *ngFor="let cat of categories" [value]="cat.id">{{cat.name}}</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="form.get('idCategory')?.invalid && form.get('idCategory')?.touched">La catégorie est requise.</div>
+              </div>
+            </div>
+
+            <!-- Titre -->
+            <div class="col-12">
+              <div class="mb-3">
+                <label for="postTitle" class="form-label">Titre</label>
+                <input id="postTitle" type="text" class="form-control" formControlName="title" [class.is-invalid]="form.get('title')?.invalid && form.get('title')?.touched">
+                <div class="invalid-feedback" *ngIf="form.get('title')?.invalid && form.get('title')?.touched">Le titre est requis.</div>
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="col-12">
+              <div class="mb-3">
+                <label for="postDescription" class="form-label">Description</label>
+                <textarea id="postDescription" rows="4" class="form-control" formControlName="description" [class.is-invalid]="form.get('description')?.invalid && form.get('description')?.touched"></textarea>
+                <div class="invalid-feedback" *ngIf="form.get('description')?.invalid && form.get('description')?.touched">La description est requise.</div>
+              </div>
+            </div>
+
+            <!-- Image -->
+            <div class="col-12">
+              <div class="mb-3">
+                <label for="postImage" class="form-label">Image</label>
+                
+                <!-- Afficher l'image existante -->
+                <div *ngIf="currentImageUrl" class="mb-3">
+                  <div class="position-relative">
+                    <img [src]="currentImageUrl" alt="Image actuelle" style="width: 150px; height: 150px; object-fit: cover; border-radius: 8px;">
+                  </div>
+                  <small class="form-text text-muted d-block mt-2">Formats acceptés: JPG, PNG, GIF</small>
+                </div>
+
+                <!-- File input toujours visible -->
+                <input [id]="fileInputId" type="file" class="form-control" accept="image/*" (change)="onFileChange($event, 'image')">
+                
+                <!-- Afficher le message si pas d'image -->
+                <small *ngIf="!currentImageUrl" class="form-text text-muted">Formats acceptés: JPG, PNG, GIF</small>
+              </div>
+            </div>
+
+            <!-- Tags -->
+            <!-- Version ultra-compacte des tags (remplace le bloc tags dans le formulaire) -->
+            <div class="col-12">
+              <div class="mb-3">
+                <label class="form-label">Tags</label>
+                <div class="d-flex flex-wrap align-items-center gap-1" *ngIf="tagsList.length > 0; else noTags">
+                  <div class="position-relative" *ngFor="let tag of tagsList; trackBy: trackByTagId">
+                    <span 
+                      class="avatar avatar-tag" 
+                      [class.selected]="isTagSelected(tag.id)"
+                      [style.background-image]="'url(' + tag.image + ')'"
+                      [title]="tag.name"
+                      (click)="toggleTag(tag.id)">
+                    </span>
+                    <input 
+                      type="checkbox" 
+                      [id]="'tag-' + tag.id"
+                      [checked]="isTagSelected(tag.id)"
+                      (change)="onTagChange(tag.id, $event)"
+                      class="tag-checkbox-mini">
+                  </div>
+                </div>
+                <ng-template #noTags>
+                  <p class="text-muted">Aucun tag disponible</p>
+                </ng-template>
+                <div class="invalid-feedback d-block" *ngIf="form.get('tags')?.invalid && form.get('tags')?.touched">
+                  Au moins un tag est requis.
+                </div>
+              </div>
+            </div>
+
+            <!-- Feedback form -->
+            <div *ngIf="formError" class="alert alert-danger mt-2">{{ formError }}</div>
+            <div *ngIf="formSuccess" class="alert alert-success mt-2">{{ formSuccess }}</div>
+
+            <!-- Attachement (Audio en français) -->
+            <div class="col-12">
+              <div class="mb-3">
+                <label for="postAttachment" class="form-label">Pièce jointe (Audio en français)</label>
+                <input id="postAttachment" type="file" class="form-control" accept="audio/*" (change)="onFileChange($event, 'attachment')">
+                <small class="form-text text-muted">Formats acceptés: MP3, WAV, OGG</small>
+              </div>
+            </div>
+
+            <!-- Attachement Kabyé (Audio en kabyé) -->
+            <div class="col-12">
+              <div class="mb-3">
+                <label for="postAttachmentKb" class="form-label">Pièce jointe (Audio en kabye)</label>
+                <input id="postAttachmentKb" type="file" class="form-control" (change)="onFileChange($event, 'attachmentKb')">
+              </div>
+            </div>
+
+            <!-- Attachement PDF -->
+            <div class="col-12">
+              <div class="mb-3">
+                <label for="postAttachmentPdf" class="form-label">Pièce jointe (Contenue pdf)</label>
+                <input id="postAttachmentPdf" type="file" class="form-control" accept="application/pdf" (change)="onFileChange($event, 'attachmentPdf')">
+                <small class="form-text text-muted">Format accepté: PDF uniquement</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeModal()">Annuler</button>
+          <button type="submit" class="btn btn-primary" [disabled]="form.invalid || isSubmitting">
+            <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            Enregistrer
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
   <!-- Page body -->
 <div class="page-body">
     <div class="container-xl">
@@ -61,7 +206,7 @@
             </div>  
 
             <div class="row row-cards mt-2">
-            <div class="col-md-6">
+              <div class="col-md-6">
                 Français
                 <div class="card card-sm mt-1">
                   <div class="card-body">
@@ -87,6 +232,77 @@
                   </div>
                 </div>
               </div>
+            </div>
+            <div class="row row-cards mt-3" *ngIf="this.post?.attachmentPdf">
+              <div class="col-12">
+                <div class="card">
+                  <div class="card-header">
+                    <h3 class="card-title">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-file-type-pdf me-2">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                        <path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4" />
+                        <path d="M5 18h1.5a1.5 1.5 0 0 0 0 -3h-1.5v6" />
+                        <path d="M17 18h2" />
+                        <path d="M20 15h-3v6" />
+                        <path d="M11 15v6h1a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2h-1z" />
+                      </svg>
+                      Document PDF
+                    </h3>
+                  </div>
+                  <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                      <div class="d-flex align-items-center">
+                        <div class="avatar avatar-lg me-3" style="background-color: #dc3545;">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                            <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+                            <path d="M9 17h6" />
+                            <path d="M9 13h6" />
+                          </svg>
+                        </div>
+                        <div>
+                          <div class="fw-bold">{{ this.post?.title }}.pdf</div>
+                          <div class="text-muted small">Document PDF</div>
+                        </div>
+                      </div>
+                      <div class="btn-list">
+                        <!-- Bouton Ouvrir -->
+                        <a [href]="this.post?.attachmentPdf" target="_blank" class="btn btn-primary">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon me-1">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6" />
+                            <path d="M11 13l9 -9" />
+                            <path d="M15 4h5v5" />
+                          </svg>
+                          Ouvrir
+                        </a>
+                        <!-- Bouton Télécharger -->
+                        <!-- <a [href]="this.post?.attachmentPdf" [download]="this.post?.title + '.pdf'" class="btn btn-outline-primary">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon me-1">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
+                            <path d="M7 11l5 5l5 -5" />
+                            <path d="M12 4l0 12" />
+                          </svg>
+                          Télécharger
+                        </a> -->
+                        
+                        <button (click)="downloadPdf()" class="btn btn-outline-primary">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon me-1">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
+                            <path d="M7 11l5 5l5 -5" />
+                            <path d="M12 4l0 12" />
+                          </svg>
+                          Télécharger
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
+            </div>
         </div>
 </div>
