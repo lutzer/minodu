@@ -48,9 +48,23 @@ class TestRagAPI:
             "query": "Chemical fertilizer",
             "language": "en"
         }
-        response = client.post(app.root_path + "/rag/sources", json=test_data)        
+        response = client.post(app.root_path + "/rag/sources", json=test_data)
         assert response.status_code == 200
         data = response.json()
 
         assert data["document"] != None
         assert data["score"] > 0
+
+    def test_welcome_message_without_source_id(self):
+        response = client.get(app.root_path + "/rag/welcome/en/")
+        assert response.status_code == 200
+        data = response.json()
+        assert "text" in data
+        assert len(data["text"]) > 0
+
+    def test_welcome_message_with_source_id(self):
+        response = client.get(app.root_path + "/rag/welcome/en/123/")
+        assert response.status_code == 200
+        data = response.json()
+        assert "text" in data
+        assert len(data["text"]) > 0

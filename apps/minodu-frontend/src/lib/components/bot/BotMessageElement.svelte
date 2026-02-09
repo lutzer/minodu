@@ -9,119 +9,83 @@
 	import { language } from '$lib/stores';
 	import { t } from '$lib/translations';
 
-	import botAvatarImage from '$lib/assets/chatbot-avatar.png'
+	import botAvatarImage from '$lib/assets/chatbot-avatar.png';
+	import crossIcon from '$lib/assets/cross_icon_white.png';
 
 	export let message: BotMessage;
 	export let ttsPlayer: TextToSpeechPlayer;
+	export let onCancelResponse: () => void;
 
-	// let streaming: boolean = false;
-	// let error: boolean = false;
+	let isError: boolean = false;
 
-	// let reader: Optional<ReadableStreamDefaultReader<Uint8Array<ArrayBuffer>>> = undefined;
-
-	// onMount(() => {
-	// 	if (!message.generated) generateResponse(message.question, conversation);
-	// });
-
-	// $: error = message.response.trimStart().startsWith('[ERROR:');
-
-	// export function stop() {
-	// 	reader?.cancel();
-	// 	streaming = false;
-	// 	onResponseGenerated?.();
-	// }
-
-	// async function generateResponse(question: string, conversation: string) {
-	// 	streaming = true;
-
-	// 	let apiResponse = await AiServicesApi.generateRagResponse({
-	// 		language: Config.language,
-	// 		conversation: conversation,
-	// 		question: question
-	// 	});
-
-	// 	reader = apiResponse.body?.getReader();
-
-	// 	if (!reader) throw Error('Could not initialize rag response reader');
-
-	// 	const decoder = new TextDecoder();
-
-	// 	while (streaming) {
-	// 		const { done, value } = await reader.read();
-	// 		if (done) break;
-
-	// 		const text = decoder.decode(value, { stream: true });
-	// 		message.response += text;
-	// 		await tick();
-	// 		await delay(1);
-	// 	}
-	// 	message.generated = true;
-
-	// 	streaming = false;
-	// 	reader = undefined;
-	// 	onResponseGenerated?.();
-	// }
+	$: isError = message.type == BotMessageType.BOT && message.text.trimStart().startsWith('[ERROR:');
+	
 </script>
 
-<div class="bot-message shadow {message.type == BotMessageType.USER && "user"}">
+<div class="bot-message shadow {message.type == BotMessageType.USER ? "user" : "bot"}">
 	{#if message.type == BotMessageType.USER}
 	<div class="message-text">
+		<h3>You</h3>
 		<p>{message.text}</p>
 	</div>
 	<div class="message-side">
 		<TextToSpeechButton text={message.text} {ttsPlayer} />
 	</div>
 	{:else}
-	<!-- <div class="chatbot-avatar"> 
-		<img src={botAvatarImage}/>
-	</div> -->
 	<div class="message-side">
+		<div class="chatbot-avatar"> 
+			<img src={botAvatarImage} alt="Icon of the chatbot"/>
+		</div>
+		{#if message.final}
 		<TextToSpeechButton text={message.text} {ttsPlayer} />
+		{/if}
 	</div>
 	<div class="message-text">
-		<h2>Chatbot</h2>
-		<p>{message.text}</p>
+		<h3>Minodu Bot</h3>
+		<p class={isError ? 'error' : ''}>
+			{message.text}
+			{#if !message.final}
+			<span class="cursor">|</span>
+			{/if}
+		</p>
+		{#if !message.final}
+		<div class="stop-button-container">
+			<button class="stop-button shadow" onclick={onCancelResponse}>
+				<img src={crossIcon}/>
+			</button>
+		</div>
+		{/if}
 	</div>
 	{/if}
-
-	<!-- <h3>{t('chatbot.question', $language)}</h3>
-	<p>
-		{message.question}
-		{#if message.question.length > 0}
-			<TextToSpeechButton text={message.question} {ttsPlayer} />
-		{/if}
-	</p>
-	<h3>{t('chatbot.answer', $language)}</h3>
-	<p class={error ? 'error' : ''}>
-		{message.response}
-		{#if streaming}
-			<span class="cursor">|</span>
-		{:else if message.response.length > 0 && !error}
-			<TextToSpeechButton text={message.response} {ttsPlayer} />
-		{/if}
-	</p>
-	{#if streaming}
-		<button onclick={stop}>{t('action.stop', $language)}</button>
-	{/if} -->
 </div>
 
 <style>
 	.bot-message {
 		padding: var(--medium-padding);
-		background-color: #d7ebe1;
 		border-radius: var(--border-radius);
 		margin-bottom: var(--medium-padding);
 		display: flex;
+		gap: var(--small-padding);
 	}
 
 	.bot-message.user {
 		background-color: #FFE9B3;
 		--box-shadow-color: #D9C38C;
-		margin-left: var(--medium-padding);
+		margin-left: calc(var(--medium-padding) + var(--small-padding));
+	}
+
+	.bot-message.bot {
+		background-color: #ebf0ee;
+		--box-shadow-color: #9c9c9c;
+		margin-right: calc(var(--medium-padding) + var(--small-padding));
 	}
 
 	.bot-message .message-side {
 		flex-grow: 0;
+		display: flex;
+		flex-direction: column;
+		align-content: center;
+		gap: var(--small-padding);
 	}
 
 	.bot-message .message-text {
@@ -129,7 +93,16 @@
 		align-self: center;
 	}
 
-	/* .cursor {
+	.chatbot-avatar {
+		width: var(--button-size);
+	}
+
+	.chatbot-avatar img {
+		width: 100%;
+		height: 100%;
+	}
+
+	.cursor {
 		animation: blink 1s infinite;
 	}
 
@@ -147,10 +120,30 @@
 	p.error {
 		color: white;
 		background-color: red;
-		padding: 5px;
-	} */
+		padding: var(--small-padding);
+		border-radius: var(--border-radius)
+	}
 
-	/* p {
-		margin: 0 0 10px 0;
-	} */
+	.stop-button-container {
+		margin-top: var(--small-padding);
+		width: 100%;
+		display: flex;
+		justify-content: end;
+	}
+
+	.stop-button {
+		background-color: red;
+		--box-shadow-color: #d90024;
+		display: flex;
+		align-items: center;
+		color: white;
+		gap: var(--small-padding);
+		padding: var(--small-padding);
+		width: auto;
+	}
+
+	.stop-button img {
+		height: 30px;
+		width: 30px;
+	}
 </style>

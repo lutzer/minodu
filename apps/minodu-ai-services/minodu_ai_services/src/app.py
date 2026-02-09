@@ -90,10 +90,24 @@ async def extract_sources(request: RagSourceRequest):
         score=score
     )
 
+class WelcomeResponse(BaseModel):
+    text: str
+
+
+@app.get("/rag/welcome/{language}/", response_model=WelcomeResponse)
+async def get_welcome_message(language: LanguageEnum):
+    welcome = "Welcome to the Minodu Chatbot. You can ask any questions about x,y,z"
+    return WelcomeResponse(text=welcome)
+
+
+@app.get("/rag/welcome/{language}/{source_id}/", response_model=WelcomeResponse)
+async def get_welcome_message_with_source(source_id: int, language: LanguageEnum):
+    welcome = "Welcome to the Minodu Chatbot. You can ask any questions about source: " + str(source_id)
+    return WelcomeResponse(text=welcome)
+
 class DocumentSummaryResponse(BaseModel):
     source_id: int
     summary: Optional[str] = None
-
 
 @app.get("/rag/documents/{language}/{source_id}/summary", response_model=DocumentSummaryResponse)
 async def get_document_summary(source_id: int, language: LanguageEnum):
