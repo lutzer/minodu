@@ -77,6 +77,10 @@ const translations: TranslationStrings = {
 		fr: 'Ok',
 		kb: 'Yego'
 	},
+	'action.delete': {
+		fr: 'Supprimer',
+		kb: 'Supprimer'
+	},
 
 	// Forum
 	'forum.noPosts': {
@@ -102,6 +106,38 @@ const translations: TranslationStrings = {
 	'forum.avatar': {
 		fr: 'Avatar',
 		kb: 'Ishusho'
+	},
+	'forum.yourName': {
+		fr: 'Votre nom',
+		kb: 'Votre nom'
+	},
+	'forum.deleteAuthor': {
+		fr: 'Supprimer le profil ?',
+		kb: 'Supprimer le profil ?'
+	},
+	'forum.transcription': {
+		fr: 'Transcription',
+		kb: 'Transcription'
+	},
+	'forum.deletePost': {
+		fr: 'Supprimer le message',
+		kb: 'Supprimer le message'
+	},
+	'forum.errorFileTooLarge': {
+		fr: 'Le fichier est trop volumineux (max 5 Mo)',
+		kb: 'Dosiye irenze urugero (max 5 Mo)'
+	},
+	'forum.errorFileUpload': {
+		fr: "Erreur lors de l'envoi du fichier",
+		kb: 'Ikosa mu kohereza dosiye'
+	},
+	'forum.errorTextTooLong': {
+		fr: 'Le texte est trop long (max 5000 caractères)',
+		kb: 'Inyandiko ni ndende cyane (max 5000)'
+	},
+	'forum.errorCreatePost': {
+		fr: 'Erreur lors de la création du message',
+		kb: 'Ikosa mu gukora ubutumwa'
 	},
 
 	// Agriculture
@@ -143,6 +179,10 @@ const translations: TranslationStrings = {
 		fr: "Avatar de l'utilisateur",
 		kb: "Ishusho y'ukoresha"
 	},
+	'alt.avatarImage': {
+		fr: "Image d'un avatar",
+		kb: "Image d'un avatar"
+	},
 	'alt.imageFor': {
 		fr: 'Image pour',
 		kb: 'Ishusho ya'
@@ -162,6 +202,26 @@ const translations: TranslationStrings = {
 	'alt.speechBubble': {
 		fr: 'Deux personnes et une bulle de dialogue',
 		kb: "Abantu babiri n'igishushanyo cy'ikiganiro"
+	},
+	'alt.backForumPost': {
+		fr: 'retour',
+		kb: 'retour'
+	},
+	'alt.createForumPost': {
+		fr: 'Créer un nouveau message',
+		kb: 'Kora ubutumwa bushya'
+	},
+	'alt.iconAudioPost': {
+		fr: 'Icône pour les messages audio',
+		kb: 'Ishusho yo kohereza amajwi'
+	},
+	'alt.iconImagePost': {
+		fr: 'Icône pour les messages photo',
+		kb: 'Ishusho yo kohereza ifoto'
+	},
+	'alt.iconTextPost': {
+		fr: 'Icône pour les messages texte',
+		kb: 'Ishusho yo kohereza inyandiko'
 	}
 };
 

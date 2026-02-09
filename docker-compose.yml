@@ -15,8 +15,10 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      timeout: 20s
-      retries: 10
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
       
    # Backend Service
   minodu-backend:
@@ -49,13 +51,14 @@ services:
       minodu-database:
         condition: service_healthy
       minodu-ai-services:
-        condition: service_healthy
+        condition: service_started
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000"]
-      interval: 30s
-      timeout: 10s
+      test: ["CMD", "curl", "-f", "http://localhost:3000/v1"]
+      interval: 10s
+      timeout: 5s
       retries: 3
+      start_period: 15s
 
   # AI Services
   minodu-ai-services:
@@ -76,9 +79,10 @@ services:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3002/api/services/"]
-      interval: 30s
-      timeout: 10s
+      interval: 10s
+      timeout: 5s
       retries: 3
+      start_period: 15s
 
   # Forum Service
   minodu-forum:
@@ -102,15 +106,16 @@ services:
       minodu-database:
         condition: service_healthy
       minodu-ai-services:
-        condition: service_healthy
+        condition: service_started
       minodu-forum-celery:
-        condition: service_healthy
+        condition: service_started
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3003/api/forum/"]
-      interval: 30s
-      timeout: 10s
+      interval: 10s
+      timeout: 5s
       retries: 3
+      start_period: 15s
 
   minodu-forum-celery:
     build:
@@ -127,23 +132,26 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+    restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "celery inspect ping --destination celery@$$HOSTNAME"]
-      interval: 30s
-      timeout: 10s
+      interval: 10s
+      timeout: 5s
       retries: 3
-      start_period: 5s
+      start_period: 15s
 
   redis:
     image: redis:alpine
     command: redis-server --maxmemory 32mb
     ports:
       - "6379:6379"
+    restart: unless-stopped
     healthcheck:
       test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
-      interval: 30s
-      timeout: 15s
+      interval: 10s
+      timeout: 5s
       retries: 3
+      start_period: 5s
 
    # Web Service [Frontend + Backoffice]
   minodu-web:

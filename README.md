@@ -121,14 +121,13 @@ sudo apt install git-lfs
 sudo apt install npm
 sudo apt install python3-poetry
 
-# install pyenv# Install pyenv
+# install pyenv
 curl https://pyenv.run | bash
 
 # Add to your ~/.bashrc or ~/.zshrc
-echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
-echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
-echo 'eval "$(pyenv init -)"' >> ~/.bashrc
-source ~/.bashrc
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init - bash)"
 
 pyenv install 3.12.11
 ```
@@ -143,6 +142,7 @@ npm install
 sudo npm run docker:start
 
 # once the database is running, sync online database to local one and update embeddings
+cd tools/sync && poetry install
 npm run sync:database && npm run sync:rag
 ```
 

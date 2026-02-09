@@ -4,6 +4,7 @@
 	import type { BackendPost } from '$lib/apis/backend/models/backendPost';
 	import AgriculturePostElement from '$lib/components/agriculture/AgriculturePostElement.svelte';
 	import { onMount } from 'svelte';
+	import { SvelteSet } from 'svelte/reactivity';
 	import chatbotButton from '$lib/assets/chatbot-button.png';
 	import { goto } from '$app/navigation';
 	import FloatingButton from '$lib/components/common/FloatingButton.svelte';
@@ -12,22 +13,38 @@
 
 	let posts: BackendPost[] = [];
 	let categories: BackendCategory[] = [];
-	let selectedCategoryId: number | null = null;
+	let selectedCategoryIds: Set<number> = new SvelteSet();
 
 	let scrollContainer: HTMLDivElement;
+
+	import solIcon from '$lib/assets/agriculture-cat-sol-icon.png';
+	import autresIcon from '$lib/assets/agriculture-cat-autres-icon.png';
+	import elevageIcon from '$lib/assets/agriculture-cat-elevage-icon.png';
+	import plantesIcon from '$lib/assets/agriculture-cat-plantes-icon.png';
+
+	const categoryIcons: Record<string, string> = {
+		SOL: solIcon,
+		AUTRES: autresIcon,
+		ELEVAGE: elevageIcon,
+		PLANTES: plantesIcon
+	};
 
 	onMount(async () => {
 		posts = await BackendApi.getPosts();
 		categories = await BackendApi.getCategories();
+		selectedCategoryIds = new SvelteSet(categories.map((c) => c.id));
 	});
 
-	function selectCategory(id: number) {
-		selectedCategoryId = selectedCategoryId === id ? null : id;
+	function toggleCategory(id: number) {
+		if (selectedCategoryIds.has(id)) {
+			selectedCategoryIds.delete(id);
+		} else {
+			selectedCategoryIds.add(id);
+		}
+		selectedCategoryIds = selectedCategoryIds;
 	}
 
-	$: filteredPosts = selectedCategoryId
-		? posts.filter((post) => post.category.id === selectedCategoryId)
-		: posts;
+	$: filteredPosts = posts.filter((post) => selectedCategoryIds.has(post.category.id));
 </script>
 
 <div class="forum-page">
@@ -35,7 +52,7 @@
 		<div class="post-container content-width">
 			{#if filteredPosts.length > 0}
 				<ul>
-					{#each filteredPosts as post}
+					{#each filteredPosts as post (post.id)}
 						<li>
 							<AgriculturePostElement {post} />
 						</li>
@@ -48,13 +65,18 @@
 	</div>
 	<div id="categories" class="content-width">
 		<ul>
-			{#each categories as category}
+			{#each categories as category (category.id)}
 				<li>
 					<button
 						class={`color ${category.name}`}
-						class:selected={selectedCategoryId === category.id}
-						onclick={() => selectCategory(category.id)}>{category.name}</button
-					>
+						class:selected={selectedCategoryIds.has(category.id)}
+						onclick={() => toggleCategory(category.id)}
+					>	
+						{#if category.name}
+						<img src={categoryIcons[category.name]} alt="category icon for {category.name}" />
+						{/if}
+						<span>{category.name}</span>
+					</button>
 				</li>
 			{/each}
 		</ul>
@@ -79,16 +101,13 @@
 
 	#categories ul {
 		display: flex;
-		gap: var(--small-padding);
 		padding: var(--small-padding);
 		flex-wrap: wrap;
 		justify-content: space-between;
 	}
 
 	#categories li {
-		width: 22%;
-		flex-grow: 0;
-		flex-shrink: 0;
+		width: 23%;
 	}
 
 	#categories button {
@@ -97,20 +116,39 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		padding: var(--small-padding);
-		white-space: nowrap;
 		height: 48px;
+		display: flex;
+		align-items: center;
+		gap: calc(var(--small-padding) * 0.5);
+		box-shadow: 2px 2px 2px #00000033;
 	}
 
 	#categories button.selected {
-		outline: 3px solid white;
-		/* outline-offset: -3px; */
-		box-shadow: none;
+		filter: none;
+	}
+
+	#categories button {
+		filter: grayscale(1);
+	}
+
+	#categories button img {
+		width: auto;
+		height: 90%;
+	}
+
+	#categories button span {
+		white-space: normal;
+		word-wrap: break-word;
+		overflow-wrap: break-word;
+		min-width: 0;
+		font-size: 90%;
+		flex-grow: 1;
 	}
 
 	.post-container {
 		margin-top: var(--header-height);
-		padding: var(--page-padding);
-		margin-bottom: calc(var(--page-padding) + var(--button-size));
+		padding: 0 var(--page-padding);
+		margin-bottom: calc(var(--page-padding) + var(--button-size) + var(--medium-padding) * 2);
 		box-sizing: border-box;
 	}
 
@@ -121,5 +159,9 @@
 
 	.scroll-container {
 		background-color: #ebf9f2;
+	}
+
+	button.color {
+		
 	}
 </style>

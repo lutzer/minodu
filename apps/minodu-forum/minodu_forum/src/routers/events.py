@@ -9,12 +9,18 @@ from ..events import active_connections
 router = APIRouter()
 
 
+HEARTBEAT_INTERVAL = 30
+
+
 async def event_generator(queue: asyncio.Queue):
     """Generate SSE formatted events from queue"""
     try:
         while True:
-            data = await queue.get()
-            yield f"data: {json.dumps(data)}\n\n"
+            try:
+                data = await asyncio.wait_for(queue.get(), timeout=HEARTBEAT_INTERVAL)
+                yield f"data: {json.dumps(data)}\n\n"
+            except asyncio.TimeoutError:
+                yield ": heartbeat\n\n"
 
     except asyncio.CancelledError:
         # Client disconnected

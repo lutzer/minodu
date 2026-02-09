@@ -28,6 +28,22 @@ export class ForumApi {
 		return response.json();
 	}
 
+	public static async getPostsPaginated(
+		before?: number,
+		limit?: number
+	): Promise<{ posts: ForumPost[]; has_more: boolean }> {
+		const params = new URLSearchParams();
+		if (before !== undefined) params.set('before', String(before));
+		if (limit !== undefined) params.set('limit', String(limit));
+		const query = params.toString();
+		const url = `${ForumApi.API_PREFIX}/posts/paginated/${query ? `?${query}` : ''}`;
+		const response = await fetch(url);
+		if (!response.ok) {
+			throw new HttpError({ code: response.status, message: await response.text() });
+		}
+		return response.json();
+	}
+
 	public static async createAuthor(
 		request: CreateAuthorRequest
 	): Promise<{ id: number; token: string }> {
@@ -111,7 +127,7 @@ export class ForumApi {
 	}
 
 	public static async checkToken(
-		token: string = Storage.forumToken
+		token: string
 	): Promise<Optional<ForumAuthor>> {
 		if (!token) {
 			return undefined;

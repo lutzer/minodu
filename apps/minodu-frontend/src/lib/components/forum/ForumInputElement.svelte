@@ -1,34 +1,50 @@
 <script lang="ts">
 	import { Config } from '$lib';
 	import { ForumApi } from '$lib/apis/forum/api';
-	import type { ForumAuthor } from '$lib/apis/forum/models/forumAuthor.ts';
 	import type { Optional } from '$lib/types';
 	import { ForumPostType } from '$lib/types';
-	import AudioRecorder from '../common/AudioRecorder.svelte';
+	import { HttpError } from '$lib/errors';
 	import { t } from '$lib/translations';
+	import { toast } from '$lib/toastStore';
 
 	import submitButton from '$lib/assets/forum-submit-post.png';
-	import cancelButton from '$lib/assets/delete-forum-post.png';
+	import deleteButton from '$lib/assets/forum-delete.png';
+	import backButton from '$lib/assets/forum-arrow-down.png';
 	import { Storage } from '$lib/storage';
 	import { language } from '$lib/stores';
 	import { onMount } from 'svelte';
+	import { fly } from 'svelte/transition';
+	import ForumImagePicker from './ForumImagePicker.svelte';
+	import ForumAudioRecorder from './ForumAudioRecorder.svelte';
 
 	export let postType: ForumPostType;
 
 	export let onPostSubmitted: () => void;
 	export let onPostCancelled: () => void;
 
-	let audioRecorder: AudioRecorder;
+	let audioRecorder: ForumAudioRecorder;
 	let audioBlob: Optional<Blob>;
-	let audioRecording: boolean = false;
 
 	let text: string = '';
+
+	let imagePicker: ForumImagePicker;
 	let image: Optional<File>;
 
 	let submitEnabled: boolean = false;
+	let submitting: boolean = false;
 
 	$: {
-		submitEnabled = text.length >= 3 || audioBlob != undefined || image != undefined;
+		switch (postType) {
+			case ForumPostType.TEXT:
+				submitEnabled = text.length >= 3;
+				break;
+			case ForumPostType.AUDIO:
+				submitEnabled = audioBlob != undefined;
+				break;
+			case ForumPostType.IMAGE:
+				submitEnabled = image != undefined;
+				break;
+		}
 	}
 
 	onMount(() => {
@@ -36,16 +52,60 @@
 	});
 
 	async function createPost(text: Optional<string>, audio: Optional<Blob>, image: Optional<File>) {
-		let post = await ForumApi.createPost({ title: '', text: text != undefined ? text : '' });
-		if (audio) {
-			await ForumApi.attachFile(post.id, audio, Config.language);
+		submitting = true;
+
+		let post;
+		try {
+			post = await ForumApi.createPost({ title: '', text: text != undefined ? text : '' });
+		} catch (e) {
+			toast.show(parseApiError(e, 'post'));
+			submitting = false;
+			return;
 		}
-		if (image) {
-			let imageBlob = new Blob([image], { type: image.type });
-			await ForumApi.attachFile(post.id, imageBlob, Config.language);
+
+		try {
+			if (audio) {
+				await ForumApi.attachFile(post.id, audio, Config.language);
+			}
+			if (image) {
+				let imageBlob = new Blob([image], { type: image.type });
+				await ForumApi.attachFile(post.id, imageBlob, Config.language);
+			}
+		} catch (e) {
+			await ForumApi.deletePost(post.id);
+			toast.show(parseApiError(e, 'file'));
+			submitting = false;
+			return;
 		}
+
+		submitting = false;
 		onPostSubmitted();
 		Storage.forumPostText = '';
+	}
+
+	function parseApiError(e: unknown, context: 'post' | 'file'): string {
+		if (e instanceof HttpError) {
+			try {
+				const body = JSON.parse(e.message);
+				if (Array.isArray(body.detail)) {
+					const hasStringTooLong = body.detail.some(
+						(err: { type?: string }) => err.type === 'string_too_long'
+					);
+					if (hasStringTooLong) {
+						return t('forum.errorTextTooLong', $language);
+					}
+				} else if (typeof body.detail === 'string') {
+					if (body.detail.includes('File size too large')) {
+						return t('forum.errorFileTooLarge', $language);
+					}
+				}
+			} catch {
+				// message is not JSON, fall through
+			}
+		}
+		return context === 'post'
+			? t('forum.errorCreatePost', $language)
+			: t('forum.errorFileUpload', $language);
 	}
 
 	function close() {
@@ -58,87 +118,140 @@
 		audioBlob = undefined;
 		image = undefined;
 	}
+
+	function handleBackdropClick() {
+		close();
+	}
 </script>
 
-<div class="forum-input-container">
-	{#if postType == ForumPostType.TEXT}
-		<div class="input-text-field">
-			<div class="input-textarea">
-				<textarea id="text" bind:value={text}></textarea>
-			</div>
-		</div>
-		<div class="input-button-group">
-			<button onclick={() => createPost(text, undefined, undefined)} disabled={!submitEnabled}>
-				<img src={submitButton} alt={t('alt.submitForumPost', $language)} />
-			</button>
-			<button onclick={close}>
-				<img src={cancelButton} alt={t('action.cancel', $language)} />
-			</button>
-		</div>
-	{/if}
-	<!-- <div class="author input-block">
-		{#if author != undefined}
-			<h4>{author.name}</h4>
-			<p>{author.avatar}</p>
-			<button onclick={onLogoutAuthorClicked}>logout</button>
-		{:else}
-			<button onclick={onCreateAuthorClicked}>Create Author</button>
-		{/if}
-	</div>
-	{#if author !== undefined}
-		<div class="input-block text">
-			<div class="input">
-				<label for="title">Title</label>
-				<div class="input-text">
-					<input id="title" type="text" bind:value={title} />
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<div class="post-overlay" onclick={handleBackdropClick}>
+	<div
+		class="create-post-container content-width"
+		transition:fly={{ y: 200, duration: 300 }}
+		onclick={(e) => e.stopPropagation()}
+	>
+		<div class="forum-input-container">
+			{#if postType == ForumPostType.TEXT}
+				<div class="input-element-field">
+					<div class="input-textarea">
+						<textarea id="text" bind:value={text} maxlength={5000}></textarea>
+					</div>
 				</div>
-			</div>
-			<div class="input">
-				<label for="text">Text</label>
-				<div class="input-textarea">
-					<textarea id="text" bind:value={text}></textarea>
+				<div class="input-button-group">
+					<button
+						class="submit-button shadow"
+						onclick={() => createPost(text, undefined, undefined)}
+						disabled={!submitEnabled || submitting}
+					>
+						<img src={submitButton} alt={t('alt.submitForumPost', $language)} />
+					</button>
+					<button class="back-button shadow" onclick={() => close()}>
+						<img src={backButton} alt={t('alt.backForumPost', $language)} />
+					</button>
 				</div>
-			</div>
-		</div>
-		<div class="input-block audio">
-			<AudioRecorder bind:this={audioRecorder} bind:recording={audioRecording} bind:blob={audioBlob}
-			></AudioRecorder>
-			{#if !audioBlob && !audioRecording}
-				<button onclick={audioRecorder.startRecording}>Record</button>
-			{:else if !audioBlob && audioRecording}
-				<button onclick={audioRecorder.stopRecording}>Stop</button>
-			{:else}
-				<button onclick={audioRecorder.reset}>Reset</button>
+			{:else if postType == ForumPostType.IMAGE}
+				<div class="input-element-field">
+					<ForumImagePicker bind:this={imagePicker} bind:image />
+				</div>
+				<div class="input-button-group">
+					<button
+						class="submit-button shadow"
+						onclick={() => createPost(undefined, undefined, image)}
+						disabled={!submitEnabled || submitting}
+					>
+						<img src={submitButton} alt={t('alt.submitForumPost', $language)} />
+					</button>
+					{#if image}
+						<button class="delete-button shadow" onclick={() => imagePicker.clearImage()}>
+							<img src={deleteButton} alt={t('alt.backForumPost', $language)} />
+						</button>
+					{:else}
+						<button class="back-button shadow" onclick={() => close()}>
+							<img src={backButton} alt={t('alt.backForumPost', $language)} />
+						</button>
+					{/if}
+				</div>
+			{:else if postType == ForumPostType.AUDIO}
+				<div class="input-element-field">
+					<ForumAudioRecorder bind:this={audioRecorder} bind:blob={audioBlob} />
+				</div>
+				<div class="input-button-group">
+					<button
+						class="submit-button shadow"
+						onclick={() => createPost(undefined, audioBlob, undefined)}
+						disabled={!submitEnabled || submitting}
+					>
+						<img src={submitButton} alt={t('alt.submitForumPost', $language)} />
+					</button>
+					{#if audioBlob}
+						<button class="delete-button shadow" onclick={() => audioRecorder.reset()}>
+							<img src={deleteButton} alt={t('alt.backForumPost', $language)} />
+						</button>
+					{:else}
+						<button class="back-button shadow" onclick={() => close()}>
+							<img src={backButton} alt={t('alt.backForumPost', $language)} />
+						</button>
+					{/if}
+				</div>
 			{/if}
 		</div>
-		<div class="input-block">
-			<ForumImagePicker bind:image />
-		</div>
-		<div class="submit input-block">
-			<button
-				onclick={() => onSubmitPostClicked(title, text, audioBlob, image)}
-				disabled={!submitEnabled}>Submit</button
-			>
-		</div>
-	{:else}
-		<div><p>Please login</p></div>
-	{/if} -->
+	</div>
 </div>
 
 <style>
+	.post-overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		z-index: 1;
+	}
+
+	.create-post-container {
+		position: fixed;
+		background-color: #edca82;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		padding: var(--small-padding);
+		border-radius: var(--border-radius) var(--border-radius) 0 0;
+		box-sizing: border-box;
+	}
+
 	.forum-input-container {
 		display: flex;
 		flex-direction: row;
-		gap: 5px;
+		gap: var(--small-padding);
 	}
 
-	.input-text-field {
+	.input-element-field {
 		flex: 1;
 	}
 
 	.input-button-group {
+		display: flex;
+		flex-direction: column;
 		flex-shrink: 0;
-		width: 60px;
 		text-align: center;
+		justify-content: space-between;
+		gap: var(--small-padding);
+	}
+
+	.submit-button {
+		background-color: #37cc84;
+		--box-shadow-color: #25b86e;
+	}
+
+	.back-button {
+		background-color: #ffffff;
+		--box-shadow-color: #cccccc;
+	}
+
+	.delete-button {
+		background-color: #fa002a;
+		--box-shadow-color: #d90024;
 	}
 </style>
