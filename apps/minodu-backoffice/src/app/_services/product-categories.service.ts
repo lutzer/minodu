@@ -26,4 +26,32 @@ export class ProductCategoriesService {
       );
   }
 
+  addCategory(name: string, image: File | null): Observable<any> {
+    if (image) {
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('image', image);
+      return this.http.post(`${API_URL}product-categories`, formData);
+    } else {
+      return this.http.post(`${API_URL}product-categories`, { name });
+    }
+  }
+
+  updateCategory(id: number, name: string, image: File | null): Observable<any> {
+    if (image) {
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('image', image, image.name);
+      return this.http.patch(`${API_URL}product-categories/${id}`, formData);
+    } else {
+      return this.http.patch(`${API_URL}product-categories/${id}`, { name }, httpOptions);
+    }
+  }
+
+  deleteCategory(id: number): Observable<any> {
+    return this.http.delete(`${API_URL}product-categories/${id}`, 
+      httpOptions
+      );
+  }
+
 }

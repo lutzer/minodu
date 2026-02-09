@@ -14,11 +14,11 @@
         <!-- Page title actions -->
         <div class="col-auto ms-auto d-print-none">
           <div class="btn-list">
-            <a href="#" class="btn btn-primary d-none d-sm-inline-block" data-bs-toggle="modal" data-bs-target="#modal-report">
+            <a href="#" class="btn btn-primary d-none d-sm-inline-block" (click)="openAddModal($event)">
               <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
             <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-plus"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>            Ajouter
             </a>
-            <a href="#" class="btn btn-primary d-sm-none btn-icon" data-bs-toggle="modal" data-bs-target="#modal-report" aria-label="Create new report">
+            <a href="#" class="btn btn-primary d-sm-none btn-icon" data-bs-toggle="modal" data-bs-target="#editUserModal" (click)="openAddModal($event)" aria-label="Create new report">
               <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
             <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-plus"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>            </a>
           </div>
@@ -31,7 +31,16 @@
       <div class="container-xl">
       <div class="row row-deck row-cards">
       <div class="col-12">
-          <div class="card">            
+          <div class="card">
+            <!-- Filtre Contact Person -->
+            <div class="card-body border-bottom">
+              <div class="form-check form-switch" style="font-size: 16px;">
+                <input class="form-check-input" type="checkbox" id="filterContactsSwitch" [(ngModel)]="showContactsOnly" />
+                <label class="form-check-label fw-medium" for="filterContactsSwitch" style="font-size: 14px;">
+                  Afficher uniquement les personnes contacts
+                </label>
+              </div>
+            </div>
             <div class="table-responsive">
               <table class="table card-table table-vcenter text-nowrap datatable">
                 <thead>
@@ -42,36 +51,86 @@
                     <th>Nom</th>
                     <th>Téléphone</th>
                     <th>Role</th>
+                    <th>Personne contact</th>
                     <th></th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let user of users; let i = index">
+                  <tr *ngFor="let user of getFilteredUsers(); let i = index">
                     <td><span class="text-secondary">{{i+1}}</span></td>
-                    <td>{{user.farmer!!.fullname}}</td>
+                    <td>{{user.fullname || '-'}}</td>
                     <td>
                       {{user.phone}}
                     </td>
                     <td>
                       {{user.role.name}}
                     </td>
+                    <td>
+                      <span *ngIf="user.isContactPerson === true || user.isContactPerson === 'true'" class="badge text-white bg-success">Oui</span>
+                      <span *ngIf="user.isContactPerson === false || user.isContactPerson === 'false'" class="badge text-white bg-secondary">Non</span>
+                    </td>
                     
                     <td class="text-end">
                       <span class="dropdown">
                         <button class="btn dropdown-toggle align-text-top" data-bs-boundary="viewport" data-bs-toggle="dropdown">Actions</button>
                         <div class="dropdown-menu dropdown-menu-end">
-                          <a class="dropdown-item" href="#">
-                            Modifier
-                          </a>
-                          <a class="dropdown-item" href="#">
-                            Supprimer
-                          </a>
+                          <a class="dropdown-item" href="#" (click)="openEditModal(user, $event)">Modifier</a>
+                          <a class="dropdown-item text-danger" href="#" (click)="confirmDelete(user, $event)">Supprimer</a>
                         </div>
                       </span>
                     </td>
                   </tr>
                 </tbody>
               </table>
+
+<!-- Modal Modification Utilisateur -->
+<div class="modal modal-blur fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form [formGroup]="editUserForm" (ngSubmit)="submitEditUser()">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editUserModalLabel">{{ isEditMode ? 'Modifier l\'utilisateur' : 'Créer un utilisateur' }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" (click)="closeModal()"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="editFullName" class="form-label">Nom complet</label>
+            <input id="editFullName" type="text" class="form-control" formControlName="fullName" required>
+          </div>
+          <div class="mb-3">
+            <label for="editGender" class="form-label">Genre</label>
+            <select id="editGender" class="form-control" formControlName="gender" required>
+              <option value="">Sélectionner</option>
+              <option value="M">Masculin</option>
+              <option value="F">Féminin</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="editPhone" class="form-label">Téléphone</label>
+            <input id="editPhone" type="text" class="form-control" formControlName="phone" required>
+          </div>
+          <div *ngIf="!isEditMode" class="mb-3">
+            <label for="editPassword" class="form-label">Mot de passe</label>
+            <input id="editPassword" type="password" class="form-control" formControlName="password" [required]="!isEditMode">
+          </div>
+          <div class="form-check form-switch" style="font-size: 18px;">
+            <input class="form-check-input" type="checkbox" id="isContactPersonSwitch" formControlName="isContactPerson" />
+            <label class="form-check-label fw-medium" for="isContactPersonSwitch" style="font-size: 14px;">
+              Définir comme personne contact
+            </label>
+          </div>
+          <div *ngIf="editUserError" class="alert alert-danger mt-3">{{ editUserError }}</div>
+          <div *ngIf="editUserSuccess" class="alert alert-success mt-3">{{ editUserSuccess }}</div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary" [disabled]="editUserForm.invalid || isEditSubmitting">{{ isEditMode ? 'Modifier' : 'Créer' }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
             </div>
             <div class="card-footer d-flex align-items-center">
               <p class="m-0 text-secondary">Affichage de <span>1</span> à <span>{{users?.length}}</span> de <span>{{users?.length}}</span> éléments</p>

@@ -19,92 +19,208 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 })
 export class ProductsComponent implements OnInit {
   errorMessage = '';
-  loading: boolean = false;
+  loading: boolean = true;
   products: Product [] | null = null;
   categories: Category [] | null = null;
   addProductForm: FormGroup;
   isFormSubmitted = false;
-  isAdded= false;
+  isAdded = false;
+  isUpdated = false;
   isSubmitting = false;
+  isDeleting = false;
   image: File | null = null;
+  currentImageUrl: string | null = null;
+  isEditMode = false;
+  currentProductId: number | null = null;
+  productToDelete: Product | null = null;
+  fileInputId: string = 'productImageInput';
 
-
-
-    constructor(private formBuilder: FormBuilder, private router: Router, public dateUtilsService: DateUtilsService, public loaderService: LoaderService, private productsService: ProductsService,  private productCategoriesService: ProductCategoriesService, private authService: AuthService){
-        this.addProductForm = this.formBuilder.group({
-        name: ['', [Validators.required]],
-        description: ['', Validators.required],
-        category: ['', Validators.required],
-        image: ['', null],
-        price: ['', null],
-        'sales-unit': ['', Validators.required],
+  constructor(private formBuilder: FormBuilder, private router: Router, public dateUtilsService: DateUtilsService, public loaderService: LoaderService, private productsService: ProductsService,  private productCategoriesService: ProductCategoriesService, private authService: AuthService){
+    this.addProductForm = this.formBuilder.group({
+      name: ['', [Validators.required]],
+      description: ['', Validators.required],
+      category: ['', Validators.required],
+      image: ['', null],
+      price: ['', null],
+      'sales-unit': ['', Validators.required],
     });
-    }
+  }
 
   ngOnInit(): void {
-    this.productsService.getProducts().subscribe({
-          next: data => {
-            this.products = data.map((item: any) => Product.fromJson(item));
-            this.loading = false;
-          },
-          error: err => {
-            this.loading = false;
-            this.errorMessage = err.error.message;
-            console.log(err.error)
-            this.authService.logout();
-          }
-        });
+    this.loadProducts();
+    this.loadCategories();
+  }
 
+  loadProducts(): void {
+    this.loading = true;
+    this.productsService.getProducts().subscribe({
+      next: data => {
+        this.products = data.map((item: any) => Product.fromJson(item));
+        this.loading = false;
+      },
+      error: err => {
+        this.loading = false;
+        this.errorMessage = err.error.message;
+        // console.log(err.error)
+        this.authService.logout();
+      }
+    });
+  }
+
+  loadCategories(): void {
     this.productCategoriesService.getProductCategories().subscribe({
-          next: data => {
-            this.categories = data;//.map((item: any) => Product.fromJson(item));
-            this.loading = false;
-          },
-          error: err => {
-            this.loading = false;
-            this.errorMessage = err.error.message;
-            console.log(err.error)
-          }
-        });
+      next: data => {
+        this.categories = data;
+      },
+      error: err => {
+        this.errorMessage = err.error.message;
+        // console.log(err.error)
+      }
+    });
   }
 
   onSubmit(): void {
     const name = this.addProductForm.get('name')!.value;
     const description = this.addProductForm.get('description')!.value;
     const category = this.addProductForm.get('category')!.value;
-    const image = this.addProductForm.get('image')!.value;
     const price = this.addProductForm.get('price')!.value;
     const salesUnit = this.addProductForm.get('sales-unit')!.value;
     this.isFormSubmitted = true;
 
     if (this.addProductForm.valid) {
-        this.isSubmitting = true;
-        this.errorMessage = '';
-        this.productsService.addProduct(name, description, category, price, salesUnit, this.image!!).subscribe({
+      this.isSubmitting = true;
+      this.errorMessage = '';
+
+      if (this.isEditMode && this.currentProductId) {
+        // Mode modification
+        this.productsService.updateProduct(this.currentProductId, name, description, category, price, salesUnit, this.image || undefined).subscribe({
           next: data => {
-                this.isAdded = true;
-                setTimeout(() => {
-                  this.isFormSubmitted = false;
-                  this.isSubmitting = false;
-                  this.addProductForm.reset();
-                }, 3000);
-                setTimeout(() => {
-                  this.isAdded = false;
-                  window.location.reload();
-                }, 4000);
+            this.isUpdated = true;
+            this.resetForm();
+            setTimeout(() => {
+              this.closeModal('modal-add-product');
+              this.loadProducts();
+            }, 2000);
           },
           error: err => {
-            console.log(err.error)
+            // console.log(err.error)
             this.isSubmitting = false;
             this.errorMessage = err.error.message;
           }
         });
+      } else {
+        // Mode ajout
+        this.productsService.addProduct(name, description, category, price, salesUnit, this.image!!).subscribe({
+          next: data => {
+            this.isAdded = true;
+            this.resetForm();
+            setTimeout(() => {
+              this.closeModal('modal-add-product');
+              this.loadProducts();
+            }, 2000);
+          },
+          error: err => {
+            // console.log(err.error)
+            this.isSubmitting = false;
+            this.errorMessage = err.error.message;
+          }
+        });
+      }
+    }
+  }
+
+  editProduct(product: Product): void {
+    this.isEditMode = true;
+    this.currentProductId = product.id;
+    this.currentImageUrl = product.image;
+    this.addProductForm.patchValue({
+      name: product.name,
+      description: product.description,
+      category: product.category.id,
+      price: product.price,
+      'sales-unit': product.salesUnit
+    });
+    this.image = null;
+  }
+
+  confirmDelete(product: Product): void {
+    this.productToDelete = product;
+  }
+
+  deleteProduct(): void {
+    if (this.productToDelete) {
+      this.isDeleting = true;
+      this.productsService.deleteProduct(this.productToDelete.id).subscribe({
+        next: () => {
+          this.isDeleting = false;
+          this.productToDelete = null;
+          this.closeModal('modal-delete');
+          this.loadProducts();
+        },
+        error: err => {
+          this.isDeleting = false;
+          this.errorMessage = err.error.message;
+          // console.log(err.error);
+        }
+      });
     }
   }
 
   onFileChange(event: any) {
     if (event.target.files && event.target.files.length > 0) {
-      this.image = event.target.files[0];
+      const file = event.target.files[0];
+      this.image = file;
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.currentImageUrl = e.target.result;
+      };
+      reader.readAsDataURL(file);
     }
+  }
+
+  resetForm(): void {
+    setTimeout(() => {
+      this.isFormSubmitted = false;
+      this.isSubmitting = false;
+      this.isEditMode = false;
+      this.currentProductId = null;
+      this.currentImageUrl = null;
+      this.isAdded = false;
+      this.isUpdated = false;
+      this.addProductForm.reset();
+      this.image = null;
+    }, 2000);
+  }
+
+  openAddModal(): void {
+    this.isEditMode = false;
+    this.currentProductId = null;
+    this.currentImageUrl = null;
+    this.addProductForm.reset();
+    this.image = null;
+    this.isFormSubmitted = false;
+    this.errorMessage = '';
+  }
+
+  closeModal(modalId: string): void {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+      const backdrop = document.querySelector('.modal-backdrop');
+      modal.classList.remove('show');
+      modal.setAttribute('aria-hidden', 'true');
+      modal.style.display = 'none';
+      document.body.classList.remove('modal-open');
+      if (backdrop) {
+        backdrop.remove();
+      }
+    }
+  }
+
+  getModalTitle(): string {
+    return this.isEditMode ? 'Modifier le produit' : 'Nouveau produit agricole';
+  }
+
+  getSubmitButtonText(): string {
+    return this.isEditMode ? 'Modifier' : 'Soumettre';
   }
 }

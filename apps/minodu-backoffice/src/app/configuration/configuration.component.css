@@ -1,0 +1,27 @@
+.modal {
+  padding-right: 0 !important;
+}
+
+.modal.show {
+  overflow-y: auto;
+}
+
+.modal-backdrop {
+  display: none;
+}
+
+.input-group-text {
+  cursor: pointer;
+}
+
+.input-group-text a {
+  text-decoration: none;
+}
+
+.input-group-text a:hover {
+  opacity: 0.7;
+}
+
+.modal.show {
+      background: rgba(0, 0, 0, 0.5);
+    }

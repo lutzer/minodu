@@ -73,12 +73,12 @@
                         </div>
 
                          <div>
-                            @if (isFormSubmitted && isUpdated) {
+                            @if (isFormSubmitted && isUpdated && !showPasswordModal) {
                                 <div class="alert alert-success mb-25" role="alert">
                                   Les informations de votre communauté ont été mise à jour avec succès.
                                 </div>
                                 }
-                            @if (isFormSubmitted && errorMessage) {
+                            @if (isFormSubmitted && !isUpdated && errorMessage && !showPasswordModal) {
                                 <div class="alert alert-danger mb-25" role="alert">
                                   {{ errorMessage }}
                                 </div>
@@ -87,15 +87,108 @@
 
                       </div>
                     </div>
-                    <div class="card-footer text-end">
+                    <div class="card-footer d-flex justify-content-between align-items-center">
+  
+                      <button (click)="openPasswordModal(); $event.preventDefault()" class="btn btn-danger">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                          <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                          <path d="M5 13a2 2 0 0 1 2 -2h6a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-6a2 2 0 0 1 -2 -2v-6z" />
+                          <path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0" />
+                          <path d="M8 13v-2a2 2 0 0 1 4 0" />
+                        </svg>
+                        Modifier le mot de passe
+                      </button>
+
                       <button [disabled]="isSubmitting" type="submit" class="btn btn-primary">
                         <div *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2" style="width: 1.3rem; height: 1.3rem;"></div>
                         <span [class.opacity-7]="isSubmitting">Mettre à jour</span>
-                     </button>
+                      </button>
+
                     </div>
+
                   </form>
                 </div>
                 </div>
             </div>
             </div>
         </div>
+<!-- Modal de modification du mot de passe -->
+<div *ngIf="showPasswordModal" class="modal fade show" style="display: block;">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Modifier le mot de passe</h5>
+        <button (click)="closePasswordModal()" type="button" class="btn-close"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="changePasswordForm" (ngSubmit)="submitPasswordChange()">
+          <!-- Nouveau mot de passe -->
+          <div class="mb-3">
+            <label class="form-label">Nouveau mot de passe</label>
+            <div class="input-group input-group-flat">
+              <input formControlName="password" [type]="showPassword ? 'text' : 'password'" class="form-control" placeholder="Entrez votre nouveau mot de passe">
+              <span class="input-group-text">
+                <a (click)="togglePasswordVisibility()" class="link-secondary">
+                  @if (!showPassword) {
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" /></svg>
+                  }
+                  @else {
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10.585 10.587a2 2 0 0 0 2.829 2.828" /><path d="M16.681 16.673a8.717 8.717 0 0 1 -4.681 1.327c-3.6 0 -6.6 -2 -9 -6c1.272 -2.12 2.712 -3.678 4.32 -4.674m2.86 -1.146a9.055 9.055 0 0 1 1.82 -.18c3.6 0 6.6 2 9 6c-.666 1.11 -1.379 2.067 -2.138 2.87" /><path d="M3 3l18 18" /></svg>
+                  }
+                </a>
+              </span>
+            </div>
+            <div *ngIf="changePasswordForm.get('password')?.invalid && (changePasswordForm.get('password')?.dirty || changePasswordForm.get('password')?.touched)" class="mt-2 text-danger">
+              <p *ngIf="changePasswordForm.get('password')?.errors?.['required']">* Le mot de passe est requis.</p>
+              <p *ngIf="changePasswordForm.get('password')?.errors?.['minlength']">* Le mot de passe doit contenir au minimum 8 caractères.</p>
+            </div>
+          </div>
+
+          <!-- Confirmation du mot de passe -->
+          <div class="mb-3">
+            <label class="form-label">Confirmer le mot de passe</label>
+            <div class="input-group input-group-flat">
+              <input formControlName="passwordConfirm" [type]="showPasswordConfirm ? 'text' : 'password'" class="form-control" placeholder="Confirmez votre nouveau mot de passe">
+              <span class="input-group-text">
+                <a (click)="togglePasswordConfirmVisibility()" class="link-secondary">
+                  @if (!showPasswordConfirm) {
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" /></svg>
+                  }
+                  @else {
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10.585 10.587a2 2 0 0 0 2.829 2.828" /><path d="M16.681 16.673a8.717 8.717 0 0 1 -4.681 1.327c-3.6 0 -6.6 -2 -9 -6c1.272 -2.12 2.712 -3.678 4.32 -4.674m2.86 -1.146a9.055 9.055 0 0 1 1.82 -.18c3.6 0 6.6 2 9 6c-.666 1.11 -1.379 2.067 -2.138 2.87" /><path d="M3 3l18 18" /></svg>
+                  }
+                </a>
+              </span>
+            </div>
+            <div *ngIf="changePasswordForm.get('passwordConfirm')?.invalid && (changePasswordForm.get('passwordConfirm')?.dirty || changePasswordForm.get('passwordConfirm')?.touched)" class="mt-2 text-danger">
+              <p *ngIf="changePasswordForm.get('passwordConfirm')?.errors?.['required']">* La confirmation du mot de passe est requise.</p>
+              <p *ngIf="changePasswordForm.get('passwordConfirm')?.errors?.['minlength']">* Le mot de passe doit contenir au minimum 8 caractères.</p>
+              <p *ngIf="changePasswordForm.get('passwordConfirm')?.errors?.['passwordMismatch']">* Les mots de passe ne correspondent pas.</p>
+            </div>
+          </div>
+
+          <!-- Messages d'erreur et de succès -->
+          @if (passwordChangeMessage) {
+            <div class="alert alert-success mb-3">
+              {{ passwordChangeMessage }}
+            </div>
+          }
+          @if (passwordChangeError) {
+            <div class="alert alert-danger mb-3">
+              {{ passwordChangeError }}
+            </div>
+          }
+
+          <!-- Boutons -->
+          <div class="modal-footer">
+            <button (click)="closePasswordModal()" type="button" class="btn btn-secondary">Annuler</button>
+            <button [disabled]="!changePasswordForm.valid || isChangingPassword" type="submit" class="btn btn-primary">
+              <div *ngIf="isChangingPassword" class="spinner-border spinner-border-sm me-2" style="width: 1.3rem; height: 1.3rem;"></div>
+              <span [class.opacity-7]="isChangingPassword">Modifier le mot de passe</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
