@@ -5,10 +5,11 @@ export type Language = 'fr' | 'kb';
 export type BotMessage = {
 	text: string;
 	type: BotMessageType;
+	final: boolean;
 };
 
 export enum BotMessageType{
-	USER, BOT_GENERATING, BOT_FINISHED
+	USER, BOT
 }
 
 export enum ForumPostType {

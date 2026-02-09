@@ -59,7 +59,9 @@
 					{/each}
 				</ul>
 			{:else}
-				<p class="no-posts">{t('agriculture.noPosts', $language)}</p>
+			<div class="no-data">
+				<p>{t('agriculture.noPosts', $language)}</p>
+			</div>
 			{/if}
 		</div>
 	</div>
@@ -152,16 +154,11 @@
 		box-sizing: border-box;
 	}
 
-	.no-posts {
-		padding: var(--medium-padding);
-		text-align: center;
-	}
-
 	.scroll-container {
 		background-color: #ebf9f2;
 	}
 
 	button.color {
-		
+		background-color: #9faaa5;
 	}
 </style>

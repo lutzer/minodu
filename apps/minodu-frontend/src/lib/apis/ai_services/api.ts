@@ -20,6 +20,15 @@ type TtsRespone = {
 	confidence: number;
 };
 
+type DocumentSummaryResponse = {
+	source_id: number;
+	summary: string | null;
+};
+
+type WelcomeResponse = {
+	text: string;
+};
+
 export class AiServicesApi {
 	static readonly API_PREFIX = '/api/services'; // No trailing slash
 
@@ -64,6 +73,34 @@ export class AiServicesApi {
 			method: 'POST',
 			body: formData
 		});
+		if (!response.ok) {
+			throw new HttpError({ code: response.status, message: await response.text() });
+		}
+		return await response.json();
+	}
+
+	public static async getDocumentSummary(
+		language: Language,
+		sourceId: number
+	): Promise<DocumentSummaryResponse> {
+		const response = await fetch(
+			`${AiServicesApi.API_PREFIX}/rag/documents/${language}/${sourceId}/summary`
+		);
+		if (!response.ok) {
+			throw new HttpError({ code: response.status, message: await response.text() });
+		}
+		return await response.json();
+	}
+
+	public static async getWelcomeMessage(
+		language: Language,
+		sourceId?: number
+	): Promise<WelcomeResponse> {
+		const url =
+			sourceId !== undefined
+				? `${AiServicesApi.API_PREFIX}/rag/welcome/${language}/${sourceId}/`
+				: `${AiServicesApi.API_PREFIX}/rag/welcome/${language}/`;
+		const response = await fetch(url);
 		if (!response.ok) {
 			throw new HttpError({ code: response.status, message: await response.text() });
 		}

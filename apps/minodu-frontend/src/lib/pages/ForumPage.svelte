@@ -216,7 +216,10 @@
 					{/each}
 				</ul>
 			{:else}
-				<p class="no-posts">{t('forum.noPosts', $language)}</p>
+				<div class="no-data">
+					<p>{t('forum.noPosts', $language)}</p>
+				</div>
+				
 			{/if}
 		</div>
 	</div>
@@ -280,11 +283,6 @@
 		padding: var(--page-padding);
 		margin-bottom: calc(var(--page-padding) + var(--button-size));
 		box-sizing: border-box;
-	}
-
-	.no-posts {
-		padding: var(--medium-padding);
-		text-align: center;
 	}
 
 	.scroll-container {
