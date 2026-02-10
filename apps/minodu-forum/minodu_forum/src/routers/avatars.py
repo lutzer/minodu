@@ -14,6 +14,7 @@ class AvatarResponse(BaseModel):
     id: int
     filename: str
     file_urlpath: str
+    color: str
 
 
 @router.get("/", response_model=list[AvatarResponse])

@@ -1,4 +1,4 @@
-import type { ForumAvatar } from './fromAvatar';
+import type { ForumAvatar } from './forumAvatar';
 
 export interface ForumAuthor {
 	id: number;

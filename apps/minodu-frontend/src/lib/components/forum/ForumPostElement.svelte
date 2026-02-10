@@ -35,7 +35,7 @@
 
 <div class="post shadow">
 	<div class="post-avatar">
-		<div class="avatar-picture">
+		<div class="avatar-picture" style:background-color={post.author.avatar.color}>
 			<img src={post.author.avatar.file_urlpath} alt={t('alt.avatarOfUser', $language)} />
 		</div>
 	</div>
@@ -126,14 +126,21 @@
 	.post-avatar {
 		width: 60px;
 		flex-shrink: 0;
+		flex-grow: 0;
 		text-align: center;
+	}
+
+	.avatar-picture {
+		width: auto;
+		height: auto;
+		border-radius: 15%;
 	}
 
 	.post-avatar img {
 		width: 100%;
 		height: auto;
 		object-fit: contain;
-		margin-bottom: var(--small-padding);
+		margin-bottom: -6px;
 	}
 
 	.paragraph {

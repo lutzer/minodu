@@ -1,11 +1,12 @@
 <script lang="ts">
+	import ExplainPageButton from '$lib/components/common/ExplainPageButton.svelte';
 	import ChatbotPage from '$lib/pages/ChatbotPage.svelte';
-	import { language } from '$lib/stores';
-	import { t } from '$lib/translations';
 </script>
 
 <div>
-	<a href="/">{t('nav.home', $language)}</a>
-	<h2>{t('chatbot.title', $language)}</h2>
 	<ChatbotPage />
+	<ExplainPageButton
+		audioFr="https://audio-samples.github.io/samples/mp3/blizzard_unconditional/sample-0.mp3"
+		audioKb="https://audio-samples.github.io/samples/mp3/blizzard_unconditional/sample-1.mp3"
+	/>
 </div>

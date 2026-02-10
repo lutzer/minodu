@@ -96,6 +96,7 @@ This file contains guidelines, practices, and principles that should be consider
 - Write clear, descriptive commit messages
 - Keep commits focused on single changes
 - Test before committing
+- Dont do a commit when tests are failing
 
 ---
 

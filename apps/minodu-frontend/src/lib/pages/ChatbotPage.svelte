@@ -7,44 +7,63 @@
 	import { Storage } from '$lib/storage';
 	import { language } from '$lib/stores';
 	import { BotMessageType, type BotMessage, type Optional } from '$lib/types';
-	import { onMount } from 'svelte';
+	import { afterUpdate, onMount, tick } from 'svelte';
 	import { t } from '$lib/translations';
 	import type { BackendPost } from '$lib/apis/backend/models/backendPost';
 	import BotInputElement from '$lib/components/bot/BotInputElement.svelte';
-	import { waitForAnimationFrame } from '$lib/utils';
-
+	import { delay, waitForAnimationFrame } from '$lib/utils';
 
 	import trashIcon from '$lib/assets/trash-icon-white.png';
 
-	export let post : Optional<BackendPost> = undefined;
+	export const post: Optional<BackendPost> = undefined;
 
 	let messages: BotMessage[] = [];
 	let ttsPlayer: TextToSpeechPlayer;
 	let conversation: string = '';
 	let generating = false;
-	let scrollContainer : HTMLDivElement;
+	let scrollContainer: HTMLDivElement;
 
 	onMount(() => {
-		messages = Storage.chatMessages;
+		if (post === undefined) 
+			messages = Storage.chatMessages;
 	});
 
-	$: generating = messages.reduce((prev, val) => prev || val.type == BotMessageType.BOT_GENERATING, false);
+	afterUpdate(() => {
+		console.log(messages.length);
+		if (messages.length == 0) {
+			generateWelcomeMessage();
+		}
+	});
+
+	$: generating = messages.reduce((prev, val) => prev || !val.final, false);
 	$: conversation = messages.reduce((acc, val) => {
-		return acc + '\n' + (val.type == BotMessageType.USER ? + `USER: ${val.text}` : + `BOT: ${val.text}`) + '\n';
+		return (
+			acc +
+			'\n' +
+			(val.type == BotMessageType.USER ? +`USER: ${val.text}` : +`BOT: ${val.text}`) +
+			'\n'
+		);
 	}, '');
 
-	function updateGenerateState() {
-		// Storage.chatMessages = messages;
-		generating = isGenerating();
-	}
+	let reader: Optional<ReadableStreamDefaultReader<Uint8Array<ArrayBuffer>>> = undefined;
+	let reading = false;
 
-	function isGenerating(): boolean {
-		return messages.reduce((prev, val) => prev || val.type == BotMessageType.BOT_GENERATING, false);
+	async function generateWelcomeMessage() {
+		console.log('generateWelcomeMessage');
+		let apiResponse = await AiServicesApi.getWelcomeMessage(Config.language, post?.id);
+
+		messages = [...messages, { text: apiResponse.text, type: BotMessageType.BOT, final: true }];
+
+		scrollContainer.scrollTo({
+			top: scrollContainer.scrollHeight,
+			behavior: 'smooth'
+		});
 	}
 
 	async function submitMessage(message: string) {
-		messages = [...messages, { text: message, type: BotMessageType.USER }];
-		Storage.chatMessages = messages;
+		messages = [...messages, { text: message, type: BotMessageType.USER, final: true }];
+
+		if (post === undefined) Storage.chatMessages = messages;
 
 		await waitForAnimationFrame();
 
@@ -53,19 +72,61 @@
 			behavior: 'smooth'
 		});
 
-		console.log(messages)
+		await requestAnswer(message, conversation);
+
+		scrollContainer.scrollTo({
+			top: scrollContainer.scrollHeight,
+			behavior: 'smooth'
+		});
+
+		if (post === undefined) Storage.chatMessages = messages;
+	}
+
+	async function requestAnswer(question: string, conversation: string) {
+		let response = { text: '', type: BotMessageType.BOT, final: false };
+		messages = [...messages, response];
+
+		let apiResponse = await AiServicesApi.generateRagResponse({
+			language: Config.language,
+			conversation: conversation,
+			question: question
+		});
+
+		reader = apiResponse.body?.getReader();
+
+		if (!reader) throw Error('Could not initialize rag response reader');
+
+		const decoder = new TextDecoder();
+
+		reading = true;
+
+		while (reading) {
+			const { done, value } = await reader.read();
+			if (done) break;
+
+			const text = decoder.decode(value, { stream: true });
+			response.text += text;
+			messages = messages;
+			await tick();
+			await delay(200);
+		}
+
+		response.final = true;
+		messages = messages;
+
+		reading = false;
+		reader = undefined;
+	}
+
+	export function stopAnswer() {
+		reader?.cancel();
+		reading = false;
 	}
 
 	function clearChat() {
-		Storage.chatMessages = undefined;
 		messages = [];
+		if (post === undefined) Storage.chatMessages = undefined;
 	}
-
-	// async function transcribeAudio(blob: Blob) {
-	// 	let response = await AiServicesApi.transcribeSpeech(blob, Config.language);
-	// 	if (response.confidence > 0.6) inputText = response.text;
-	// 	audioRecorder.reset();
-	// }
 </script>
 
 <div class="chatbot-page">
@@ -73,38 +134,32 @@
 		<div class="message-container content-width">
 			<ul>
 				{#each messages as msg, i (i)}
-				<li>
-					<BotMessageElement
-						message={msg}
-						{ttsPlayer}
-					/>
-				</li>
+					<li>
+						<BotMessageElement message={msg} {ttsPlayer} onCancelResponse={stopAnswer} />
+					</li>
 				{/each}
 				{#if messages.length > 0}
-				<li>
-					<div class="reset-button-container">
-						<button class="reset-button long shadow" onclick={clearChat}>
-							<img src={trashIcon}/>
-							<span>Clear Chat</span>
-						</button>
-					</div>
-				</li>
+					<li>
+						<div class="reset-button-container">
+							<button class="reset-button long shadow" onclick={clearChat}>
+								<img src={trashIcon} alt="Icon for clearing the conversation" />
+								<span>Clear Chat</span>
+							</button>
+						</div>
+					</li>
 				{:else}
-				<li>
-					<p class="empty">Empty conversation</p>
-				</li>
+					<div class="no-data">
+						<p>There are no messages in this conversation yet</p>
+					</div>
 				{/if}
 			</ul>
 		</div>
 	</div>
-	<BotInputElement 
-		onMessageSubmitted={submitMessage}
-		enabled={!generating}/>
+	<BotInputElement onMessageSubmitted={submitMessage} enabled={!generating} />
 	<TextToSpeechPlayer bind:this={ttsPlayer} />
 </div>
 
 <style>
-
 	.message-container {
 		padding: var(--page-padding);
 		margin-bottom: calc(var(--page-padding) + var(--button-size));
@@ -112,7 +167,7 @@
 	}
 
 	.scroll-container {
-		background-color: #C3EED9;
+		background-color: #c3eed9;
 	}
 
 	.reset-button-container {
@@ -122,13 +177,13 @@
 	}
 
 	.reset-button {
-		background-color: #CC604B;
-		--box-shadow-color: #8C4A3C;
+		background-color: #cc604b;
+		--box-shadow-color: #8c4a3c;
 		margin: var(--small-padding);
 		padding: 0 var(--small-padding);
 		display: flex;
 		color: white;
-		width:160px;
+		width: 160px;
 		align-items: center;
 		justify-content: space-between;
 	}
@@ -142,10 +197,4 @@
 		flex-grow: 1;
 		text-align: center;
 	}
-
-	.empty {
-		text-align: center;
-		margin: var(--page-padding);
-	}
-
 </style>
