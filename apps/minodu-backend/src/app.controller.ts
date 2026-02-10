@@ -10,6 +10,7 @@ import { BaseConfig } from './utils/common.util';
 import { PostService } from './posts/post.service';
 import { ProductsService } from './products/product.service';
 import { Throttle } from '@nestjs/throttler/dist/throttler.decorator';
+import { SkipThrottle } from '@nestjs/throttler';
 
 @Controller()
 export class AppController {
@@ -22,10 +23,14 @@ export class AppController {
     private readonly postService: PostService,
     private readonly productsService: ProductsService,
   ) {
-    this.userStatusService.createDefaultStatuses();
-    this.rolesService.createDefaultRoles();
-    this.usersService.createDefaultAdmin();
-    this.configurationService.createDefaultConfiguration();
+    this.initializeDefaultData();
+  }
+
+  async initializeDefaultData() {
+    await this.userStatusService.createDefaultStatuses();
+    await this.rolesService.createDefaultRoles();
+    await this.usersService.createDefaultAdmin();
+    await this.configurationService.createDefaultConfiguration();
   }
 
   /**
@@ -36,7 +41,7 @@ export class AppController {
    * @param res - The response object used to send the file to the client.
    * @returns The file is sent back to the client.
    */
-  @Throttle({ default: { limit: 50, ttl: 60000 } }) // Max 5 tentatives par 10 minute
+  @SkipThrottle()
   @Public()
   @ApiOperation({
     summary: "Download a file",
