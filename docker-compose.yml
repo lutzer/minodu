@@ -8,6 +8,8 @@ services:
       - "3306:3306"
     environment:
       - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
     volumes:
       - mysql-data:/var/lib/mysql 
@@ -26,17 +28,15 @@ services:
       context: ./apps/minodu-backend
       dockerfile: Dockerfile
     ports:
-      - "${APP_PORT}:3000"
-    env_file: .env
+      - "${APP_PORT:-3000}:3000"
     environment:
-      DB_HOST: "${DB_HOST}"
-      DB_PORT: "${DB_PORT}"
+      DB_HOST: "${DB_HOST:-minodu-database}"
+      DB_PORT: "${DB_PORT:-3306}"
       DB_USERNAME: "${MYSQL_USER}"
       DB_PASSWORD: "${MYSQL_PASSWORD}"
       DB_NAME: "${DB_NAME}"
-      APP_PORT: "${APP_PORT}"
-      APP_HOST: "${APP_HOST}"
-      APP_FRONT: "${APP_FRONT}"
+      APP_PORT: "${APP_PORT:-3000}"
+      APP_HOST: "${APP_HOST:-/api/backend}"
       JWT_SECRET: "${JWT_SECRET_KEY}"
       ADMIN_PHONE: "${ADMIN_PHONE}"
       ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
@@ -187,5 +187,5 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: ./data/web/log
+      device: ./data/logs
       o: bind  
