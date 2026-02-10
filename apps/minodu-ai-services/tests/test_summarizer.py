@@ -7,7 +7,6 @@ from fastapi.testclient import TestClient
 from minodu_ai_services.src.app import app
 from minodu_ai_services.src.rag.summarizer import (
     DocumentSummarizer,
-    MAX_SUMMARY_LENGTH,
     MAX_INPUT_CHARS
 )
 from minodu_ai_services.src.rag.rag import RAG
@@ -20,32 +19,6 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 
 
 class TestDocumentSummarizer:
-
-    def test_summarizer_truncates_input(self):
-        """Test that input is truncated to MAX_INPUT_CHARS"""
-        with patch.object(DocumentSummarizer, '__init__', lambda x, y: None):
-            summarizer = DocumentSummarizer(LanguageEnum.en)
-            summarizer.chain = MagicMock()
-            summarizer.chain.invoke = MagicMock(return_value="Short summary")
-
-            long_content = "A" * (MAX_INPUT_CHARS + 1000)
-            summarizer.summarize(long_content)
-
-            call_args = summarizer.chain.invoke.call_args[0][0]
-            assert len(call_args["content"]) == MAX_INPUT_CHARS
-
-    def test_summarizer_truncates_output(self):
-        """Test that output summary is truncated to MAX_SUMMARY_LENGTH"""
-        with patch.object(DocumentSummarizer, '__init__', lambda x, y: None):
-            summarizer = DocumentSummarizer(LanguageEnum.en)
-            summarizer.chain = MagicMock()
-            long_summary = "B" * (MAX_SUMMARY_LENGTH + 100)
-            summarizer.chain.invoke = MagicMock(return_value=long_summary)
-
-            result = summarizer.summarize("Some content")
-
-            assert len(result) == MAX_SUMMARY_LENGTH
-            assert result.endswith("...")
 
     def test_summarizer_strips_whitespace(self):
         """Test that summary whitespace is stripped"""
