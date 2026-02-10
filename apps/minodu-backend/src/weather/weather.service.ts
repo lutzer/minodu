@@ -7,6 +7,7 @@ import { Workbook } from 'exceljs';
 import { Response } from 'express';
 import axios from 'axios';
 import { LoggerService } from 'src/logs/logger.service';
+import { DataFormater } from 'src/utils/data.formatter';
 
 @Injectable()
 export class WeatherService {
@@ -18,55 +19,58 @@ export class WeatherService {
   ) { }
 
   async sync(syncWeatherDto: SyncWeatherDto) {
-    //pull data from teleagriculture
-    try {
-      let weather = new Weather();
-      if(syncWeatherDto){
-        weather.temperature = syncWeatherDto.temp;
-        weather.temperature1 = syncWeatherDto.temp1;
-        weather.humidity = syncWeatherDto.hum;
-        weather.humidity1 = syncWeatherDto.hum1;
-        weather.pressure = syncWeatherDto.press;
-        weather.luminosity = syncWeatherDto.lux;
-        weather.ambient = syncWeatherDto.ambient;
-        weather.co = syncWeatherDto.CO;
-        weather.no2 = syncWeatherDto.NO2;
-        weather.wind_direction = syncWeatherDto.wind_dir;
-        weather.wind_speed = syncWeatherDto.wind_spd;
-        weather.indice_uv = syncWeatherDto.uv;
-        weather.battery = syncWeatherDto.battery;
-        weather.time = syncWeatherDto.time ? syncWeatherDto.time : new Date().toISOString();
-        await weather.save();
+    if (!syncWeatherDto) return;
 
-        setImmediate(async () => {
-          try {
-            const jsonObj = {
-                            temperature: weather.temperature,
-                            humidity: weather.humidity,
-                            pressure: weather.pressure,
-                            luminosity: weather.luminosity,
-                            ambient_luminosity: weather.ambient,
-                            carbon_monoxide: weather.co,
-                            nitrogen_dioxide: weather.no2
-                          };
-            const description = await this.interpretWeather(JSON.stringify(jsonObj));
-            if (description) {
-              weather.description = description
-              await this.weatherRepository.update(weather.id, { description });
-              this.loggerService.log(`Weather ${weather.id} updated with AI description`);
-            }
-          } catch (error) {
-            this.loggerService.error(error,WeatherService.name);
-          }
-        });
+    try {
+      const weather = this.weatherRepository.create({
+        temperature: syncWeatherDto.temp,
+        temperature1: syncWeatherDto.temp1,
+        humidity: syncWeatherDto.hum,
+        humidity1: syncWeatherDto.hum1,
+        pressure: syncWeatherDto.press,
+        luminosity: syncWeatherDto.lux,
+        ambient: syncWeatherDto.ambient,
+        co: syncWeatherDto.CO,
+        no2: syncWeatherDto.NO2,
+        wind_direction: syncWeatherDto.wind_dir,
+        wind_speed: syncWeatherDto.wind_spd,
+        indice_uv: syncWeatherDto.uv,
+        battery: syncWeatherDto.battery,
+        time: syncWeatherDto.time ?? new Date().toISOString(),
+      });
+
+      try {
+        const weatherData = {
+          temperature: weather.temperature,
+          humidity: weather.humidity,
+          pressure: weather.pressure,
+          luminosity: weather.luminosity,
+          ambient_luminosity: weather.ambient,
+          carbon_monoxide: weather.co,
+          nitrogen_dioxide: weather.no2
+        };
+
+        const description = await this.interpretWeather(weatherData);
+        if (description) {
+          weather.description = description;
+        }
+      } catch (aiError) {
+        this.loggerService.error(`AI Interpretation failed: ${aiError.message}`, WeatherService.name);
       }
 
+      const savedWeather = await this.weatherRepository.save(weather);
+      this.loggerService.log(`Weather data synchronized (ID: ${savedWeather.id})`);
+      
+      return savedWeather;
+
     } catch (error) {
+      this.loggerService.error(`Sync failed: ${error.message}`, WeatherService.name);
       throw error;
     }
   }
 
-  async interpretWeather(data: string): Promise<any> {
+
+  async interpretWeather(data): Promise<any> {
     try {
       const response = await axios.post(`${process.env.AI_SERVICE_URL}/weather/text`, {
         language: 'fr',
