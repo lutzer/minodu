@@ -24,8 +24,8 @@ export class BackendApi {
 		return response.json();
 	}
 
-	public static async getPost(postId: string): Promise<BackendPost> {
-		const response = await fetch(`${BackendApi.API_PREFIX}/post/${postId}`);
+	public static async getPost(postId: number): Promise<BackendPost> {
+		const response = await fetch(`${BackendApi.API_PREFIX}/posts/${postId}`);
 		if (!response.ok) {
 			throw new HttpError({ code: response.status, message: await response.text() });
 		}

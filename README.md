@@ -26,6 +26,8 @@ MYSQL_USER=minodu_user
 MYSQL_PASSWORD=password
 MYSQL_ROOT_PASSWORD=rootpassword
 JWT_SECRET_KEY=secret
+ADMIN_PHONE=123456789
+ADMIN_PASSWORD=admin_password
 ENVIRONMENT=development
 ```
 * run `npm install`

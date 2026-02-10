@@ -94,7 +94,6 @@ class DocumentStore:
             full_text = "\n\n".join(texts)
             summarizer = DocumentSummarizer(self.language)
             summary = summarizer.summarize(full_text)
-            print(f"Generated summary: {summary[:50]}...")
 
         self.add_text_documents(texts, metadatas, summary=summary)
         return summary
