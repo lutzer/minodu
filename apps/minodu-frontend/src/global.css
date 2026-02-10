@@ -222,9 +222,19 @@ dialog.overlay::backdrop {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	animation: fadeIn 2s ease forwards;
 }
 
 .no-data > p {
 	margin: var(--page-padding);
 	text-align: center;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
 }
