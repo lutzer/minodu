@@ -1,0 +1,147 @@
+<div class="page-header d-print-none">
+    <div class="container-xl">
+      <div class="row g-2 align-items-center">
+        <div class="col">
+          <h2 class="page-title">Logs serveur</h2>
+          <div class="page-pretitle mt-1">Affichage et gestion des logs du serveur</div>
+        </div>
+        <div class="col-auto ms-auto d-print-none">
+          <div class="btn-list">
+            <button type="button" class="btn btn-danger" (click)="confirmClearLogs($event)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-trash"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v1" /></svg>
+              VIDER LES LOGS
+            </button>
+            <!-- <div class="btn-group">
+              <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-download"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 3v12" /></svg>
+                TÉLÉCHARGER
+              </button>
+              <div class="dropdown-menu dropdown-menu-end">
+                <a class="dropdown-item" href="#" (click)="downloadLogs('txt'); $event.preventDefault()">
+                  Télécharger en TXT
+                </a>
+                <a class="dropdown-item" href="#" (click)="downloadLogs('json'); $event.preventDefault()">
+                  Télécharger en JSON
+                </a>
+              </div>
+            </div> -->
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+<div class="page-body">
+  <div class="container-xl">
+    <!-- Messages d'erreur et succès -->
+    <div class="row">
+      <div class="col-12">
+        <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 8v4" /><path d="M12 16v.01" /></svg>
+          <div>{{ errorMessage }}</div>
+          <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+        </div>
+        <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M9 12l2 2l4 -4" /></svg>
+          <div>{{ successMessage }}</div>
+          <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <!-- Onglets -->
+          <div class="card-header border-bottom">
+            <ul class="nav nav-tabs card-header-tabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link"
+                  [class.active]="activeTab === 'default'"
+                  (click)="switchTab('default')"
+                  id="default-tab"
+                  type="button">
+                  Tous les logs
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link"
+                  [class.active]="activeTab === 'error'"
+                  (click)="switchTab('error')"
+                  id="error-tab"
+                  type="button">
+                  Erreurs uniquement
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link"
+                  [class.active]="activeTab === 'access'"
+                  (click)="switchTab('access')"
+                  id="access-tab"
+                  type="button">
+                  Accès uniquement
+                </button>
+              </li>
+            </ul>
+          </div>
+          
+          <div class="card-body">
+            <div *ngIf="loading" class="text-center py-5">
+              <span class="spinner-border spinner-border-sm" role="status"></span> Chargement des logs...
+            </div>
+            <div *ngIf="!loading && logsText" class="logs-container">
+              <pre class="logs-content">{{ logsText }}</pre>
+              <div class="text-center mt-3">
+                <small class="text-secondary">Affichage de {{ currentLines }} lignes</small>
+              </div>
+              <div class="text-center mt-2">
+                <button 
+                  class="btn btn-outline-primary" 
+                  (click)="loadMoreLogs()" 
+                  [disabled]="loadingMore">
+                  <span *ngIf="loadingMore" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                  <span *ngIf="!loadingMore">Voir plus</span>
+                  <span *ngIf="loadingMore">Chargement...</span>
+                </button>
+              </div>
+            </div>
+            <div *ngIf="!loading && !logsText && !errorMessage" class="text-center text-secondary py-5">
+              Aucun log disponible ou fichier vide
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Clear logs confirmation modal -->
+<div class="modal modal-blur fade" id="clear-logs-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      <!-- <div class="modal-status bg-danger"></div> -->
+      <div class="modal-body text-center py-4">
+        <!-- <svg xmlns="http://www.w3.org/2000/svg" class="icon mb-2 text-danger icon-lg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 9v6" /><path d="M9 12h6" /></svg> -->
+        <h3>Êtes-vous sûr?</h3>
+        <div class="text-secondary">Vous êtes sur le point de vider tous les logs du serveur. Cette action est irréversible.</div>
+      </div>
+      <div class="modal-footer">
+        <div class="w-100">
+          <div class="row">
+            <div class="col"><a href="#" class="btn btn-white w-100" data-bs-dismiss="modal">Annuler</a></div>
+            <div class="col">
+              <button type="button" class="btn btn-danger w-100" (click)="clearLogs()" [disabled]="isClearing" data-bs-dismiss="modal">
+                <span *ngIf="isClearing" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                Vider les logs
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
