@@ -1,6 +1,6 @@
 import type { ForumPost } from './models/forumPost';
 import { HttpError } from '$lib/errors';
-import type { ForumAvatar } from './models/fromAvatar';
+import type { ForumAvatar } from './models/forumAvatar';
 import type { ForumAuthor } from './models/forumAuthor';
 import type { Language, Optional } from '$lib/types';
 import type { ForumFile } from './models/forumFile';
