@@ -1,0 +1,39 @@
+/* Logs component styles */
+
+.logs-container {
+  max-height: 600px;
+  overflow: auto;
+  background-color: #2b3e50;
+  border-radius: 4px;
+  border: 1px solid #34495e;
+  padding: 1rem;
+}
+
+.logs-content {
+  margin: 0;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #ecf0f1;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* Scrollbar styling */
+.logs-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.logs-container::-webkit-scrollbar-track {
+  background: #34495e;
+}
+
+.logs-container::-webkit-scrollbar-thumb {
+  background: #7f8c8d;
+  border-radius: 4px;
+}
+
+.logs-container::-webkit-scrollbar-thumb:hover {
+  background: #95a5a6;
+}
+
