@@ -40,7 +40,16 @@ export class WeatherService {
 
         setImmediate(async () => {
           try {
-            const description = await this.interpretWeather(JSON.stringify(syncWeatherDto));
+            const jsonObj = {
+                            temperature: weather.temperature,
+                            humidity: weather.humidity,
+                            pressure: weather.pressure,
+                            luminosity: weather.luminosity,
+                            ambient_luminosity: weather.ambient,
+                            carbon_monoxide: weather.co,
+                            nitrogen_dioxide: weather.no2
+                          };
+            const description = await this.interpretWeather(JSON.stringify(jsonObj));
             if (description) {
               weather.description = description
               await this.weatherRepository.update(weather.id, { description });
