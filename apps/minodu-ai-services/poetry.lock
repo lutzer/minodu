@@ -4614,4 +4614,4 @@ cffi = ["cffi (>=1.17) ; python_version >= \"3.13\" and platform_python_implemen
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12,<3.13"
-content-hash = "d9f1b74e9fdd754cbd8db3f68a1204595ce34430f428988097c2b8c30aa6a8d9"
+content-hash = "432e837338f63ac5bea18eed06ef6b7a1459fa477363b49bc744f3a33a6c4dc2"

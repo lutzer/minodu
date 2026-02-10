@@ -48,10 +48,14 @@
 	let reading = false;
 
 	async function generateWelcomeMessage() {
-		console.log('generateWelcomeMessage');
+		let welcome = { text: '', type: BotMessageType.BOT, final: false }
+		messages = [...messages, welcome ];
+
 		let apiResponse = await AiServicesApi.getWelcomeMessage(Config.language, post?.id);
 
-		messages = [...messages, { text: apiResponse.text, type: BotMessageType.BOT, final: true }];
+		welcome.text = apiResponse.text;
+		welcome.final = true;
+		messages = messages;
 
 		scrollContainer.scrollTo({
 			top: scrollContainer.scrollHeight,
