@@ -6,12 +6,13 @@
 	import ChatbotPage from '$lib/pages/ChatbotPage.svelte';
 	import { onMount } from 'svelte';
 
-	const postId = page.url.searchParams.get('id') || '';
+	const postId = Number(page.params.id);
 	let post : BackendPost;
 	
-	$: async () => {
+	onMount(async () => {
 		post = await BackendApi.getPost(postId);
-	}
+		console.log(post)
+	});
 
 </script>
 

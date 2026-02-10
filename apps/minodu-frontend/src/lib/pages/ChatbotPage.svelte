@@ -15,7 +15,8 @@
 
 	import trashIcon from '$lib/assets/trash-icon-white.png';
 
-	export const post: Optional<BackendPost> = undefined;
+	export let post: Optional<BackendPost> = undefined;
+	export let saveChat: boolean
 
 	let messages: BotMessage[] = [];
 	let ttsPlayer: TextToSpeechPlayer;
@@ -24,12 +25,10 @@
 	let scrollContainer: HTMLDivElement;
 
 	onMount(() => {
-		if (post === undefined) 
-			messages = Storage.chatMessages;
+		if (saveChat) messages = Storage.chatMessages;
 	});
 
 	afterUpdate(() => {
-		console.log(messages.length);
 		if (messages.length == 0) {
 			generateWelcomeMessage();
 		}
@@ -79,7 +78,7 @@
 			behavior: 'smooth'
 		});
 
-		if (post === undefined) Storage.chatMessages = messages;
+		if (saveChat) Storage.chatMessages = messages;
 	}
 
 	async function requestAnswer(question: string, conversation: string) {
@@ -108,7 +107,7 @@
 			response.text += text;
 			messages = messages;
 			await tick();
-			await delay(200);
+			await delay(100);
 		}
 
 		response.final = true;
@@ -125,7 +124,7 @@
 
 	function clearChat() {
 		messages = [];
-		if (post === undefined) Storage.chatMessages = undefined;
+		if (saveChat) Storage.chatMessages = undefined;
 	}
 </script>
 
