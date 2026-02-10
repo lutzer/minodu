@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { ForumApi } from '$lib/apis/forum/api';
-	import type { ForumAvatar } from '$lib/apis/forum/models/fromAvatar';
+	import type { ForumAvatar } from '$lib/apis/forum/models/forumAvatarr';
 	import { Storage } from '$lib/storage';
 	import { language } from '$lib/stores';
 	import type { Optional } from '$lib/types';
@@ -26,6 +26,8 @@
 
 	async function loadAvatars() {
 		avatarList = await ForumApi.getAvatars();
+
+		console.log(avatarList)
 	}
 
 	async function createAuthor(name: string, avatar: number) {
@@ -45,7 +47,9 @@
 		{#each avatarList as avatar (avatar.id)}
 			<li>
 				<label for={`avatar-${avatar.id}`}>
-					<img src={avatar.file_urlpath} alt={t('alt.avatarImage', $language)} />
+					<div class="avatar-bg" style:background-color={avatar.color}>
+						<img src={avatar.file_urlpath} alt={t('alt.avatarImage', $language)} />
+					</div>
 				</label>
 				<input
 					type="radio"
@@ -84,19 +88,16 @@
 	.avatar-list {
 		display: flex;
 		flex-wrap: wrap;
-		gap: var(--small-padding);
 		align-items: center;
 		justify-content: center;
 		margin: var(--medium-padding) 0;
 	}
 
 	.avatar-list li {
-		width: 28%;
+		width: 21%;
 		max-width: 150px;
 		min-width: 60px;
-		border-radius: var(--border-radius);
 		padding: 5px;
-		background-color: #ffffff;
 	}
 
 	.avatar-list li input[type='radio'] {
@@ -104,13 +105,19 @@
 	}
 
 	.avatar-list li:has(input[type='radio']:checked) {
-		background-color: #37cc84;
+		background-color: red;
+		border-radius: var(--border-radius);
 	}
 
 	.avatar-list img {
 		width: 100%;
 		height: 100%;
+		margin-bottom: -6px;
 		object-fit: contain;
+	}
+
+	.avatar-bg {
+		border-radius: 15%;
 	}
 
 	button.accept {

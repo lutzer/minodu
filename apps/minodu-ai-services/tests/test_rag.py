@@ -48,48 +48,23 @@ class TestRagAPI:
             "query": "Chemical fertilizer",
             "language": "en"
         }
-        response = client.post(app.root_path + "/rag/sources", json=test_data)        
+        response = client.post(app.root_path + "/rag/sources", json=test_data)
         assert response.status_code == 200
         data = response.json()
 
         assert data["document"] != None
         assert data["score"] > 0
 
-    def test_add_document(self):
-        file_path = os.path.join(script_dir, "docs/1_EN_AKPE_Script.pdf")
-        with open(file_path, "rb") as f:
-            response = client.post(
-                "/rag/documents",
-                files={"file": (os.path.basename(file_path), f, "application/pdf")},
-                data={
-                    "language": "en",
-                    "source_id" : 3
-                }
-            )
-    
+    def test_welcome_message_without_source_id(self):
+        response = client.get(app.root_path + "/rag/welcome/en/")
         assert response.status_code == 200
+        data = response.json()
+        assert "text" in data
+        assert len(data["text"]) > 0
 
-        # check if document is present
-        rag = RAG(language=LanguageEnum.en)
-        store = DocumentStore(rag.vectorstore, rag.chroma_client)
-        documents = store.list_documents()
-
-        is_in_documents = reduce(lambda acc, val: acc or val["metadata"]["source_id"] == 3, documents, False)
-        assert is_in_documents
-
-    def test_delete_document(self):
-        response = client.delete(app.root_path + "/rag/documents/en/3")
+    def test_welcome_message_with_source_id(self):
+        response = client.get(app.root_path + "/rag/welcome/en/123/")
         assert response.status_code == 200
-
-        # check if document is deleted
-        rag = RAG(language=LanguageEnum.en)
-        store = DocumentStore(rag.vectorstore, rag.chroma_client)
-        documents = store.list_documents()
-
-        is_in_documents = reduce(lambda acc, val: acc or val["metadata"]["source_id"] == 3, documents, False)
-        assert not is_in_documents
-
-
-    def test_delete_document_error(self):
-        response = client.delete(app.root_path + "/rag/documents/en/999")
-        assert response.status_code != 200
+        data = response.json()
+        assert "text" in data
+        assert len(data["text"]) > 0

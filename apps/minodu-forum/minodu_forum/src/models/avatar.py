@@ -23,6 +23,7 @@ class Avatar(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     filename = Column(String(255), nullable=False)
+    color = Column(String(7), nullable=True)  # Hex color e.g. #37CC84
 
     authors = relationship("Author", back_populates="avatar", uselist=True)
 
@@ -46,15 +47,17 @@ def create_avatar_table():
         # iterate over all image files in folder
         for image_path in avatar_images:
             image_name = os.path.basename(image_path)
-            # Extract ID from filename pattern avatar-<n>.png
-            match = re.match(r'avatar-(\d+)\.\w+$', image_name)
+            # Extract ID and color from filename pattern avatar<n>_c<color>.png
+            match = re.match(r'avatar(\d+)_c([A-Fa-f0-9]{6})\.\w+$', image_name)
             if match:
                 avatar_id = int(match.group(1))
+                avatar_color = "#" + match.group(2)  # Add # prefix for valid hex color
                 avatar = db.query(Avatar).filter(Avatar.id == avatar_id).first()
                 if avatar == None:
                     # create new avatar
-                    db.add(Avatar(id=avatar_id, filename=image_name))
+                    db.add(Avatar(id=avatar_id, filename=image_name, color=avatar_color))
                 else:
-                    # update filename of existing entry
+                    # update filename and color of existing entry
                     avatar.filename = image_name
+                    avatar.color = avatar_color
         db.commit()

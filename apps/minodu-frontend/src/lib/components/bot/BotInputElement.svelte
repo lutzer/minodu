@@ -58,7 +58,7 @@
 					<button
 						class="submit-button shadow"
 						onclick={() => submitMessage()}
-						disabled={!enabled || text.length <= 3}
+						disabled={!enabled || text.length <= 2}
 					>
 						<img src={submitButton} alt={t('alt.submitForumPost', $language)} />
 					</button>
@@ -73,8 +73,7 @@
 </div>
 <style>
 	.bot-input-container.disabled {
-		opacity: 0.5;
-		pointer-events: none;
+		/* opacity: 0.5; */
 	}
 
 	.message-overlay {
@@ -89,9 +88,10 @@
 	.create-message-container {
 		position: fixed;
 		background-color: #edca82;
-		bottom: var(--footer-height);
+		bottom: 0;
 		left: 0;
 		right: 0;
+		min-height: var(--footer-height);
 		padding: var(--small-padding);
 		border-radius: var(--border-radius) var(--border-radius) 0 0;
 		box-sizing: border-box;
@@ -128,7 +128,7 @@
 	}
 
 	.input-textarea.minimized {
-		height: var(--button-size);
+		height: 100%;
 		box-sizing: border-box;
 	}
 

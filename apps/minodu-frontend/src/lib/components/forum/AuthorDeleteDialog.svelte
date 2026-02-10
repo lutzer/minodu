@@ -22,7 +22,7 @@
 <dialog bind:this={dialog} class="shadow overlay">
 	<h2>{t('forum.deleteAuthor', $language)}</h2>
 	{#if author}
-		<div class="author-image">
+		<div class="author-image" style:background-color={author.avatar.color}>
 			<img src={author.avatar.file_urlpath} alt={t('alt.avatarImage', $language)} />
 		</div>
 		<div class="author-name">
@@ -44,12 +44,14 @@
 		width: 50%;
 		margin: 0 auto;
 		text-align: center;
+		border-radius: 15%;
 	}
 
 	.author-image img {
 		width: 100%;
 		height: 100%;
 		object-fit: contain;
+		margin-bottom: -6px;
 	}
 
 	.author-name {
