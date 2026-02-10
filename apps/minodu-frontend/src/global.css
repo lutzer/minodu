@@ -171,6 +171,11 @@ li {
 	padding-bottom: calc(var(--footer-height));
 }
 
+.color {
+	background-color: #adaadb;
+	--box-shadow-color: #72708f;
+}
+
 .color.SOL {
 	background-color: #efd6c3;
 	--box-shadow-color: #d5ae90;
@@ -191,10 +196,7 @@ li {
 	--box-shadow-color: #d9b38c;
 }
 
-.color {
-	background-color: #adaadb;
-	--box-shadow-color: #72708f;
-}
+
 
 dialog.overlay {
 	max-height: calc(100% - calc(4 * var(--page-padding)));

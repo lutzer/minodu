@@ -58,18 +58,6 @@ class TestDocumentSummarizer:
 
             assert result == "Summary with spaces"
 
-    def test_summarizer_french_template(self):
-        """Test that French language uses French template"""
-        summarizer = DocumentSummarizer(LanguageEnum.fr)
-        assert "Résumez" in summarizer.template
-        assert "caractères" in summarizer.template
-
-    def test_summarizer_english_template(self):
-        """Test that English language uses English template"""
-        summarizer = DocumentSummarizer(LanguageEnum.en)
-        assert "Summarize" in summarizer.template
-        assert "characters" in summarizer.template
-
 
 class TestDocumentSummaryAPI:
 

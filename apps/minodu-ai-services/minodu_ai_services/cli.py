@@ -59,9 +59,7 @@ def main():
             if not Path(path).exists():
                 raise Exception(f"file {path} doesnt exist.")
 
-            summary = store.add_file(path, id)
-            if summary:
-                print(f"Summary: {summary}")
+            store.add_file(path, id)
         except Exception as e:
             print(f"Error: {e}")
             return 1
