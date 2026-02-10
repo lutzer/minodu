@@ -1,12 +1,14 @@
-import { Body, Controller, Delete, Get, Patch, Query, Res, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Public } from 'src/auth/decorators/public.decorator';
+import { Controller, Delete, Get, Query, Res, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { NginxLogsService } from './nginx-logs.service';
 import { Response } from 'express';
-import { AdminGuard } from 'src/auth/guards/admin.guard';
+import { RolesGuard } from 'src/auth/guards/role.guard';
+import { Roles } from 'src/auth/decorators/role.decorator';
+import { userRole } from 'src/roles/entities/user_role.enum';
 
 @ApiTags("Nginx Logs")
 @ApiBearerAuth()
+@UseGuards(RolesGuard)
 @Controller({
   path: 'nginx-logs',
   version: "1"
@@ -16,18 +18,30 @@ export class NginxLogsController {
     private readonly nginxLogsService: NginxLogsService
   ) { }
   
-  @UseGuards(AdminGuard)
+  @Roles(userRole.ADMIN)
   @ApiOperation({ summary: "Read Nginx Logs", description: "Read raw Nginx log files" })
   @Get()
+  @ApiQuery({ 
+    name: 'type', 
+    required: false, 
+    enum: ['access', 'error', 'default'],
+    description: "Type of log to read: 'access' , 'error' or 'default'"
+  })
+  @ApiQuery({ 
+    name: 'lines', 
+    required: false, 
+    type: Number,
+    description: "Number of lines to retrieve (default: 500)"
+  })
   async readNginxLogs(
-    @Query('type') type: string = 'default',
-    @Query('lines') lines: number = 500,
+    @Query('type') type,
+    @Query('lines') lines,
     @Res() res: Response
   ) {
     try {
       const logContent = await this.nginxLogsService.readRawLogs(
         type,
-        Number(lines),
+        lines,
       );
       
       // Return as plain text
@@ -41,7 +55,7 @@ export class NginxLogsController {
     }
   }
   
-  @UseGuards(AdminGuard)
+  @Roles(userRole.ADMIN)
   @ApiOperation({ summary: "Empty logs files", description: "Empty all logs files" })
   @Delete()
   emptyLogsFiles() {

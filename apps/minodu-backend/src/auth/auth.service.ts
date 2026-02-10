@@ -1,8 +1,6 @@
 import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
 import { ClsService } from 'nestjs-cls';
-import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { UsersService } from '../users/user.service';
 import { RolesService } from '../roles/role.service';
@@ -34,6 +32,7 @@ export class AuthService {
   async signIn(phone: string, password: string): Promise<any> {
     this.logger.log(`Tentative d'authentification de ${phone}`, 'AuthController');
     const user = await this.usersService.findByPhone(phone);
+
     if (!user) {
       this.logger.log(`Authentification de ${phone}, refusée. Le numero de télephone est invalide.`, 'AuthController');
       throw new UnauthorizedException('Numéro de télephone ou mot de passe invalide.');
@@ -57,7 +56,7 @@ export class AuthService {
     const payload = {
       id: user.id,
       phone: user.phone,
-      role: user?.role?.name,
+      role: user.role.name,
     };
     const access_token = await this.jwtService.signAsync(payload);
     await this.cls.set('access_token', access_token);
@@ -132,6 +131,7 @@ export class AuthService {
   async logout(user: User) {
     try {
       await this.sessionService.deleteSessions(user);
+      return {success: true, message: 'Déconnexion réussie.'};
     } catch (error) {
       console.log('clearSessions-Err', error);
       throw error;

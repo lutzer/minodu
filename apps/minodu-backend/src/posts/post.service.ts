@@ -9,6 +9,7 @@ import { PostTagService } from 'src/post_tags/post-tag.service';
 import { PostResourceService } from 'src/post_resources/post-resource.service';
 import { PostCategoryService } from 'src/post_categories/post-category.service';
 import { UsersService } from 'src/users/user.service';
+import { BaseConfig } from 'src/utils/common.util';
 
 @Injectable()
 export class PostService {
@@ -44,6 +45,7 @@ export class PostService {
       post.title = createPostDto.title;
       post.description = createPostDto.description;
       post.image = createPostDto.image;
+      await BaseConfig.processImage(createPostDto.image);
       post.attachment = createPostDto.attachment;
       post.attachmentKb = createPostDto.attachmentKb;
       post.attachmentPdf = createPostDto.attachmentPdf;
@@ -185,14 +187,23 @@ export class PostService {
       one.author = updatePostDto.author;
       one.title = updatePostDto.title;
       one.description = updatePostDto.description;
-      if(updatePostDto.image)
-      one.image = updatePostDto.image;
-      if(updatePostDto.attachment)
-      one.attachment = updatePostDto.attachment;
-      if(updatePostDto.attachmentKb)
-      one.attachmentKb = updatePostDto.attachmentKb;
-      if(updatePostDto.attachmentPdf)
-      one.attachmentPdf = updatePostDto.attachmentPdf;
+      if(updatePostDto.image){
+        await BaseConfig.deleteFile(one.image);
+        one.image = updatePostDto.image;
+        await BaseConfig.processImage(updatePostDto.image);
+      }
+      if(updatePostDto.attachment){
+        await BaseConfig.deleteFile(one.attachment);
+        one.attachment = updatePostDto.attachment;
+      }
+      if(updatePostDto.attachmentKb){
+        await BaseConfig.deleteFile(one.attachmentKb);
+        one.attachmentKb = updatePostDto.attachmentKb;
+      }
+      if(updatePostDto.attachmentPdf){
+        await BaseConfig.deleteFile(one.attachmentPdf);
+        one.attachmentPdf = updatePostDto.attachmentPdf;
+      }
       one.postCategory = category;
       if(resources)
       one.resources = resources;

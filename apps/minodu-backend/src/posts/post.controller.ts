@@ -3,16 +3,18 @@ import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nes
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { AdminGuard } from 'src/auth/guards/admin.guard';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { BaseConfig } from 'src/utils/common.util';
-import { UserGuard } from 'src/auth/guards/user.guard';
 import { User } from 'src/auth/decorators/user.decorator';
 import { Public } from 'src/auth/decorators/public.decorator';
+import { RolesGuard } from 'src/auth/guards/role.guard';
+import { Roles } from 'src/auth/decorators/role.decorator';
+import { userRole } from 'src/roles/entities/user_role.enum';
 
 @ApiTags("Post")
 @ApiBearerAuth()
+@UseGuards(RolesGuard)
 @Controller({
   path: 'posts',
   version: "1"
@@ -22,7 +24,7 @@ export class PostController {
     private readonly postService: PostService
   ) { }
 
-  @UseGuards(AdminGuard)
+  @Roles(userRole.ADMIN)
   @ApiOperation({ summary: "Create Post", description: "Create a new Post" })
   @ApiConsumes('multipart/form-data', 'application/json')
   @Post()
@@ -103,10 +105,15 @@ export class PostController {
       ],
       {
         storage: diskStorage({
-          destination: BaseConfig.setFilePath,
+          destination: (req, file, cb) => {
+            BaseConfig.setFilePath(req, file, cb);
+          },
           filename: BaseConfig.editFileName,
         }),
         fileFilter: BaseConfig.fileFilter,
+        limits: {
+          fileSize: 5 * 1024 * 1024, // Limit to 5 MB
+        }
       },
     ),
   )
@@ -129,20 +136,21 @@ export class PostController {
     return this.postService.create(createPostDto, currentUser);
   }
 
+  @Public()
   @ApiOperation({ summary: "Post list", description: "All post list" })
   @Get()
   findAll() {
     return this.postService.findAll();
   }
 
-  @UseGuards(AdminGuard, UserGuard)
+  @Public()
   @ApiOperation({ summary: "Post list", description: "All post list filtered by the selected resource" })
   @Get('resource/:id')
   findAllByResource(@Param('id') id: string) {
     return this.postService.findAllByResource(parseInt(id));
   }
 
-  @UseGuards(AdminGuard, UserGuard)
+  @Public()
   @ApiOperation({ summary: "Post list", description: "All post list filtered by the selected tag" })
   @Get('tag/:id')
   findAllByTag(@Param('id') id: string) {
@@ -156,7 +164,7 @@ export class PostController {
     return this.postService._findOne(+id);
   }
 
-  @UseGuards(AdminGuard)
+  @Roles(userRole.ADMIN)
   @ApiOperation({ summary: "Update post", description: "Update given post infos" })
   @ApiConsumes('multipart/form-data', 'application/json')
   @ApiBody({
@@ -237,10 +245,15 @@ export class PostController {
       ],
       {
         storage: diskStorage({
-          destination: BaseConfig.setFilePath,
+          destination: (req, file, cb) => {
+          BaseConfig.setFilePath(req, file, cb);
+          },
           filename: BaseConfig.editFileName,
         }),
         fileFilter: BaseConfig.fileFilter,
+        limits: {
+          fileSize: 5 * 1024 * 1024, // Limit to 5 MB
+        }
       },
     ),
   )
@@ -264,7 +277,7 @@ export class PostController {
     return this.postService.update(+id, updatePostDto);
   }
 
-  @UseGuards(AdminGuard)
+  @Roles(userRole.ADMIN)
   @ApiOperation({ summary: "Remove Post", description: "Remove the given post" })
   @Delete(':id')
   remove(@Param('id') id: string) {

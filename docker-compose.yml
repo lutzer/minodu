@@ -7,12 +7,11 @@ services:
     ports:
       - "3306:3306"
     environment:
-      - MYSQL_DATABASE=minodu
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${DB_NAME}
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
     volumes:
-      - mysql-data:/var/lib/mysql
+      - mysql-data:/var/lib/mysql 
+      - ./data/dbsql/minodu.sql:/docker-entrypoint-initdb.d/init.sql
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
@@ -27,19 +26,26 @@ services:
       context: ./apps/minodu-backend
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "${APP_PORT}:3000"
+    env_file: .env
     environment:
-      - DB_HOST=minodu-database
-      - DB_PORT=3306
-      - DB_USERNAME=${MYSQL_USER}
-      - DB_PASSWORD=${MYSQL_PASSWORD}
-      - DB_NAME=minodu
-      - APP_PORT=3000
-      - APP_HOST=/api/backend
-      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
-      - AI_SERVICE_URL=http://minodu-ai-services:3002/services
+      DB_HOST: "${DB_HOST}"
+      DB_PORT: "${DB_PORT}"
+      DB_USERNAME: "${MYSQL_USER}"
+      DB_PASSWORD: "${MYSQL_PASSWORD}"
+      DB_NAME: "${DB_NAME}"
+      APP_PORT: "${APP_PORT}"
+      APP_HOST: "${APP_HOST}"
+      APP_FRONT: "${APP_FRONT}"
+      JWT_SECRET: "${JWT_SECRET_KEY}"
+      ADMIN_PHONE: "${ADMIN_PHONE}"
+      ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
+      FORUM_URL: "http://minodu-forum:3003"
+      FORUM_ADMIN_PASSWORD: "${FORUM_ADMIN_PASSWORD}"
+      AI_SERVICE_URL: "http://minodu-ai-services:3002"
     volumes:
-      - ./data/minodu-backend:/app/data
+      - shared-data:/app/data
+      - log-data:/app/server/logs
     depends_on:
       minodu-database:
         condition: service_healthy
@@ -156,16 +162,13 @@ services:
     ports:
       - "80:80"      # Frontend (80 on RPI/8088 on local)
       - "8080:8080"  # Backoffice
+    volumes:
+      - log-data:/var/log/nginx
     depends_on:
       - minodu-forum
       - minodu-ai-services
       - minodu-backend
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost/ && curl -f http://localhost:8080 || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
 
 volumes:
   shared-data:
@@ -184,5 +187,5 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: ./data/logs
+      device: ./data/web/log
       o: bind  

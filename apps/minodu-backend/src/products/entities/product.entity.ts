@@ -12,22 +12,22 @@ export class Product extends BaseEntity {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, length: 60 })
   name: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, length: 255 })
   image: string;
 
   @Column({ nullable: false })
   description: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, length: 30 })
   sales_unit: string;
 
   @Column({ nullable: false })
   price: number;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, length: 60 })
   audio_url: string;
 
   @ManyToOne(() => ProductCategory, (productCategory) => productCategory.products)

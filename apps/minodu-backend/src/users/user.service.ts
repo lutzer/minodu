@@ -1,11 +1,12 @@
 import {
+  ConflictException,
   forwardRef,
   Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import {
   UpdatePwdDto,
@@ -21,6 +22,7 @@ import { ProductsService } from 'src/products/product.service';
 import { PostService } from 'src/posts/post.service';
 import { ConfigurationService } from 'src/configuration/configuration.service';
 import { userRole } from 'src/roles/entities/user_role.enum';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -39,6 +41,33 @@ export class UsersService {
     private readonly postService: PostService,
     private readonly productsService: ProductsService
   ) { }
+
+  async create(createUserDto: CreateUserDto) {
+    const { fullName, phone, gender, password, isContactPerson } = createUserDto;
+    try {
+      const defaultRole = await this.rolesService.defaultRole();
+      const defaultState = await this.userStatusService.defaultStatus(); 
+
+      const user = new User();
+      user.fullname = fullName;
+      user.gender = gender
+      user.phone = phone;
+      user.role = defaultRole;
+      user.status = defaultState;
+      user.isContactPerson = [true, 'true', 1, '1'].includes(isContactPerson);
+      const salt = await bcrypt.genSalt();
+      user.password = await this.hashPassword(password, salt);
+
+      return user.save().then((saved) => {
+        if(user.isContactPerson!)
+          this.updateContactPerson(saved.id)
+        return DataFormater.getUser(saved);
+      });
+
+    } catch (error) {
+        throw new ConflictException(`Un compte est déjà enregistré avec le telephone ${phone} !`);
+    }
+  }
 
   async getAdminDashboard(userId: number) {
     try {
@@ -147,13 +176,30 @@ export class UsersService {
         throw new NotFoundException('Utilisateur non trouvé !');
       }
       return user;
-      // return { ...DataFormater.getUser(user)};
     } catch (error) {
       console.log('User.one.error', error);
       throw error;
     }
   }
 
+  async findContactPerson() {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { isContactPerson:true },
+        relations: {
+          role: true,
+          status: true
+        },
+      });
+      if (!user) {
+        throw new NotFoundException('Utilisateur non trouvé !');
+      }
+      return DataFormater.getUser(user);
+    } catch (error) {
+      console.log('User.one.error', error);
+      throw error;
+    }
+  }
 
   async updateUserRole(id: number, idRole: number) {
     try {
@@ -199,6 +245,12 @@ export class UsersService {
     }
   }
 
+  async updateContactPerson(userId: number) {
+    await this.userRepository.update(
+      { id: Not(userId) }, // WHERE
+      { isContactPerson: false }    // SET
+    );
+  }
 
   async deleteUser(id) {
     try {
@@ -239,11 +291,11 @@ export class UsersService {
 
   async updateUser(updateUserDto: UpdateUserDto, userId: string) {
     try {
-      const { fullName, gender, phone } = updateUserDto;
+      const { fullName, gender, phone, isContactPerson } = updateUserDto;
       const user = await this.userRepository.findOne({
         where: { 
           id: parseInt(userId),
-          role:{name:userRole.USER}
+          // role:{name:userRole.USER}
          },
       });
       if (!user) {
@@ -252,7 +304,10 @@ export class UsersService {
       if (fullName) user.fullname = fullName;
       if (phone) user.phone = phone;
       if (gender) user.gender = gender;
+      user.isContactPerson = [true, 'true', 1, '1'].includes(isContactPerson);
       return user.save().then((saved) => {
+         if(user.isContactPerson)
+          this.updateContactPerson(saved.id)
         return DataFormater.getUser(saved);
       });
     } catch (error) {
@@ -261,11 +316,11 @@ export class UsersService {
     }
   }
 
-  async changePwd(updatePwdDto: UpdatePwdDto, currentUser) {
+  async changePwd(updatePwdDto: UpdatePwdDto, id: number) {
     try {
-      const {password } = updatePwdDto;
+      const {password} = updatePwdDto;
       const user = await this.userRepository.findOne({
-        where: { id: currentUser.id },
+        where: { id },
       });
       if (!user) {
         throw new NotFoundException('Utilisateur non trouvé !');
@@ -304,25 +359,38 @@ export class UsersService {
     }
   }
 
-  async createDefaultAdmin() {
-    try {
-      const hasAnyAdmin = await this.hasActiveAdmin();
-      if (!hasAnyAdmin) {
-        const defaultStatus = await this.userStatusService.defaultStatus();
-        const role = await this.rolesService.adminRole();
-
-        let user = new User();
-        user.phone = "90000000";
-        user.status = defaultStatus;
-        const salt = await bcrypt.genSalt();
-        user.password = await bcrypt.hash('Admin@123', salt);
-        user.role = role;
-        await user.save();
-      }
-      return true;
-    } catch (error) {
-      console.log('defaultAdmin.create.default.error', error);
-      throw error;
+async createDefaultAdmin() {
+  try {
+    const role = await this.rolesService.adminRole();
+    if (!role) {
+      console.error('Role ADMIN not found. Make sure createDefaultRoles() runs first.');
+      return false;
     }
+
+    const hasAnyAdmin = await this.hasActiveAdmin();
+    if (!hasAnyAdmin) {
+      const defaultStatus = await this.userStatusService.defaultStatus();
+      let user = new User();
+      user.fullname ="Admin"
+      user.phone = process.env.ADMIN_PHONE;
+      user.status = defaultStatus;
+      const salt = await bcrypt.genSalt();
+      user.password = await bcrypt.hash(process.env.ADMIN_PASSWORD, salt);
+      user.role = role;
+      user.isContactPerson = true;
+
+      if (!user.phone ) throw new Error("ADMIN_PHONE is not defined in .env");
+      if (!user.password) throw new Error("ADMIN_PASSWORD is not defined in .env");
+
+      await this.userRepository.upsert(user, ['phone']);
+      console.log(`Default admin created.`);
+    }
+
+    return true;
+  } catch (error) {
+    console.error('defaultAdmin.create.error', error);
+    return false;
   }
+}
+
 }

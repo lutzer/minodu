@@ -18,7 +18,7 @@ import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: ".prod.env",
+      envFilePath: ".env",
       isGlobal: true,
       expandVariables: true,
     }),
@@ -26,7 +26,7 @@ import { ConfigModule } from '@nestjs/config';
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '2 days' },
+      signOptions: { expiresIn: '30 days' },
     }),
     TypeOrmModule.forFeature([
       Role,

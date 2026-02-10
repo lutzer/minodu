@@ -1,8 +1,9 @@
 import { extname } from 'path';
 import * as fs from 'node:fs';
+import * as sharp from 'sharp';
 
 export abstract class BaseConfig {
-  static FILES_DIR = '/app/data';
+  static FILES_DIR = '/app/data/minodu-backend';
 
   static setFilePath(req: any, file: any, callback: any) {
     if (file) {
@@ -42,6 +43,7 @@ export abstract class BaseConfig {
         str = str.replace(/^\s+|\s+$/g, ''); // trim leading/trailing white space
         str = str.toLowerCase(); // convert string to lowercase
         str = str
+          .normalize('NFD') // Décompose les accents
           .replace(/[^a-z0-9 -]/g, '') // remove any non-alphanumeric characters
           .replace(/\s+/g, '-') // replace spaces with hyphens
           .replace(/-+/g, '-'); // remove consecutive hyphens
@@ -86,37 +88,43 @@ export abstract class BaseConfig {
 
   static getFileUrl(filename: string) {
     if (filename) {
-      return `${process.env.APP_HOST}/v1/files/${filename}`;
+      return `${process.env.APP_HOST}/files/${filename}`;
     }
     return null;
   }
 
-  // Slugity a string
-  static slugify(str: string) {
-    str = str.replace(/^\s+|\s+$/g, '');
+  static async processImage(fileName: string) {
+    if (!fileName) return;
+    const filePath = `${BaseConfig.FILES_DIR}/images/${fileName}`
+    const ext = extname(filePath);
+    const tempPath = filePath.replace(ext, `-temp${ext}`);
 
-    // Make the string lowercase
-    str = str.toLowerCase();
+    await sharp(filePath)
+      .resize({
+      width: 900,
+      withoutEnlargement: true
+      }) // Redimensionne à 900px de large (conserve le ratio)
+      .jpeg({ quality: 50 }) // Compresse à 50%
+      .toFile(tempPath);
 
-    // Remove accents, swap ñ for n, etc
-    var from =
-      'ÁÄÂÀÃÅČÇĆĎÉĚËÈÊẼĔȆÍÌÎÏŇÑÓÖÒÔÕØŘŔŠŤÚŮÜÙÛÝŸŽáäâàãåčçćďéěëèêẽĕȇíìîïňñóöòôõøðřŕšťúůüùûýÿžþÞĐđßÆa·/_,:;';
-    var to =
-      'AAAAAACCCDEEEEEEEEIIIINNOOOOOORRSTUUUUUYYZaaaaaacccdeeeeeeeeiiiinnooooooorrstuuuuuyyzbBDdBAa------';
-    for (var i = 0, l = from.length; i < l; i++) {
-      str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
-    }
-
-    // Remove invalid chars
-    str = str
-      .replace(/[^a-z0-9 -]/g, '')
-      // Collapse whitespace and replace by -
-      .replace(/\s+/g, '-')
-      // Collapse dashes
-      .replace(/-+/g, '-');
-
-    return str;
+    // Remplace l'original par la version optimisée
+    fs.renameSync(tempPath, filePath);
   }
+
+  static async deleteFile(fileName: string) {
+    if (!fileName) return;
+    const filePath = BaseConfig.getFilePath(fileName)+`/${fileName}`
+
+    if (fs.existsSync(filePath)) {
+      try {
+        fs.unlinkSync(filePath);
+        console.log(`Ancienne image supprimée : ${fileName}`);
+      } catch (err) {
+        console.error(`Erreur lors de la suppression de l'image : ${err.message}`);
+      }
+    }
+  };
+
 
   static toTitle(str: string) {
     const arr = str.split('');

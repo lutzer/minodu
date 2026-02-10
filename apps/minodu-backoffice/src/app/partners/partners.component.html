@@ -1,0 +1,136 @@
+<div class="page-header d-print-none">
+  <div class="container-xl">
+    <div class="row g-2 align-items-center">
+      <div class="col">
+        <h2 class="page-title">Partenaires</h2>
+      </div>
+      <div class="col-auto ms-auto d-print-none">
+        <div class="btn-list">
+          <a href="#" class="btn btn-primary d-none d-sm-inline-block" data-bs-toggle="modal" data-bs-target="#modal-add-partner" (click)="openAddModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-plus"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14"/><path d="M5 12l14 0"/></svg>
+            Ajouter
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page-body">
+  <div class="container-xl">
+    <div class="row row-deck row-cards">
+      <div class="col-12">
+        <div class="card">
+          <div class="table-responsive">
+            <table class="table card-table table-vcenter text-nowrap datatable">
+              <thead>
+                <tr>
+                  <th class="w-1">No.</th>
+                  <th>Nom</th>
+                  <th>Adresse</th>
+                  <th>Téléphone</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let partner of partners; let i = index">
+                  <td><span class="text-secondary">{{i+1}}</span></td>
+                  <td>{{ partner.name }}</td>
+                  <td>{{ partner.adresse }}</td>
+                  <td>{{ partner.phone }}</td>
+                  <td class="text-end">
+                    <span class="dropdown">
+                      <button class="btn dropdown-toggle align-text-top" data-bs-boundary="viewport" data-bs-toggle="dropdown">Actions</button>
+                      <div class="dropdown-menu dropdown-menu-end">
+                        <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-add-partner" (click)="editPartner(partner)">Modifier</a>
+                        <a href="#" class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#modal-delete" (click)="confirmDelete(partner)">Supprimer</a>
+                      </div>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card-footer d-flex align-items-center">
+            <p class="m-0 text-secondary">Affichage de <span>1</span> à <span>{{partners.length}}</span> de <span>{{partners.length}}</span> éléments</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Ajout/Édition Partenaire -->
+<div class="modal modal-blur fade" id="modal-add-partner" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <form [formGroup]="addPartnerForm" (ngSubmit)="onSubmit()" class="card">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ getModalTitle() }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Nom</label>
+            <input type="text" class="form-control" formControlName="name" placeholder="Nom du partenaire">
+            <div *ngIf="addPartnerForm.get('name')?.invalid && isFormSubmitted" class="mt-2 text-danger">
+              <p>* Le nom est requis.</p>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Adresse</label>
+            <input type="text" class="form-control" formControlName="adresse" placeholder="Adresse du partenaire">
+            <div *ngIf="addPartnerForm.get('adresse')?.invalid && isFormSubmitted" class="mt-2 text-danger">
+              <p>* L'adresse est requise.</p>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Téléphone</label>
+            <input type="tel" class="form-control" formControlName="phone" placeholder="+228 XX XX XX XX">
+            <div *ngIf="addPartnerForm.get('phone')?.invalid && isFormSubmitted" class="mt-2 text-danger">
+              <p *ngIf="addPartnerForm.get('phone')?.errors?.['required']">* Le téléphone est requis.</p>
+              <p *ngIf="addPartnerForm.get('phone')?.errors?.['pattern']">* Format de téléphone invalide.</p>
+            </div>
+          </div>
+          <div class="mb-3">
+            <div *ngIf="isFormSubmitted && isAdded" class="alert alert-success mb-2" role="alert">
+              Nouveau partenaire ajouté avec succès.
+            </div>
+            <div *ngIf="isFormSubmitted && isUpdated" class="alert alert-success mb-2" role="alert">
+              Partenaire modifié avec succès.
+            </div>
+            <div *ngIf="isFormSubmitted && errorMessage" class="alert alert-danger mb-2" role="alert">
+              {{ errorMessage }}
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <a href="#" class="btn btn-link link-secondary" data-bs-dismiss="modal">Annuler</a>
+          <button [disabled]="isSubmitting" type="submit" class="btn btn-primary">
+            <div *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2" style="width: 1.3rem; height: 1.3rem;"></div>
+            <span [class.opacity-7]="isSubmitting">{{ getSubmitButtonText() }}</span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal de suppression -->
+<div class="modal modal-blur fade" id="modal-delete" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="modal-title">Cette action est irréversible</div>
+        <div>La suppression entraînera la perte irréversible de ce partenaire. Êtes-vous certain de vouloir continuer ?</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-link link-secondary me-auto" data-bs-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-danger" [disabled]="isDeleting" (click)="deletePartner()">
+          <div *ngIf="isDeleting" class="spinner-border spinner-border-sm me-2" style="width: 1rem; height: 1rem;"></div>
+          <span [class.opacity-7]="isDeleting">Oui, Supprimer</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

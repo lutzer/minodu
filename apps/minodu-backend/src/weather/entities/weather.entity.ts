@@ -48,7 +48,7 @@ export class Weather extends BaseEntity {
   @Column({ nullable: true })
   time: string;
 
-  @Column({ type: 'varchar', length:1000, nullable: true })
+  @Column({ type: 'text', nullable: true })
   description: string;
 
   @CreateDateColumn({ type: 'timestamp' })

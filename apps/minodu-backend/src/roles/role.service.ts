@@ -5,13 +5,15 @@ import { Role } from './entities/role.entity';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { userRole } from './entities/user_role.enum';
+import { LoggerService } from 'src/logs/logger.service';
 
 @Injectable()
 export class RolesService {
 
   constructor(
     @InjectRepository(Role)
-    private readonly roleRepository: Repository<Role>
+    private readonly roleRepository: Repository<Role>,
+    private readonly loggerService: LoggerService
   ) { }
 
   create(createRoleDto: CreateRoleDto) {
@@ -71,27 +73,18 @@ export class RolesService {
     }
   }
 
-  async createRoles() {
+  async createDefaultRoles() {
+    const rolesToCreate = [
+      { name: userRole.ADMIN },
+      { name: userRole.USER },
+    ];
+
     try {
-      const role0 = await this.roleRepository.findOne({ where: { name: userRole.ADMIN } });
-      const role1 = await this.roleRepository.findOne({ where: { name: userRole.USER } });
-      if (!role0) {
-        const newRole0 = new Role();
-        newRole0.name = userRole.ADMIN;
-        await newRole0.save();
-      }
-
-      if (!role1) {
-        const newRole1 = new Role();
-        newRole1.name = userRole.USER;
-        await newRole1.save();
-      }
-
+      // Upsert will insert new roles or skip/update if they exist
+      await this.roleRepository.upsert(rolesToCreate, ['name']);
+      return true;
     } catch (error) {
-      if (error.code === '11000' || error.code === '23505') {
-        return true;
-      }
-      console.log('Role.create.default.error', error);
+      this.loggerService.error(error, RolesService.name);
       return false;
     }
   }
