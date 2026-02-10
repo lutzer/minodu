@@ -1,3 +1,4 @@
+import logging
 from typing import Dict, List, Optional
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader
@@ -8,6 +9,7 @@ import os
 from ..vars import LanguageEnum
 from .summarizer import DocumentSummarizer
 
+logger = logging.getLogger(__name__)
 
 class DocumentStoreException(Exception):
     pass
@@ -94,6 +96,7 @@ class DocumentStore:
             full_text = "\n\n".join(texts)
             summarizer = DocumentSummarizer(self.language)
             summary = summarizer.summarize(full_text)
+            logger.info(f"Created Summary for document {file_path} : {summary}""")
 
         self.add_text_documents(texts, metadatas, summary=summary)
         return summary

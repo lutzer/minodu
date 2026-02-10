@@ -1,3 +1,4 @@
+import textwrap
 from langchain_ollama.llms import OllamaLLM
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.schema.output_parser import StrOutputParser
@@ -8,7 +9,6 @@ from ..vars import LanguageEnum
 MAX_SUMMARY_LENGTH = 300
 MAX_INPUT_CHARS = 4000
 
-
 class DocumentSummarizer:
     def __init__(self, language: LanguageEnum):
         self.llm = OllamaLLM(
@@ -18,22 +18,14 @@ class DocumentSummarizer:
             keep_alive=600
         )
 
-        if language == LanguageEnum.fr:
-            self.template = """Résumez le document suivant en 300 caractères maximum.
-Concentrez-vous sur le sujet principal. Utilisez un langage simple.
+        self.template = textwrap.dedent("""
+            You are a helpful farming assistant for small-scale farmers in Togo, Africa. Your job is to take the text below and write a short, simple summary of what it is about. Use very simple words and short sentences. Write like you are talking to a farmer who did not go to school for many years. Do not add any information that is not in the text. The summary should be no more than 3 to 5 sentences long. Focus on the most important and useful points for a farmer.
 
-Document:
-{content}
+            Text to summarize:
+            {context}
 
-Résumé:"""
-        else:
-            self.template = """Summarize the following document in maximum 300 characters.
-Focus on the main topic and key points. Use simple language.
-
-Document:
-{content}
-
-Summary:"""
+            Write the summary now.            
+        """)
 
         self.prompt = ChatPromptTemplate.from_template(self.template)
         self.chain = self.prompt | self.llm | StrOutputParser()
@@ -48,3 +40,4 @@ Summary:"""
             summary = summary[:MAX_SUMMARY_LENGTH - 3] + "..."
 
         return summary
+        

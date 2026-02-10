@@ -68,3 +68,102 @@ class TestRagAPI:
         data = response.json()
         assert "text" in data
         assert len(data["text"]) > 0
+
+
+class TestWelcomeMessages:
+    """Comprehensive tests for RAG welcome message functionality."""
+
+    def test_default_welcome_message_content(self):
+        """Test that the default welcome message contains expected content."""
+        rag = RAG(language=LanguageEnum.en)
+        welcome = rag.welcome(None)
+
+        assert "farming" in welcome.lower()
+        assert "welcome" in welcome.lower()
+        assert len(welcome) > 50
+
+    def test_default_welcome_message_is_static(self):
+        """Test that calling welcome(None) returns consistent message."""
+        rag = RAG(language=LanguageEnum.en)
+        welcome1 = rag.welcome(None)
+        welcome2 = rag.welcome(None)
+
+        assert welcome1 == welcome2
+
+    def test_welcome_endpoint_french_language(self):
+        """Test welcome message endpoint with French language."""
+        response = client.get(app.root_path + "/rag/welcome/fr/")
+        assert response.status_code == 200
+        data = response.json()
+        assert "text" in data
+        assert len(data["text"]) > 0
+
+    def test_welcome_endpoint_invalid_language(self):
+        """Test welcome message endpoint with invalid language returns error."""
+        response = client.get(app.root_path + "/rag/welcome/xyz/")
+        assert response.status_code == 422
+
+    def test_welcome_with_summary_generates_custom_message(self):
+        """Test that providing a summary generates a different message than default."""
+        rag = RAG(language=LanguageEnum.en)
+        default_welcome = rag.welcome(None)
+
+        summary = "This document covers maize cultivation techniques including planting, irrigation and harvesting."
+        custom_welcome = rag.welcome(summary)
+
+        assert custom_welcome != default_welcome
+        assert len(custom_welcome) > 0
+
+    def test_welcome_with_empty_string_summary(self):
+        """Test welcome message when summary is an empty string."""
+        rag = RAG(language=LanguageEnum.en)
+        welcome = rag.welcome("")
+
+        assert len(welcome) > 0
+
+    def test_welcome_endpoint_with_nonexistent_source_id(self):
+        """Test welcome endpoint with a source_id that doesn't exist."""
+        response = client.get(app.root_path + "/rag/welcome/en/999999/")
+        assert response.status_code == 200
+        data = response.json()
+        assert "text" in data
+
+    def test_welcome_message_response_model(self):
+        """Test that welcome response matches WelcomeResponse model."""
+        response = client.get(app.root_path + "/rag/welcome/en/")
+        assert response.status_code == 200
+        data = response.json()
+
+        assert isinstance(data, dict)
+        assert "text" in data
+        assert isinstance(data["text"], str)
+        assert set(data.keys()) == {"text"}
+
+    def test_welcome_with_existing_document(self):
+        """Test welcome message with a document that exists in the store."""
+        file_path = os.path.join(script_dir, "docs/2_EN_AMANA_SCRIPT AUDIO.pdf")
+        source_id = 2
+
+        rag = RAG(language=LanguageEnum.en)
+        store = DocumentStore(rag.vectorstore, rag.chroma_client)
+        store.add_file(file_path, source_id)
+
+        response = client.get(app.root_path + f"/rag/welcome/en/{source_id}/")
+        assert response.status_code == 200
+        data = response.json()
+        assert "text" in data
+        assert len(data["text"]) > 0
+
+    def test_welcome_different_languages_same_source(self):
+        """Test that welcome messages can be retrieved for different languages."""
+        response_en = client.get(app.root_path + "/rag/welcome/en/")
+        response_fr = client.get(app.root_path + "/rag/welcome/fr/")
+
+        assert response_en.status_code == 200
+        assert response_fr.status_code == 200
+
+        data_en = response_en.json()
+        data_fr = response_fr.json()
+
+        assert len(data_en["text"]) > 0
+        assert len(data_fr["text"]) > 0

@@ -96,13 +96,17 @@ class WelcomeResponse(BaseModel):
 
 @app.get("/rag/welcome/{language}/", response_model=WelcomeResponse)
 async def get_welcome_message(language: LanguageEnum):
-    welcome = "Welcome to the Minodu Chatbot. You can ask any questions about x,y,z"
+    rag = RAG(language=language)
+    welcome = rag.welcome(None)
     return WelcomeResponse(text=welcome)
 
 
 @app.get("/rag/welcome/{language}/{source_id}/", response_model=WelcomeResponse)
 async def get_welcome_message_with_source(source_id: int, language: LanguageEnum):
-    welcome = "Welcome to the Minodu Chatbot. You can ask any questions about source: " + str(source_id)
+    rag = RAG(language=language)
+    store = DocumentStore(rag.vectorstore, rag.chroma_client)
+    summary = store.get_document_summary(source_id)
+    welcome = rag.welcome(summary)
     return WelcomeResponse(text=welcome)
 
 class DocumentSummaryResponse(BaseModel):

@@ -74,7 +74,7 @@
 						class:selected={selectedCategoryIds.has(category.id)}
 						onclick={() => toggleCategory(category.id)}
 					>	
-						{#if category.name}
+						{#if categoryIcons[category.name]}
 						<img src={categoryIcons[category.name]} alt="category icon for {category.name}" />
 						{/if}
 						<span>{category.name}</span>
@@ -110,6 +110,7 @@
 
 	#categories li {
 		width: 23%;
+		margin-bottom: var(--small-padding);
 	}
 
 	#categories button {
@@ -156,9 +157,5 @@
 
 	.scroll-container {
 		background-color: #ebf9f2;
-	}
-
-	button.color {
-		background-color: #9faaa5;
 	}
 </style>
