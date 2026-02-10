@@ -6,6 +6,7 @@ import { CreateProductCategoryDto } from './dto/create-product-category.dto';
 import { ProductCategory } from './entities/product_category.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { UpdateProductCategoryDto } from './dto/update-product-category.dto';
+import { BaseConfig } from 'src/utils/common.util';
 
 @Injectable()
 export class ProductCategoriesService {
@@ -17,11 +18,12 @@ export class ProductCategoriesService {
     private readonly productRepository: Repository<Product>
   ) { }
 
-  create(createProductCategoryDto: CreateProductCategoryDto) {
+  async create(createProductCategoryDto: CreateProductCategoryDto) {
     try {
       const category = new ProductCategory();
       category.name = createProductCategoryDto.name.toUpperCase();
       category.image = createProductCategoryDto.image;
+      await BaseConfig.processImage(createProductCategoryDto.image);
       return category.save();
     } catch (error) {
       if (error.code === '11000' || error.code === '23505') {
@@ -77,8 +79,11 @@ export class ProductCategoriesService {
     try {
       const one = await this.findOne(id);
       one.name = updateProductCategoryDto.name;
-      if(one.image)
+      if(one.image){
+        await BaseConfig.deleteFile(one.image);
         one.image = updateProductCategoryDto.image;
+        await BaseConfig.processImage(updateProductCategoryDto.image);
+      }
       return one.save();
     } catch (error) {
       console.log('ProductCategory.update.error', error);

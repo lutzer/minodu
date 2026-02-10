@@ -1,11 +1,11 @@
 import { Controller, UseGuards } from '@nestjs/common';
 import { SessionService } from './session.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { AdminGuard } from 'src/auth/guards/admin.guard';
+import { RolesGuard } from 'src/auth/guards/role.guard';
 
 @ApiTags("Session")
 @ApiBearerAuth()
-@UseGuards(AdminGuard)
+@UseGuards(RolesGuard)
 @Controller({
   path: 'sessions',
   version: "1"

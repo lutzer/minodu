@@ -70,7 +70,7 @@ onSubmit(): void {
     this.errorMessage = '';
     this.authService.login(phone, password).subscribe({
       next: data => {
-        console.log(data)
+        // console.log(data)
         if(data.role.name!=ROLE.ADMIN){
           this.errorMessage = "Connexion impossible : Vous ne disposez pas des autorisations nécessaires pour accéder à ce service!";
           return
@@ -86,7 +86,7 @@ onSubmit(): void {
             this.isLoginSuccessful = true;
             window.location.href = "/admin";
         }else{
-          this.errorMessage = "Problème d'authentification : la session a expiré.";
+          this.errorMessage = "Problème d'authentification, veuillez réessayer.";
         }
       },
       error: err => {

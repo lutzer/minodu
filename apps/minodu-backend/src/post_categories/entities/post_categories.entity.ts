@@ -8,8 +8,11 @@ export class PostCategory extends BaseEntity {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'varchar', length: 60 })
   name: string;
+
+  @Column({ type: 'varchar', length: 60 })
+  nameKb: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   image: string;

@@ -37,4 +37,20 @@ export class ProductsService {
     formData.append('image', image, image.name);
     return this.http.post(API_URL + 'products', formData);
   }
+
+  updateProduct(id: number, name: string, description: string, category: string, price: string, salesUnit: string, image?: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('description', description);
+    formData.append('categoryId', category);
+    formData.append('price', price);
+    formData.append('sales_unit', salesUnit);
+    if(image)
+    formData.append('image', image, image.name);
+    return this.http.patch(API_URL + 'products/' + id, formData);
+  }
+
+  deleteProduct(id: number): Observable<any> {
+    return this.http.delete(`${API_URL}products/${id}`, httpOptions);
+  }
 }

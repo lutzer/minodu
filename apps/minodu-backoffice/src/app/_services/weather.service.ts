@@ -14,11 +14,43 @@ const httpOptions = {
 export class WeatherService {
   constructor(private http: HttpClient) { }
 
+  getWeatherCurrent() : Observable<any>{
+    return this.http.get(API_URL + 'weather/current', 
+      httpOptions
+      );
+  }
+
+  getWeatherDownload(): Observable<Blob> {
+    return this.http.get(
+      API_URL + 'weather/download',
+      {
+        responseType: 'blob'
+      }
+    );
+  }
+
+
   getWeather() : Observable<any>{
     return this.http.get(API_URL + 'weather/current', 
       httpOptions
       );
-  } 
+  }
+
+  getWeatherHistory(limit: number = 10, offset: number = 0): Observable<any> {
+    return this.http.get(`${API_URL}weather?limit=${limit}&offset=${offset}`, httpOptions);
+  }
+
+  syncWeatherManual(): Observable<any> {
+    return this.http.post(`${API_URL}weather/sync-manual`, {}, httpOptions);
+  }
+
+  deleteWeatherById(id: number): Observable<any> {
+    return this.http.delete(`${API_URL}weather/${id}`, httpOptions);
+  }
+
+  deleteAllWeatherHistory(): Observable<any> {
+    return this.http.delete(`${API_URL}weather`, httpOptions);
+  }
 
   syncWeather(id: string): Observable<any> {
     return this.http.get(`${API_URL}weather/sync`, 

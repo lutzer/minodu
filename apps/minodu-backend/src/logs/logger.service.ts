@@ -11,7 +11,7 @@ export class LoggerService {
     ),
     transports: [
       new winston.transports.File({
-        filename: 'logs/combined.log',
+        filename: './data/minodu-backend/logs/combined.log',
         maxsize:5120
     }),
 

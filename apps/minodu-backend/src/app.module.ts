@@ -18,18 +18,24 @@ import { ProductsModule } from './products/product.module';
 import { ProductCategoriesModule } from './product_categories/product_category.module';
 import { WeatherModule } from './weather/weather.module';
 import { ConfigurationModule } from './configuration/configuration.module';
-import { Partner } from './partners/entities/partner.entity';
 import { ProductDemandModule } from './product_demands/demand.module';
 import { ProductOfferModule } from './product_offers/product_offer.module';
 import { PartnerModule } from './partners/partner.module';
-import { BackupService } from './backup/backup.service';
 import { BackupModule } from './backup/backup.module';
 import { NginxLogsModule } from './nginx-logs/nginx-logs.module';
+import { ForumModule } from './forum/forum.module';
+import { ThrottlerModule } from '@nestjs/throttler/dist/throttler.module';
+import { APP_GUARD } from '@nestjs/core/constants';
+import { ThrottlerGuard } from '@nestjs/throttler/dist/throttler.guard';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([{
+      ttl: 60000, // Temps de vie en millisecondes (1 min)
+      limit: 100,   // Nombre max de requêtes par utilisateur
+    }]),
     ConfigModule.forRoot({
-      envFilePath: ".prod.env",
+      envFilePath: ".env",
       isGlobal: true,
       expandVariables: true,
     }),
@@ -72,9 +78,16 @@ import { NginxLogsModule } from './nginx-logs/nginx-logs.module';
     ProductDemandModule,
     ProductOfferModule,
     BackupModule,
-    NginxLogsModule
+    NginxLogsModule,
+    ForumModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+   {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    }
+  ],
 })
 export class AppModule {}

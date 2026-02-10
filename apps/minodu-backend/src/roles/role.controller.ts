@@ -1,13 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RolesService } from './role.service';
-import { CreateRoleDto } from './dto/create-role.dto';
-import { UpdateRoleDto } from './dto/update-role.dto';
-import { AdminGuard } from 'src/auth/guards/admin.guard';
+import { RolesGuard } from 'src/auth/guards/role.guard';
+import { Roles } from 'src/auth/decorators/role.decorator';
+import { userRole } from './entities/user_role.enum';
 
 @ApiTags("Role")
 @ApiBearerAuth()
-@UseGuards(AdminGuard)
+@UseGuards(RolesGuard)
 @Controller({
   path: 'roles',
   version: "1"
@@ -17,13 +17,13 @@ export class RolesController {
     private readonly rolesService: RolesService,
   ) { }
 
-
+  @Roles(userRole.ADMIN)
   @ApiOperation({ summary: "Roles list", description: "All role list" })
   @Get()
   findAll() {
     return this.rolesService.findAll();
   }
-
+  @Roles(userRole.ADMIN)
   @ApiOperation({ summary: "Role infos", description: "Role infos by given ID" })
   @Get(':id')
   findOne(@Param('id') id: string) {

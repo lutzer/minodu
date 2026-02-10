@@ -47,7 +47,7 @@ export class AuthService {
   }
 
   resetPassword(token: string, password: string): Observable<any> {
-    console.log(API_URL)
+    // console.log(API_URL)
     return this.http.post(`${API_URL}auth/reset-password/${token}`, 
     {
       "password" : password
@@ -60,6 +60,15 @@ export class AuthService {
     return this.http.get(`${API_URL}users/current`, 
       httpOptions
       );
+  }
+
+  changePassword(password: string): Observable<any> {
+    return this.http.put(`${API_URL}users/password`,
+    {
+      "password": password
+    },
+    httpOptions
+    );
   }
 
   logout() {

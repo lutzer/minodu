@@ -1,38 +1,171 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, FormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { Tag } from '../_models/tags';
-import { DateUtilsService } from '../_helpers/dateutils.service';
 import { LoaderService } from '../_helpers/loader.service';
-import { PostService } from '../_services/posts.service';
+import { TagsService } from '../_services/tags.service';
 import { AuthService } from '../_services/auth.service';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-post-tags',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, FormsModule],
   templateUrl: './post-tags.component.html',
   styleUrl: './post-tags.component.css'
 })
 export class PostTagsComponent implements OnInit {
-      errorMessage = '';
-      loading: boolean = false;
-      tags: Tag [] | null = null;
+  tags: Tag[] = [];
+  form: FormGroup;
+  selectedTag: Tag | null = null;
+  modalTitle = '';
+  loading = false;
+  errorMessage = '';
+  successMessage = '';
+  isSubmitting = false;
+  isDeleting = false;
+  imageFile: File | undefined = undefined;
+  currentImageUrl: string | null = null;
+  deleteId: number | null = null;
+  fileInputId: string = 'tagImageInput';
 
-      constructor(private router: Router, public dateUtilsService: DateUtilsService, public loaderService: LoaderService, private postService: PostService, private authService: AuthService){}
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    public loaderService: LoaderService,
+    private tagsService: TagsService,
+    private authService: AuthService
+  ) {
+    this.form = this.fb.group({
+      name: ['', Validators.required],
+      image: [null]
+    });
+  }
 
-    ngOnInit(): void {
-    this.postService.getPostTags().subscribe({
-          next: data => {
-            this.tags = data;
-            this.loading = false;
-          },
-          error: err => {
-            this.loading = false;
-            this.errorMessage = err.error.message;
-            console.log(err.error)
-            this.authService.logout();
-          }
-        });
+  ngOnInit(): void {
+    this.loadTags();
+  }
+
+  loadTags() {
+    this.loading = true;
+    this.tagsService.getTags().subscribe({
+      next: data => {
+        this.tags = data;
+        this.loading = false;
+      },
+      error: err => {
+        this.loading = false;
+        this.errorMessage = err.error?.message || 'Erreur lors du chargement des tags';
+        if (err.status === 401) this.authService.logout();
+      }
+    });
+  }
+
+  openAddModal() {
+    this.resetForm();
+    this.modalTitle = 'Ajouter un tag';
+    this.selectedTag = null;
+    (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-tag')).show();
+  }
+
+  openEditModal(tag: Tag, event?: Event) {
+    if (event) event.preventDefault();
+    this.resetForm();
+    this.modalTitle = 'Modifier le tag';
+    this.selectedTag = tag;
+    this.currentImageUrl = tag.image || null;
+    this.form.patchValue({
+      name: tag.name
+    });
+    (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-tag')).show();
+  }
+
+  onFileChange(event: any) {
+    const file = event.target.files[0];
+    this.imageFile = file;
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.currentImageUrl = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  submitForm() {
+    if (this.form.invalid) return;
+    this.isSubmitting = true;
+    const { name } = this.form.value;
+    if (this.selectedTag) {
+      this.tagsService.updateTag(this.selectedTag.id, name, this.imageFile).subscribe({
+        next: _ => {
+          this.successMessage = 'Tag modifié avec succès';
+          this.loadTags();
+          this.closeModal();
+          this.isSubmitting = false;
+        },
+        error: err => {
+          this.errorMessage = err.error?.message || 'Erreur lors de la modification';
+          this.isSubmitting = false;
+        }
+      });
+    } else {
+      this.tagsService.addTag(name, this.imageFile).subscribe({
+        next: _ => {
+          this.successMessage = 'Tag ajouté avec succès';
+          this.loadTags();
+          this.closeModal();
+          this.isSubmitting = false;
+        },
+        error: err => {
+          this.errorMessage = err.error?.message || 'Erreur lors de l\'ajout';
+          this.isSubmitting = false;
+        }
+      });
+    }
+  }
+
+  confirmDelete(id: number, event?: Event) {
+    if (event) event.preventDefault();
+    this.deleteId = id;
+    (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-delete-tag')).show();
+  }
+
+  deleteTag() {
+    if (!this.deleteId) return;
+    this.isDeleting = true;
+    this.tagsService.deleteTag(this.deleteId).subscribe({
+      next: _ => {
+        this.successMessage = 'Tag supprimé avec succès';
+        this.loadTags();
+        this.closeModal('delete');
+        this.isDeleting = false;
+      },
+      error: err => {
+        this.errorMessage = err.error?.message || 'Erreur lors de la suppression';
+        this.isDeleting = false;
+      }
+    });
+  }
+
+  closeModal(type: 'delete' | 'form' = 'form') {
+    if (type === 'form') {
+      (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-tag')).hide();
+      this.resetForm();
+    } else {
+      (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-delete-tag')).hide();
+      this.deleteId = null;
+    }
+  }
+
+  resetForm() {
+    this.form.reset();
+    this.selectedTag = null;
+    this.imageFile = undefined;
+    this.currentImageUrl = null;
+    this.errorMessage = '';
+    this.successMessage = '';
+    this.isSubmitting = false;
   }
 }

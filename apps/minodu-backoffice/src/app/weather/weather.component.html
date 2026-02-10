@@ -8,13 +8,19 @@
         </div>
         <div class="col-auto ms-auto d-print-none">
           <div class="btn-list">
-            <a href="#" class="btn btn-primary d-none d-sm-inline-block" data-bs-toggle="modal" data-bs-target="#modal-report">
-              <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
-            <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-refresh"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" /></svg>              Synchroniser
-            </a>
-            <a href="#" class="btn btn-primary d-sm-none btn-icon" data-bs-toggle="modal" data-bs-target="#modal-report" aria-label="Create new report">
-              <!-- Download SVG icon from http://tabler-icons.io/i/plus -->
-            <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-refresh"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" /></svg>            </a>
+            <button (click)="syncWeatherManually(); $event.preventDefault()" [disabled]="syncing" class="btn btn-primary d-none d-sm-inline-block">
+              <svg *ngIf="!syncing" xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-refresh"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" /></svg>
+              <span *ngIf="syncing" class="spinner-border spinner-border-sm me-2"></span>
+              {{ syncing ? 'Synchronisation...' : 'Synchroniser' }}
+            </button>
+            <button (click)="syncWeatherManually(); $event.preventDefault()" [disabled]="syncing" class="btn btn-primary d-sm-none btn-icon" [attr.aria-label]="'Synchroniser'">
+              <svg *ngIf="!syncing" xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-refresh"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" /></svg>
+              <span *ngIf="syncing" class="spinner-border spinner-border-sm"></span>
+            </button>
+          </div>
+          <div *ngIf="syncMessage" class="alert alert-info alert-dismissible mt-2" role="alert">
+            {{ syncMessage }}
+            <a href="#" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></a>
           </div>
         </div>
       </div>
@@ -34,7 +40,8 @@
               <div class="row align-items-center">
                 <div class="col-10">
                   <div class="markdown text-secondary">
-                    Votre bulletin météo agricole intelligent : l'interface centrale de monitoring des données agroclimatiques issues de la station téléagriculture, permettant aux agriculteurs d'accéder à des prévisions fiables et des alertes terrain en temps réel.
+                          {{weather?.description}}
+                    <!-- Votre bulletin météo agricole intelligent : l'interface centrale de monitoring des données agroclimatiques issues de la station téléagriculture, permettant aux agriculteurs d'accéder à des prévisions fiables et des alertes terrain en temps réel. -->
                   </div>
                 </div>
               </div>
@@ -43,8 +50,8 @@
         </div>   
 
             <div class="row row-cards mt-2">
-              <div class="col-md-6 col-xl-3">
-                <div class="card card-sm">
+              <div class="col-md-6 col-xl-3 d-flex">
+                <div class="card card-sm flex-fill">
                   <div class="card-body">
                     <div class="row align-items-center">
                       <div class="col-auto">
@@ -63,8 +70,8 @@
                   </div>
                 </div>
               </div>
-              <div class="col-md-6 col-xl-3">
-                <div class="card card-sm">
+              <div class="col-md-6 col-xl-3 d-flex">
+                <div class="card card-sm flex-fill">
                   <div class="card-body">
                     <div class="row align-items-center">
                       <div class="col-auto">
@@ -83,8 +90,8 @@
                   </div>
                 </div>
               </div>
-              <div class="col-md-6 col-xl-3">
-                <div class="card card-sm">
+              <div class="col-md-6 col-xl-3 d-flex">
+                <div class="card card-sm flex-fill">
                   <div class="card-body">
                     <div class="row align-items-center">
                       <div class="col-auto">
@@ -104,8 +111,8 @@
                   </div>
                 </div>
               </div>
-              <div class="col-md-6 col-xl-3">
-                <div class="card card-sm">
+              <div class="col-md-6 col-xl-3 d-flex">
+                <div class="card card-sm flex-fill">
                   <div class="card-body">
                     <div class="row align-items-center">
                       <div class="col-auto">
@@ -124,8 +131,8 @@
                   </div>
                 </div>
               </div>
-              <div class="col-md-6 col-xl-3">
-                <div class="card card-sm">
+              <div class="col-md-6 col-xl-3 d-flex">
+                <div class="card card-sm flex-fill">
                   <div class="card-body">
                     <div class="row align-items-center">
                       <div class="col-auto">
@@ -145,8 +152,8 @@
                   </div>
                 </div>
               </div>
-              <div class="col-md-6 col-xl-3">
-                <div class="card card-sm">
+              <div class="col-md-6 col-xl-3 d-flex">
+                <div class="card card-sm flex-fill">
                   <div class="card-body">
                     <div class="row align-items-center">
                       <div class="col-auto">
@@ -166,8 +173,8 @@
                   </div>
                 </div>
               </div>
-              <div class="col-md-6 col-xl-3">
-                <div class="card card-sm">
+              <div class="col-md-6 col-xl-3 d-flex">
+                <div class="card card-sm flex-fill">
                   <div class="card-body">
                     <div class="row align-items-center">
                       <div class="col-auto">
@@ -187,8 +194,8 @@
                   </div>
                 </div>
               </div>
-              <div class="col-md-6 col-xl-3">
-                <div class="card card-sm">
+              <div class="col-md-6 col-xl-3 d-flex">
+                <div class="card card-sm flex-fill">
                   <div class="card-body">
                     <div class="row align-items-center">
                       <div class="col-auto">
@@ -208,7 +215,288 @@
                   </div>
                 </div>
               </div>
+            </div>
 
+              <!-- Weather History Table -->
+              <div class="mt-5 px-5 mx-3">
+                <h3 class="mb-3">Historique des données météo</h3>
+                <div class="row mb-3">
+                  <div class="col-auto ms-auto">
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-outline-primary" (click)="downloadWeatherData(); $event.preventDefault()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-download"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 3v12" /></svg>
+                        TÉLÉCHARGER
+                      </button>
+                      <!-- <div class="dropdown-menu dropdown-menu-end">
+                        <a
+                          class="dropdown-item"
+                          href="#"
+                          (click)="downloadWeatherData(); $event.preventDefault()"
+                        >
+                          Télécharger les données météo
+                        </a>
+                      </div> -->
+                    </div>
+                  </div>
+                </div>
+                <div class="card">
+                  <div class="table-responsive">
+                    <table class="table card-table table-vcenter text-nowrap datatable">
+                      <thead>
+                        <tr>
+                          <th class="w-1">No.</th>
+                          <th>Date</th>
+                          <th>Température</th>
+                          <th>Temp. ressentie</th>
+                          <th>Humidité</th>
+                          <th>Pression</th>
+                          <th>Luminosité</th>
+                          <th>CO</th>
+                          <th>NO₂</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let weather of paginatedWeatherHistory; let i = index" (click)="viewWeatherDetail(weather, $event)" style="cursor: pointer;" class="table-hover">
+                          <td><span class="text-secondary">{{ i + 1 }}</span></td>
+                          <td>{{ weather.createdAt ? (weather.createdAt | date: 'short') : '-' }}</td>
+                          <td><span class="text-truncate">{{ weather.temperature }}°C</span></td>
+                          <td><span class="text-truncate">{{ weather.temperature1 }}°C</span></td>
+                          <td><span class="text-truncate">{{ weather.humidity }}%</span></td>
+                          <td><span class="text-truncate">{{ weather.pressure }} hPa</span></td>
+                          <td><span class="text-truncate">{{ weather.luminosity }} lux</span></td>
+                          <td><span class="text-truncate">{{ weather.co }}</span></td>
+                          <td><span class="text-truncate">{{ weather.no2 }}</span></td>
+                        </tr>
+                        <tr *ngIf="paginatedWeatherHistory.length === 0">
+                          <td colspan="9" class="text-center text-secondary py-4">
+                            Aucune donnée historique disponible
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <!-- Pagination avec bouton Voir Plus -->
+                  <div class="card-footer d-flex align-items-center justify-content-between">
+                    <p class="text-secondary">
+                      Affichage de {{ weatherHistory.length }} données chargées
+                    </p>
+                    <button 
+                      *ngIf="hasMoreData" 
+                      (click)="loadMore()" 
+                      [disabled]="loadingMore"
+                      class="btn btn-primary">
+                      <span *ngIf="loadingMore" class="spinner-border spinner-border-sm me-2"></span>
+                      {{ loadingMore ? 'Chargement...' : 'Voir plus' }}
+                    </button>
+                    <p *ngIf="!hasMoreData" class="text-secondary ms-auto">
+                      Toutes les données sont chargées
+                    </p>
+                  </div>
+                </div>
               </div>
+            </div>
+
+<!-- View weather details modal -->
+<div class="modal modal-blur fade" id="view-weather-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content" *ngIf="selectedWeather">
+      <button type="button" class="btn-close" (click)="closeViewModal($event)" aria-label="Close"></button>
+      
+      <div class="modal-body">
+        <!-- Titre -->
+        <h2 class="mb-3 text-center">Détails des données météo</h2>
+
+        <!-- Date et heure -->
+        <div class="d-flex justify-content-center align-items-center gap-3 mb-4 text-secondary flex-wrap">
+          <small><strong>{{ selectedWeather.createdAt | date: 'medium' }}</strong></small>
+          <span>•</span>
+          <small>{{ selectedWeather.time }}</small>
+        </div>
+
+        <!-- Section Température -->
+        <div class="mb-4">
+          <h5 class="mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+              <path d="M10 13.5a4 4 0 1 0 4 0v-8.5a2 2 0 0 0 -4 0v8.5"></path>
+              <path d="M10 9l4 0"></path>
+            </svg>
+            Température
+          </h5>
+          <div class="border-top pt-3">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="weather-row">
+                  <strong>Température:</strong>
+                  <span>{{ selectedWeather.temperature }}°C</span>
+                </div>
               </div>
+              <div class="col-md-6">
+                <div class="weather-row">
+                  <strong>Température ressentie:</strong>
+                  <span>{{ selectedWeather.temperature1 }}°C</span>
+                </div>
               </div>
+              <div class="col-md-6">
+                <div class="weather-row">
+                  <strong>Température ambiante:</strong>
+                  <span>{{ selectedWeather.ambient }}°C</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section Humidité et Pression -->
+        <div class="mb-4">
+          <h5 class="mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+              <path d="M7.502 19.423c2.602 2.105 6.395 2.105 8.996 0c2.602 -2.105 3.262 -5.708 1.566 -8.546l-4.89 -7.26c-.42 -.625 -1.287 -.803 -1.936 -.397a1.376 1.376 0 0 0 -.41 .397l-4.893 7.26c-1.695 2.838 -1.035 6.441 1.567 8.546z"></path>
+            </svg>
+            Humidité et Pression
+          </h5>
+          <div class="border-top pt-3">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="weather-row">
+                  <strong>Humidité:</strong>
+                  <span>{{ selectedWeather.humidity }}%</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="weather-row">
+                  <strong>Humidité 2:</strong>
+                  <span>{{ selectedWeather.humidity1 }}%</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="weather-row">
+                  <strong>Pression atmosphérique:</strong>
+                  <span>{{ selectedWeather.pressure }} hPa</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section Vent -->
+        <div class="mb-4">
+          <h5 class="mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+              <path d="M5 8h8.5a2.5 2.5 0 1 0 -2.34 -3.24"></path>
+              <path d="M3 12h15.5a2.5 2.5 0 1 1 -2.34 3.24"></path>
+              <path d="M4 16h5.5a2.5 2.5 0 1 1 -2.34 3.24"></path>
+            </svg>
+            Vent
+          </h5>
+          <div class="border-top pt-3">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="weather-row">
+                  <strong>Vitesse du vent:</strong>
+                  <span>{{ selectedWeather.wind_speed }} m/s</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="weather-row">
+                  <strong>Direction du vent:</strong>
+                  <span>{{ selectedWeather.wind_direction }}°</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section Qualité de l'air -->
+        <div class="mb-4">
+          <h5 class="mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+              <path d="M3 10h11"></path>
+              <path d="M12 16h9"></path>
+              <path d="M6.663 8.68a5 5 0 1 1 4.674 0"></path>
+              <path d="M15.336 15.32a5 5 0 1 1 -4.674 0"></path>
+            </svg>
+            Qualité de l'air
+          </h5>
+          <div class="border-top pt-3">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="weather-row">
+                  <strong>Monoxyde de carbone (CO):</strong>
+                  <span>{{ selectedWeather.co }}</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="weather-row">
+                  <strong>Dioxyde d'azote (NO₂):</strong>
+                  <span>{{ selectedWeather.no2 }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section Autres mesures -->
+        <div class="mb-4">
+          <h5 class="mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+              <path d="M12 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"></path>
+              <path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7"></path>
+            </svg>
+            Autres mesures
+          </h5>
+          <div class="border-top pt-3">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="weather-row">
+                  <strong>Luminosité:</strong>
+                  <span>{{ selectedWeather.luminosity }} lux</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="weather-row">
+                  <strong>Indice UV:</strong>
+                  <span>{{ selectedWeather.indice_uv }}</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="weather-row">
+                  <strong>Niveau de batterie:</strong>
+                  <span>{{ selectedWeather.battery }}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div *ngIf="selectedWeather.description" class="mb-4">
+          <h5 class="mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler me-2" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+              <path d="M8 6h12"></path>
+              <path d="M8 12h12"></path>
+              <path d="M8 18h12"></path>
+              <path d="M3 6v.01"></path>
+              <path d="M3 12v.01"></path>
+              <path d="M3 18v.01"></path>
+            </svg>
+            Description
+          </h5>
+          <div class="border-top pt-3">
+            <p class="text-muted mb-0">{{ selectedWeather.description }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-white" (click)="closeViewModal($event)">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>

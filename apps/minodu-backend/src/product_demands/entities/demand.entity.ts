@@ -1,6 +1,5 @@
 import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 import { Product } from "src/products/entities/product.entity";
-import { User } from "src/users/entities/user.entity";
 import { Partner } from "src/partners/entities/partner.entity";
 
 @Entity({ name: 'backend_product_demand', schema: 'public' })
