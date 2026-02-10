@@ -3,7 +3,7 @@ import * as fs from 'node:fs';
 import * as sharp from 'sharp';
 
 export abstract class BaseConfig {
-  static FILES_DIR = '/app/data';
+  static FILES_DIR = '/app/data/minodu-backend';
 
   static setFilePath(req: any, file: any, callback: any) {
     if (file) {

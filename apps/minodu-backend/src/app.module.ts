@@ -32,7 +32,7 @@ import { ThrottlerGuard } from '@nestjs/throttler/dist/throttler.guard';
   imports: [
     ThrottlerModule.forRoot([{
       ttl: 60000, // Temps de vie en millisecondes (1 min)
-      limit: 30,   // Nombre max de requêtes par utilisateur
+      limit: 100,   // Nombre max de requêtes par utilisateur
     }]),
     ConfigModule.forRoot({
       envFilePath: ".env",

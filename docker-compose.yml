@@ -10,8 +10,8 @@ services:
       - MYSQL_DATABASE=${DB_NAME}
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
     volumes:
-      - ./data/mysql:/var/lib/mysql 
-      - ./data/dbsql/minodu.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - mysql-data:/var/lib/mysql 
+      - ./data/dbsql/minodu.sql:/docker-entrypoint-initdb.d/init.sql
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
@@ -40,13 +40,12 @@ services:
       JWT_SECRET: "${JWT_SECRET_KEY}"
       ADMIN_PHONE: "${ADMIN_PHONE}"
       ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
-      FORUM_URL: "http:/localhost:3003"
+      FORUM_URL: "http://localhost:3003"
       FORUM_ADMIN_PASSWORD: "${FORUM_ADMIN_PASSWORD}"
-      AI_SERVICE_URL: "http:/localhost:3002"
+      AI_SERVICE_URL: "http://localhost:3002"
     volumes:
-      - ./data/minodu-backend:/app/data
-      - ./data/logs:/app/logs
-      - ./data/log:/app/server/logs
+      - shared-data:/app/data
+      - log-data:/app/server/logs
     depends_on:
       minodu-database:
         condition: service_healthy
@@ -75,7 +74,7 @@ services:
       - ENVIRONMENT=${ENVIRONMENT}
       - EMBEDDING_DATABASE_PATH=/app/data/minodu-ai-services
     volumes:
-      - ./data:/app/data
+      - shared-data:/app/data
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3002/api/services/"]
@@ -101,7 +100,7 @@ services:
       - ENVIRONMENT=${ENVIRONMENT}
       - ADMIN_PASSWORD=${FORUM_ADMIN_PASSWORD}
     volumes:
-      - ./data:/app/data
+      - shared-data:/app/data
     depends_on:
       minodu-database:
         condition: service_healthy
@@ -128,7 +127,7 @@ services:
       - AI_SERVICE_URL=http://minodu-ai-services:3002/api/services
       - ENVIRONMENT=${ENVIRONMENT}
     volumes:
-      - ./data:/app/data
+      - shared-data:/app/data
     depends_on:
       redis:
         condition: service_healthy
@@ -164,29 +163,29 @@ services:
       - "80:80"      # Frontend (80 on RPI/8088 on local)
       - "8080:8080"  # Backoffice
     volumes:
-      - ./data/log:/var/log/nginx
+      - log-data:/var/log/nginx
     depends_on:
       - minodu-forum
       - minodu-ai-services
       - minodu-backend
     restart: unless-stopped
 
-# volumes:
-#   shared-data:
-#     driver: local
-#     driver_opts:
-#       type: none
-#       device: ./data
-#       o: bind
-#   mysql-data:
-#     driver: local
-#     driver_opts:
-#       type: none
-#       device: ./data/mysql
-#       o: bind
-#   log-data:
-#     driver: local
-#     driver_opts:
-#       type: none
-#       device: ./data/logs
-#       o: bind  
+volumes:
+  shared-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./data
+      o: bind
+  mysql-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./data/mysql
+      o: bind
+  log-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./data/web/log
+      o: bind  

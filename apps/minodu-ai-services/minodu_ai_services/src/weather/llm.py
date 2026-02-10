@@ -62,35 +62,43 @@ class WeatherLLM:
         # Simple chaine
         if language == LanguageEnum.en:
             self.template = textwrap.dedent("""
-                Act as a meteorological expert. Analyze and interpret the raw data from a weather station located in Kara, Northern Togo, for local farmers.
+                Act as a meteorological expert advising farmers in Kara, northern Togo.
+                Analyze the data below, taking the current season ({season}) into account.
 
-                The raw data is as follows:
-                Current Temperature: {temperature}°C
-                Relative Humidity: {humidity}%
-                Atmospheric Pressure: {pressure} hPa
-                Luminosity: {luminosity} lux
-                Ambient Luminosity: {ambient_luminosity}
-                Carbon Monoxide (CO): {carbon_monoxide}
-                Nitrogen Dioxide (NO2): {nitrogen_dioxide}
-                Current Season : {season}
+                **Station Data:**
+                - Temperature: {temperature}°C
+                - Relative Humidity: {humidity}%
+                - Atmospheric Pressure: {pressure} hPa
+                - Luminosity: {luminosity} lux
+                - Carbon Monoxide (CO): {carbon_monoxide}
+                - Nitrogen Dioxide (NO2): {nitrogen_dioxide}
 
-                Provide a single, simple English paragraph presenting the current weather conditions, the rainfall outlook (if relevant), air quality information (if available), and the implications for local plants and crops. Ensure your analysis considers the current season.
+                **Response Instructions:**
+                1. Summarize in ONE SINGLE paragraph in simple, natural English.
+                2. Describe current conditions, rain risks, air quality (if relevant), and impact on crops.
+                3. **Do not quote any raw numbers** from the data.
+                4. Limit your response to **100 words maximum**.
+                5. Tailor your analysis to the current season ({season}).
                 """)
         elif language == LanguageEnum.fr:
             self.template = textwrap.dedent("""
-                Agis en tant qu'expert en météorologie. Analyse et interprète les données brutes d'une station météo de Kara, au nord du Togo, pour des agriculteurs.
-                                            
-                Les données brutes sont les suivantes :
-                Température actuelle : {temperature}°C
-                Humidité relative : {humidity}%
-                Pression atmosphérique: {pressure} hPa
-                Luminosité: {luminosity} lux
-                Luminosité ambiante: {ambient_luminosity}
-                Monoxyde de carbone (CO): {carbon_monoxide}
-                Dioxyde d'azote (NO2): {nitrogen_dioxide}
-                Saison actuelle : {season}
+                Agis en tant qu'expert météorologue conseillant des agriculteurs à Kara, au nord du Togo.
+                Analyse les données ci-dessous en tenant compte de la saison actuelle ({season}).
 
-                Fournis en un seul paragraphe en français simple exposant les conditions météo actuelles, les prévisions de pluie (si pertinentes), les informations sur la pollution (si disponibles), et les implications pour les plantes et les cultures. Tiens compte de la saison actuelle lors de ton analyse.            
+                **Données de la station :**
+                - Température : {temperature}°C
+                - Humidité relative : {humidity}%
+                - Pression atmosphérique : {pressure} hPa
+                - Luminosité : {luminosity} lux
+                - Monoxyde de carbone (CO) : {carbon_monoxide}
+                - Dioxyde d'azote (NO2) : {nitrogen_dioxide}
+
+                **Consignes de réponse :**
+                1. Résume en UN SEUL paragraphe en français simple et naturel.
+                2. Décris les conditions actuelles, les risques de pluie, la qualité de l'air (si pertinent), et l'impact sur les cultures.
+                3. **Ne cite aucun chiffre** des données brutes.
+                4. Limite ta réponse à **100 mots maximum**.
+                5. Adapte ton analyse à la saison ({season}).           
             """)
         
         self.prompt = ChatPromptTemplate.from_template(self.template)
