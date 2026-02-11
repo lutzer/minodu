@@ -13,6 +13,7 @@ type RagRequest = {
 	conversation: string;
 	question: string;
 	language: Language;
+	source_id?: number;
 };
 
 type TtsRespone = {

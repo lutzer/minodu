@@ -11,14 +11,13 @@
 	
 	onMount(async () => {
 		post = await BackendApi.getPost(postId);
-		console.log(post)
 	});
 
 </script>
 
 <div class="chatbot-page">
 	{#if post}
-		<ChatbotPage post={post}/>
+		<ChatbotPage post={post} saveChat={false}/>
 	{:else}
 	<div class="no-data">
 		<p>Cannot load post data.</p>
