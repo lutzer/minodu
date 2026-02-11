@@ -10,6 +10,7 @@ Monorepo containing all the minodu apps and services
 * install poetry with `brew install poetry`
 * install nx with `npm install -g nx`
 * install docker
+* install python 3.12.x
 
 #### Project specific requirements
 
@@ -67,8 +68,9 @@ nx g @nxlv/python:poetry-project <name> --directory=apps/<name> --projectType=ap
 nx g @nx/node:application <name> --directory=apps/<name>
 ```
 
-## Update Proecedure
+## Update Procedure
 
+* run `(cd tools/sync && poetry install)` to install dependencies
 * run `sync:update_backup` to create new backup file on digital ocean
 * run `sync:database`to fetch and sync data locally
 * run `sync:rag`to update embeddings
