@@ -70,9 +70,9 @@
 				: 'none'}
 		>
 			{#if post.text.length > 0}
-				<div class="paragraph">
+				<p class="paragraph">
 					{post.text}
-				</div>
+				</p>
 			{/if}
 			<ul>
 				{#each post.files as file (file.id)}

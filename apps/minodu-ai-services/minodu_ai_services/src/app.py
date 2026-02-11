@@ -43,6 +43,7 @@ class RagRequest(BaseModel):
     conversation: str
     language: LanguageEnum
     question: str
+    source_id: Optional[int] = None
 
 
 @app.post("/rag/ask")
@@ -50,7 +51,7 @@ async def rag_ask(request: RagRequest):
     rag = RAG(language=request.language)
 
     def generate_stream():
-        data = RAG.RagRequestData(request.question, request.conversation)
+        data = RAG.RagRequestData(request.question, request.conversation, request.source_id)
         try:
             for chunk in rag.ask_streaming(data):
                 yield chunk

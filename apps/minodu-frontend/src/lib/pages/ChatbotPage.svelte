@@ -35,13 +35,8 @@
 	});
 
 	$: generating = messages.reduce((prev, val) => prev || !val.final, false);
-	$: conversation = messages.reduce((acc, val) => {
-		return (
-			acc +
-			'\n' +
-			(val.type == BotMessageType.USER ? +`USER: ${val.text}` : +`BOT: ${val.text}`) +
-			'\n'
-		);
+	$: conversation = messages.slice(-8).reduce((acc, val) => {
+		return `${acc} \n ${val.type == BotMessageType.USER ? "USER" : "BOT"}: ${val.text} \n`;
 	}, '');
 
 	let reader: Optional<ReadableStreamDefaultReader<Uint8Array<ArrayBuffer>>> = undefined;
@@ -92,7 +87,8 @@
 		let apiResponse = await AiServicesApi.generateRagResponse({
 			language: Config.language,
 			conversation: conversation,
-			question: question
+			question: question,
+			source_id: post?.id
 		});
 
 		reader = apiResponse.body?.getReader();
