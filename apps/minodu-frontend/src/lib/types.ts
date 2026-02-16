@@ -6,7 +6,13 @@ export type BotMessage = {
 	text: string;
 	type: BotMessageType;
 	final: boolean;
+	audio?: MultiLanguageString;
 };
+
+export type MultiLanguageString = {
+	fr: string;
+	kb: string;
+}
 
 export enum BotMessageType{
 	USER, BOT

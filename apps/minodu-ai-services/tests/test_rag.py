@@ -167,3 +167,72 @@ class TestWelcomeMessages:
 
         assert len(data_en["text"]) > 0
         assert len(data_fr["text"]) > 0
+
+
+class TestWelcomeStreaming:
+    """Tests for RAG welcome message streaming endpoints."""
+
+    def test_welcome_stream_without_source_id(self):
+        """Test streaming welcome message endpoint without source_id."""
+        response = client.get(app.root_path + "/rag/welcome/en/stream")
+        assert response.status_code == 200
+        assert response.headers["content-type"] == "text/plain; charset=utf-8"
+        assert len(response.text) > 0
+
+    def test_welcome_stream_with_source_id(self):
+        """Test streaming welcome message endpoint with source_id."""
+        response = client.get(app.root_path + "/rag/welcome/en/123/stream")
+        assert response.status_code == 200
+        assert response.headers["content-type"] == "text/plain; charset=utf-8"
+        assert len(response.text) > 0
+
+    def test_welcome_stream_french_language(self):
+        """Test streaming welcome message endpoint with French language."""
+        response = client.get(app.root_path + "/rag/welcome/fr/stream")
+        assert response.status_code == 200
+        assert len(response.text) > 0
+
+    def test_welcome_stream_invalid_language(self):
+        """Test streaming welcome endpoint with invalid language returns error."""
+        response = client.get(app.root_path + "/rag/welcome/xyz/stream")
+        assert response.status_code == 422
+
+    def test_welcome_stream_returns_same_content_as_non_stream(self):
+        """Test that streamed content matches non-streamed content for static welcome."""
+        stream_response = client.get(app.root_path + "/rag/welcome/en/stream")
+        regular_response = client.get(app.root_path + "/rag/welcome/en/")
+
+        assert stream_response.status_code == 200
+        assert regular_response.status_code == 200
+        assert stream_response.text == regular_response.json()["text"]
+
+    def test_welcome_streaming_method_with_none_summary(self):
+        """Test RAG welcome_streaming method returns static message for None summary."""
+        rag = RAG(language=LanguageEnum.en)
+        chunks = list(rag.welcome_streaming(None))
+
+        assert len(chunks) == 1
+        assert "farming" in chunks[0].lower()
+
+    def test_welcome_streaming_method_with_summary(self):
+        """Test RAG welcome_streaming method yields chunks for dynamic message."""
+        rag = RAG(language=LanguageEnum.en)
+        summary = "This document covers maize cultivation."
+        chunks = list(rag.welcome_streaming(summary))
+
+        assert len(chunks) > 0
+        full_response = "".join(chunks)
+        assert len(full_response) > 0
+
+    def test_welcome_stream_with_existing_document(self):
+        """Test streaming welcome message with a document that exists."""
+        file_path = os.path.join(script_dir, "docs/2_EN_AMANA_SCRIPT AUDIO.pdf")
+        source_id = 2
+
+        rag = RAG(language=LanguageEnum.en)
+        store = DocumentStore(rag.vectorstore, rag.chroma_client)
+        store.add_file(file_path, source_id)
+
+        response = client.get(app.root_path + f"/rag/welcome/en/{source_id}/stream")
+        assert response.status_code == 200
+        assert len(response.text) > 0

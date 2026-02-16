@@ -11,7 +11,7 @@
 	import { t } from '$lib/translations';
 	import type { BackendPost } from '$lib/apis/backend/models/backendPost';
 	import BotInputElement from '$lib/components/bot/BotInputElement.svelte';
-	import { delay, waitForAnimationFrame } from '$lib/utils';
+	import { delay, streamResponseGenerator, waitForAnimationFrame } from '$lib/utils';
 
 	import trashIcon from '$lib/assets/trash-icon-white.png';
 
@@ -39,24 +39,7 @@
 		return `${acc} \n ${val.type == BotMessageType.USER ? "USER" : "BOT"}: ${val.text} \n`;
 	}, '');
 
-	let reader: Optional<ReadableStreamDefaultReader<Uint8Array<ArrayBuffer>>> = undefined;
-	let reading = false;
-
-	async function generateWelcomeMessage() {
-		let welcome = { text: '', type: BotMessageType.BOT, final: false }
-		messages = [...messages, welcome ];
-
-		let apiResponse = await AiServicesApi.getWelcomeMessage(Config.language, post?.id);
-
-		welcome.text = apiResponse.text;
-		welcome.final = true;
-		messages = messages;
-
-		scrollContainer.scrollTo({
-			top: scrollContainer.scrollHeight,
-			behavior: 'smooth'
-		});
-	}
+	let streamAbortController : Optional<AbortController>;
 
 	async function submitMessage(message: string) {
 		messages = [...messages, { text: message, type: BotMessageType.USER, final: true }];
@@ -80,46 +63,52 @@
 		if (saveChat) Storage.chatMessages = messages;
 	}
 
+	async function generateWelcomeMessage() {
+		let welcome : BotMessage = { text: '', type: BotMessageType.BOT, final: false, audio: post && { fr: post!.attachment, kb: post!.attachment_kb } }
+		messages = [...messages, welcome ];
+
+		streamAbortController = new AbortController();
+		let stream = streamResponseGenerator(
+			await AiServicesApi.getWelcomeMessageStream(
+				Config.language, post?.id
+			), streamAbortController.signal)
+
+		for await (const chunk of stream) {
+			welcome.text += chunk;
+			messages = messages;
+		}
+
+		welcome.final = true;
+		messages = messages;
+		streamAbortController = undefined;
+	}
+
 	async function requestAnswer(question: string, conversation: string) {
 		let response = { text: '', type: BotMessageType.BOT, final: false };
 		messages = [...messages, response];
 
-		let apiResponse = await AiServicesApi.generateRagResponse({
-			language: Config.language,
-			conversation: conversation,
-			question: question,
-			source_id: post?.id
-		});
+		streamAbortController = new AbortController();
+		let stream = streamResponseGenerator(
+			await AiServicesApi.generateRagResponse({
+				language: Config.language,
+				conversation: conversation,
+				question: question,
+				source_id: post?.id
+			}), streamAbortController.signal)
 
-		reader = apiResponse.body?.getReader();
-
-		if (!reader) throw Error('Could not initialize rag response reader');
-
-		const decoder = new TextDecoder();
-
-		reading = true;
-
-		while (reading) {
-			const { done, value } = await reader.read();
-			if (done) break;
-
-			const text = decoder.decode(value, { stream: true });
-			response.text += text;
+		for await (const chunk of stream) {
+			response.text += chunk;
 			messages = messages;
-			await tick();
-			await delay(100);
 		}
 
 		response.final = true;
 		messages = messages;
-
-		reading = false;
-		reader = undefined;
+		streamAbortController = undefined;
 	}
 
 	export function stopAnswer() {
-		reader?.cancel();
-		reading = false;
+		streamAbortController?.abort();
+		streamAbortController = undefined;
 	}
 
 	function clearChat() {
@@ -134,7 +123,7 @@
 			<ul>
 				{#each messages as msg, i (i)}
 					<li>
-						<BotMessageElement message={msg} {ttsPlayer} onCancelResponse={stopAnswer} />
+						<BotMessageElement message={msg} {ttsPlayer} onCancelResponse={stopAnswer}/>
 					</li>
 				{/each}
 				{#if messages.length > 0}

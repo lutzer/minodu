@@ -1,16 +1,12 @@
 <script lang="ts">
-	import { AiServicesApi } from '$lib/apis/ai_services/api';
 	import { BotMessageType, type BotMessage, type Optional } from '$lib/types';
-	import { delay } from '$lib/utils';
-	import { onMount, tick } from 'svelte';
 	import TextToSpeechButton from '../common/TextToSpeechButton.svelte';
 	import TextToSpeechPlayer from '../common/TextToSpeechPlayer.svelte';
-	import { Config } from '$lib';
 	import { language } from '$lib/stores';
-	import { t } from '$lib/translations';
 
 	import botAvatarImage from '$lib/assets/chatbot-avatar.png';
 	import crossIcon from '$lib/assets/cross_icon_white.png';
+	import AudioPlayer from '../common/AudioPlayer.svelte';
 
 	export let message: BotMessage;
 	export let ttsPlayer: TextToSpeechPlayer;
@@ -42,6 +38,10 @@
 	</div>
 	<div class="message-text">
 		<h3>Minodu Bot</h3>
+		{#if message.audio && $language}
+		<AudioPlayer
+			audioSource={message.audio[$language]}/>
+		{/if}
 		<p class={isError ? 'error' : ''}>
 			{message.text}
 			{#if !message.final}
