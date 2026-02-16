@@ -59,7 +59,6 @@
 
 	.button-group {
 		display: flex;
-		padding: var(--medium-padding) 0;
 		justify-content: space-between;
 		gap: var(--medium-padding);
 	}

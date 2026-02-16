@@ -3,7 +3,7 @@
 	import ForumPage from '$lib/pages/ForumPage.svelte';
 </script>
 
-<div class="forum-page-container">
+<div>
 	<ForumPage />
 	<ExplainPageButton
 		audioFr="https://audio-samples.github.io/samples/mp3/blizzard_unconditional/sample-0.mp3"
