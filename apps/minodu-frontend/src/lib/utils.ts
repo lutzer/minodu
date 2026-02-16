@@ -69,7 +69,7 @@ export async function* streamResponseGenerator(streamingResponse: any, signal?: 
 				const text = decoder.decode(value, { stream: true });
 				yield text;
 				await tick();
-				await delay(50);
+				await delay(10);
 			}
 		} finally {
 			reader.releaseLock();
