@@ -148,6 +148,7 @@
 </div>
 
 <style>
+
 	.message-container {
 		padding: var(--page-padding);
 		margin-bottom: calc(var(--page-padding) + var(--button-size));
