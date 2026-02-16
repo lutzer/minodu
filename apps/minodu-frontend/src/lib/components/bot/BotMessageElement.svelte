@@ -50,7 +50,7 @@
 		</p>
 		{#if !message.final}
 		<div class="stop-button-container">
-			<button class="stop-button shadow" onclick={onCancelResponse}>
+			<button class="stop-button small shadow" onclick={onCancelResponse}>
 				<img src={crossIcon}/>
 			</button>
 		</div>
@@ -131,8 +131,8 @@
 		width: auto;
 	}
 
-	.stop-button img {
+	/* .stop-button img {
 		height: 30px;
 		width: 30px;
-	}
+	} */
 </style>

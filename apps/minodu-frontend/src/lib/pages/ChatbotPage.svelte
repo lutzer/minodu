@@ -119,12 +119,18 @@
 		messages = [];
 		if (saveChat) Storage.chatMessages = undefined;
 	}
+
+	async function closeBot() {
+		showPanel = false;
+		await delay(300);
+		goto('/agriculture');
+	}
 </script>
 
 <div class="chatbot-page">
 	{#if showPanel}
 	<div class="scroll-container" bind:this={scrollContainer} transition:fly={{ y: '100%', duration: 300 }}>
-		<button class="close-button" onclick={() => goto('/agriculture')}>
+		<button class="close-button" onclick={() => closeBot()}>
 			<img src={crossIcon}/>
 		</button>
 		<div class="message-container content-width">
@@ -165,7 +171,7 @@
 		right:0;
 		bottom:0;
 		z-index: 10;
-		backdrop-filter: blur(3px);
+		backdrop-filter: blur(2px);
 	}
 
 	.message-container {
@@ -180,6 +186,7 @@
 		right:0;
 		background-color: #c3eed9;
 		border-radius: var(--border-radius);
+		padding-top: 50px;
 	}
 
 	.reset-button-container {
@@ -211,12 +218,14 @@
 	}
 
 	.close-button {
+		position: fixed;
+		top: 0;
 		display: flex;
     	justify-content: center;
     	padding: var(--small-padding);
 		width:100%;
 		background: #6c9e85;
-		border-radius: 0;
+		border-radius: var(--border-radius) var(--border-radius) 0 0;
 	}
 
 	.close-button img {
