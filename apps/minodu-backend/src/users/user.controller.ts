@@ -22,9 +22,9 @@ import { RolesGuard } from 'src/auth/guards/role.guard';
 import { Roles } from 'src/auth/decorators/role.decorator';
 import { Throttle } from '@nestjs/throttler';
 import { CreateUserDto } from './dto/create-user.dto';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @ApiTags('User')
-@ApiBearerAuth()
 @UseGuards(RolesGuard)
 @Controller({
   path: 'users',
@@ -33,6 +33,14 @@ import { CreateUserDto } from './dto/create-user.dto';
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
+  @Public()
+  @ApiOperation({ summary: 'Contact person', description: 'Contact person\'s  infos' })
+  @Get('contact-person')
+  findContactPerson() {
+    return this.usersService.findContactPerson();
+  }
+
+  @ApiBearerAuth()
   @Roles(userRole.ADMIN)
   @ApiOperation({ summary: 'Users list', description: 'All users list' })
   @Get()
@@ -40,6 +48,7 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @ApiBearerAuth()
   @Roles(userRole.ADMIN)
   @ApiOperation({
     summary: 'User dashboard',
@@ -50,6 +59,7 @@ export class UsersController {
     return this.usersService.getAdminDashboard(user.id);
   }
 
+  @ApiBearerAuth()
   @Roles(userRole.ADMIN, userRole.USER)
   @ApiOperation({
     summary: 'User details',
@@ -60,6 +70,7 @@ export class UsersController {
     return this.usersService._findOne(user.id);
   }
 
+  @ApiBearerAuth()
   @Roles(userRole.ADMIN)
   @ApiOperation({ summary: 'User infos', description: 'Given user infos' })
   @ApiParam({ type: Number, name: 'id', description: 'Isuer ID' })
@@ -68,13 +79,7 @@ export class UsersController {
     return this.usersService._findOne(+id);
   }
 
-  @ApiOperation({ summary: 'User infos', description: 'Given user infos' })
-  @ApiParam({ type: Number, name: 'id', description: 'Isuer ID' })
-  @Get('contact-person')
-  findContactPerson() {
-    return this.usersService.findContactPerson();
-  }
-
+  @ApiBearerAuth()
   @Roles(userRole.ADMIN)
   @ApiOperation({summary: "Create User", description: "Create new user"})
   @Post()
@@ -82,6 +87,7 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
+  @ApiBearerAuth()
   @Roles(userRole.ADMIN, userRole.USER)
   @ApiOperation({
     summary: 'Update current user data',
@@ -92,6 +98,7 @@ export class UsersController {
     return this.usersService.updateCurrentUser(updateUserDto, user);
   }
 
+  @ApiBearerAuth()
   @Roles(userRole.ADMIN)
   @ApiOperation({
     summary: 'Update user data',
@@ -103,6 +110,7 @@ export class UsersController {
     return this.usersService.updateUser(updateUserDto, id);
   }
 
+  @ApiBearerAuth()
   @Roles(userRole.ADMIN, userRole.USER)
   @Put('password')
   @ApiOperation({
