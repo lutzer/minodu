@@ -55,9 +55,4 @@ vite.config.*.timestamp*
 vitest.config.*.timestamp*
 
 data/*
-!data/.keep
-!data/mysql
-!data/dbsql
-!data/nginx-logs
-!data/logs
 .env
