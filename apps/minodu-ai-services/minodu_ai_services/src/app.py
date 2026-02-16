@@ -91,6 +91,7 @@ async def extract_sources(request: RagSourceRequest):
         score=score
     )
 
+
 class WelcomeResponse(BaseModel):
     text: str
 
@@ -110,9 +111,59 @@ async def get_welcome_message_with_source(source_id: int, language: LanguageEnum
     welcome = rag.welcome(summary)
     return WelcomeResponse(text=welcome)
 
+
+@app.get("/rag/welcome/{language}/stream")
+async def get_welcome_message_stream(language: LanguageEnum):
+    rag = RAG(language=language)
+
+    def generate_stream():
+        try:
+            for chunk in rag.welcome_streaming(None):
+                yield chunk
+        except Exception as e:
+            logging.error(f"Error in welcome streaming: {e}", exc_info=True)
+            yield f"\n\n[ERROR: {str(e)}]"
+
+    return StreamingResponse(
+        generate_stream(),
+        media_type="text/plain; charset=utf-8",
+        headers={
+            'Cache-Control': 'no-cache',
+            'X-Accel-Buffering': 'no',
+            'Transfer-Encoding': 'chunked'
+        }
+    )
+
+
+@app.get("/rag/welcome/{language}/{source_id}/stream")
+async def get_welcome_message_with_source_stream(source_id: int, language: LanguageEnum):
+    rag = RAG(language=language)
+    store = DocumentStore(rag.vectorstore, rag.chroma_client)
+    summary = store.get_document_summary(source_id)
+
+    def generate_stream():
+        try:
+            for chunk in rag.welcome_streaming(summary):
+                yield chunk
+        except Exception as e:
+            logging.error(f"Error in welcome streaming: {e}", exc_info=True)
+            yield f"\n\n[ERROR: {str(e)}]"
+
+    return StreamingResponse(
+        generate_stream(),
+        media_type="text/plain; charset=utf-8",
+        headers={
+            'Cache-Control': 'no-cache',
+            'X-Accel-Buffering': 'no',
+            'Transfer-Encoding': 'chunked'
+        }
+    )
+
+
 class DocumentSummaryResponse(BaseModel):
     source_id: int
     summary: Optional[str] = None
+
 
 @app.get("/rag/documents/{language}/{source_id}/summary", response_model=DocumentSummaryResponse)
 async def get_document_summary(source_id: int, language: LanguageEnum):

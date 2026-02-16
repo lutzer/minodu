@@ -107,4 +107,19 @@ export class AiServicesApi {
 		}
 		return await response.json();
 	}
+
+	public static async getWelcomeMessageStream(
+		language: Language,
+		sourceId?: number
+	): Promise<Response> {
+		const url =
+			sourceId !== undefined
+				? `${AiServicesApi.API_PREFIX}/rag/welcome/${language}/${sourceId}/stream`
+				: `${AiServicesApi.API_PREFIX}/rag/welcome/${language}/stream`;
+		const response = await fetch(url);
+		if (!response.ok) {
+			throw new HttpError({ code: response.status, message: await response.text() });
+		}
+		return response;
+	}
 }

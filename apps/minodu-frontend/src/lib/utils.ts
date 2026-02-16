@@ -1,3 +1,6 @@
+import { tick } from "svelte";
+import type { Optional } from "./types";
+
 export function delay(ms: number): Promise<void> {
 	return new Promise((resolve) => {
 		setTimeout(resolve, ms);
@@ -46,4 +49,29 @@ export function mimeTypeToFileExtension(mimeType: string): string {
 	// Normalize and handle charset parameters (e.g., 'text/html; charset=utf-8')
 	const normalizedMime = mimeType.toLowerCase().split(';')[0].trim();
 	return mimeToExtension[normalizedMime] || '';
+}
+
+export async function* streamResponseGenerator(streamingResponse: any, signal?: AbortSignal) : AsyncGenerator<string> {
+
+		const reader : Optional<ReadableStreamDefaultReader<Uint8Array<ArrayBuffer>>> = streamingResponse.body?.getReader();
+
+		if (!reader) throw Error('Could not initialize response reader');
+
+		const decoder = new TextDecoder();
+
+		try {
+			while (true) {
+				if (signal?.aborted) break;
+
+				const { done, value } = await reader.read();
+				if (done) break;
+
+				const text = decoder.decode(value, { stream: true });
+				yield text;
+				await tick();
+				await delay(50);
+			}
+		} finally {
+			reader.releaseLock();
+		}
 }

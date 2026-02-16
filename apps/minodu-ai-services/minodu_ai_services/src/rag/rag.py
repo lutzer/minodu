@@ -24,16 +24,18 @@ logging.getLogger("chromadb.telemetry").setLevel(logging.CRITICAL)
 
 NUMBER_OF_RETRIEVED_CHUNKS = 10
 
+
 class RAG:
     @dataclass
     class RagRequestData:
         question: str
         history: str
-        source_id : Optional[int] = None
+        source_id: Optional[int] = None
 
-    def __init__(self, language : LanguageEnum):
+    def __init__(self, language: LanguageEnum):
 
-        self.llm = OllamaLLM(base_url=Config().ollama_host, model=Config().ollama_model, temperature=0.1, keep_alive=600 )
+        self.llm = OllamaLLM(base_url=Config().ollama_host, model=Config().ollama_model,
+                             temperature=0.1, keep_alive=600)
 
         # Vector store setup (same as above)
         self.embeddings = OllamaEmbeddings(base_url=Config().ollama_host, model=Config().embedding_model)
@@ -57,7 +59,7 @@ class RAG:
         self.chain = (
             RunnableParallel({
                 "context": lambda x: self.get_retriever(x["source_id"]).invoke(x["question"]),
-                "question": lambda x: x["question"], 
+                "question": lambda x: x["question"],
                 "history": lambda x: x["history"]
             })
             | self.prompt
@@ -65,25 +67,23 @@ class RAG:
             | StrOutputParser()
         )
 
-
-    
     def ask(self, request: RagRequestData) -> str:
         return self.chain.invoke(asdict(request))
-    
+
     def ask_streaming(self, request: RagRequestData) -> Iterator[str]:
         for chunk in self.chain.stream(asdict(request)):
             yield chunk
 
     def find_sources_for_text(self, query) -> str:
         search_kwargs = {
-            "k" : 1
+            "k": 1
         }
 
         results = self.vectorstore.similarity_search_with_score(query, **search_kwargs)
 
         if not results:
             return (None, 0)
-        
+
         docs, scores = zip(*results)
         return (docs[0], scores[0])
 
@@ -92,7 +92,7 @@ class RAG:
             "filter": {"source_id": source_id},
             "k": NUMBER_OF_RETRIEVED_CHUNKS
         } if source_id != None else {
-            "k" : NUMBER_OF_RETRIEVED_CHUNKS
+            "k": NUMBER_OF_RETRIEVED_CHUNKS
         }
 
         return self.vectorstore.as_retriever(
@@ -110,3 +110,15 @@ class RAG:
 
         welcome = chain.invoke({"summary": summary})
         return welcome.strip()
+
+    def welcome_streaming(self, summary: Optional[str]) -> Iterator[str]:
+        if summary is None:
+            yield PromptLoader().get("rag", "welcome_static", self.language)
+            return
+
+        template = PromptLoader().get("rag", "welcome_dynamic", self.language)
+        prompt = ChatPromptTemplate.from_template(template)
+        chain = prompt | self.llm | StrOutputParser()
+
+        for chunk in chain.stream({"summary": summary}):
+            yield chunk
