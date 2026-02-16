@@ -27,7 +27,6 @@
 			typeDialog.showModal();
 			let buttonBB = postButton.getBoundingClientRect();
 			let dialogBB = typeDialog.getBoundingClientRect();
-			console.log(buttonBB, dialogBB)
 			typeDialog.style.right = `${window.innerWidth - buttonBB.right}px`;
 			typeDialog.style.bottom = `${window.innerHeight - buttonBB.top}px`;
 		} else {

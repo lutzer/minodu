@@ -37,5 +37,6 @@
 		right:0;
 		bottom:0;
 		background-color: #C3EED9;
+		z-index: 10;
 	}
 </style>
