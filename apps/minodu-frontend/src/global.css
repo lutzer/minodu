@@ -133,7 +133,6 @@ button.long {
 }
 
 button img {
-	position: relative;
 	width: 100%;
 	height: 100%;
 	object-fit: contain;
