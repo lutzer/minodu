@@ -15,28 +15,8 @@
 
 </script>
 
-<div class="chatbot-page">
+<div>
 	{#if post}
 		<ChatbotPage post={post} saveChat={false}/>
-	{:else}
-	<div class="no-data">
-		<p>Cannot load post data.</p>
-	</div>
 	{/if}
-	<ExplainPageButton
-		audioFr="https://audio-samples.github.io/samples/mp3/blizzard_unconditional/sample-0.mp3"
-		audioKb="https://audio-samples.github.io/samples/mp3/blizzard_unconditional/sample-1.mp3"
-	/>
 </div>
-
-<style>
-	.chatbot-page {
-		position: absolute;
-		top:0;
-		left:0;
-		right:0;
-		bottom:0;
-		background-color: #C3EED9;
-		z-index: 10;
-	}
-</style>
