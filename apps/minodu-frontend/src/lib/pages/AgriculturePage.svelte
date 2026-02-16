@@ -47,7 +47,7 @@
 	$: filteredPosts = posts.filter((post) => selectedCategoryIds.has(post.category.id));
 </script>
 
-<div class="forum-page">
+<div>
 	<div class="scroll-container" bind:this={scrollContainer}>
 		<div class="post-container content-width">
 			{#if filteredPosts.length > 0}

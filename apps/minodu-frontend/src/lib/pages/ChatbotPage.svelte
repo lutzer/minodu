@@ -2,18 +2,18 @@
 	import { Config } from '$lib';
 	import { AiServicesApi } from '$lib/apis/ai_services/api';
 	import BotMessageElement from '$lib/components/bot/BotMessageElement.svelte';
-	import AudioRecorder from '$lib/components/common/AudioRecorder.svelte';
 	import TextToSpeechPlayer from '$lib/components/common/TextToSpeechPlayer.svelte';
 	import { Storage } from '$lib/storage';
-	import { language } from '$lib/stores';
 	import { BotMessageType, type BotMessage, type Optional } from '$lib/types';
 	import { afterUpdate, onMount, tick } from 'svelte';
-	import { t } from '$lib/translations';
 	import type { BackendPost } from '$lib/apis/backend/models/backendPost';
 	import BotInputElement from '$lib/components/bot/BotInputElement.svelte';
 	import { delay, streamResponseGenerator, waitForAnimationFrame } from '$lib/utils';
+	import { fly } from 'svelte/transition';
 
 	import trashIcon from '$lib/assets/trash-icon-white.png';
+	import crossIcon from '$lib/assets/cross_icon_white.png';
+	import { goto } from '$app/navigation';
 
 	export let post: Optional<BackendPost> = undefined;
 	export let saveChat: boolean
@@ -24,8 +24,12 @@
 	let generating = false;
 	let scrollContainer: HTMLDivElement;
 
-	onMount(() => {
+	let showPanel : boolean = false;
+
+	onMount(async () => {
 		if (saveChat) messages = Storage.chatMessages;
+		await tick();
+		showPanel = true;
 	});
 
 	afterUpdate(() => {
@@ -118,7 +122,11 @@
 </script>
 
 <div class="chatbot-page">
-	<div class="scroll-container" bind:this={scrollContainer}>
+	{#if showPanel}
+	<div class="scroll-container" bind:this={scrollContainer} transition:fly={{ y: '100%', duration: 300 }}>
+		<button class="close-button" onclick={() => goto('/agriculture')}>
+			<img src={crossIcon}/>
+		</button>
 		<div class="message-container content-width">
 			<ul>
 				{#each messages as msg, i (i)}
@@ -143,11 +151,22 @@
 			</ul>
 		</div>
 	</div>
+	{/if}
 	<BotInputElement onMessageSubmitted={submitMessage} enabled={!generating} />
 	<TextToSpeechPlayer bind:this={ttsPlayer} />
 </div>
 
 <style>
+
+	.chatbot-page {
+		position: absolute;
+		top:0;
+		left:0;
+		right:0;
+		bottom:0;
+		z-index: 10;
+		backdrop-filter: blur(3px);
+	}
 
 	.message-container {
 		padding: var(--page-padding);
@@ -156,7 +175,11 @@
 	}
 
 	.scroll-container {
+		top:0;
+		left:0;
+		right:0;
 		background-color: #c3eed9;
+		border-radius: var(--border-radius);
 	}
 
 	.reset-button-container {
@@ -185,5 +208,18 @@
 	.reset-button span {
 		flex-grow: 1;
 		text-align: center;
+	}
+
+	.close-button {
+		display: flex;
+    	justify-content: center;
+    	padding: var(--small-padding);
+		width:100%;
+		background: #6c9e85;
+		border-radius: 0;
+	}
+
+	.close-button img {
+		width: auto;
 	}
 </style>
