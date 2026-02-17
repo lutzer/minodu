@@ -1,6 +1,16 @@
 export interface BackendContact {
 	id: number;
-	name: string;
-	adresse: string;
+	fullname: string;
+	gender: string | null;
 	phone: string;
+	role: {
+		id: number;
+		name: string;
+	};
+	status: {
+		id: number;
+		name: string;
+	};
+	isContactPerson: boolean;
+	lastConnexion: string | null;
 }

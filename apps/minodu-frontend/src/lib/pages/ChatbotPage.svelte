@@ -14,9 +14,11 @@
 	import trashIcon from '$lib/assets/trash-icon-white.png';
 	import crossIcon from '$lib/assets/cross_icon_white.png';
 	import { goto } from '$app/navigation';
+	import { language } from '$lib/stores';
+	import { t } from '$lib/translations';
 
 	export let post: Optional<BackendPost> = undefined;
-	export let saveChat: boolean
+	export let saveChat: boolean;
 
 	let messages: BotMessage[] = [];
 	let ttsPlayer: TextToSpeechPlayer;
@@ -24,7 +26,9 @@
 	let generating = false;
 	let scrollContainer: HTMLDivElement;
 
-	let showPanel : boolean = false;
+	let showPanel: boolean = false;
+
+	const TRANSITION_TIME = 300;
 
 	onMount(async () => {
 		if (saveChat) messages = Storage.chatMessages;
@@ -40,10 +44,10 @@
 
 	$: generating = messages.reduce((prev, val) => prev || !val.final, false);
 	$: conversation = messages.slice(-8).reduce((acc, val) => {
-		return `${acc} \n ${val.type == BotMessageType.USER ? "USER" : "BOT"}: ${val.text} \n`;
+		return `${acc} \n ${val.type == BotMessageType.USER ? 'USER' : 'BOT'}: ${val.text} \n`;
 	}, '');
 
-	let streamAbortController : Optional<AbortController>;
+	let streamAbortController: Optional<AbortController>;
 
 	async function submitMessage(message: string) {
 		messages = [...messages, { text: message, type: BotMessageType.USER, final: true }];
@@ -68,14 +72,19 @@
 	}
 
 	async function generateWelcomeMessage() {
-		let welcome : BotMessage = { text: '', type: BotMessageType.BOT, final: false, audio: post && { fr: post!.attachment, kb: post!.attachment_kb } }
-		messages = [...messages, welcome ];
+		let welcome: BotMessage = {
+			text: '',
+			type: BotMessageType.BOT,
+			final: false,
+			audio: post && { fr: post!.attachment, kb: post!.attachment_kb }
+		};
+		messages = [...messages, welcome];
 
 		streamAbortController = new AbortController();
 		let stream = streamResponseGenerator(
-			await AiServicesApi.getWelcomeMessageStream(
-				Config.language, post?.id
-			), streamAbortController.signal)
+			await AiServicesApi.getWelcomeMessageStream(Config.language, post?.id),
+			streamAbortController.signal
+		);
 
 		for await (const chunk of stream) {
 			welcome.text += chunk;
@@ -98,7 +107,9 @@
 				conversation: conversation,
 				question: question,
 				source_id: post?.id
-			}), streamAbortController.signal)
+			}),
+			streamAbortController.signal
+		);
 
 		for await (const chunk of stream) {
 			response.text += chunk;
@@ -122,54 +133,57 @@
 
 	async function closeBot() {
 		showPanel = false;
-		await delay(300);
+		await delay(TRANSITION_TIME);
 		goto('/agriculture');
 	}
 </script>
 
 <div class="chatbot-page">
 	{#if showPanel}
-	<div class="scroll-container" bind:this={scrollContainer} transition:fly={{ y: '100%', duration: 300 }}>
-		<button class="close-button" onclick={() => closeBot()}>
-			<img src={crossIcon}/>
-		</button>
-		<div class="message-container content-width">
-			<ul>
-				{#each messages as msg, i (i)}
-					<li>
-						<BotMessageElement message={msg} {ttsPlayer} onCancelResponse={stopAnswer}/>
-					</li>
-				{/each}
-				{#if messages.length > 0}
-					<li>
-						<div class="reset-button-container">
-							<button class="reset-button long shadow" onclick={clearChat}>
-								<img src={trashIcon} alt="Icon for clearing the conversation" />
-								<span>Clear Chat</span>
-							</button>
+		<div
+			class="scroll-container"
+			bind:this={scrollContainer}
+			transition:fly={{ y: '100%', duration: TRANSITION_TIME }}
+		>
+			<button class="close-button" onclick={() => closeBot()}>
+				<img src={crossIcon} />
+			</button>
+			<div class="message-container content-width">
+				<ul>
+					{#each messages as msg, i (i)}
+						<li>
+							<BotMessageElement message={msg} {ttsPlayer} onCancelResponse={stopAnswer} />
+						</li>
+					{/each}
+					{#if messages.length > 0}
+						<li>
+							<div class="reset-button-container">
+								<button class="reset-button long shadow" onclick={clearChat}>
+									<img src={trashIcon} alt={t('alt.clearChatIcon', $language)} />
+									<span>{t('action.clearChat', $language)}</span>
+								</button>
+							</div>
+						</li>
+					{:else}
+						<div class="no-data">
+							<p>{t('chatbot.noMessages', $language)}</p>
 						</div>
-					</li>
-				{:else}
-					<div class="no-data">
-						<p>There are no messages in this conversation yet</p>
-					</div>
-				{/if}
-			</ul>
+					{/if}
+				</ul>
+			</div>
+			<BotInputElement onMessageSubmitted={submitMessage} enabled={!generating} />
 		</div>
-	</div>
 	{/if}
-	<BotInputElement onMessageSubmitted={submitMessage} enabled={!generating} />
 	<TextToSpeechPlayer bind:this={ttsPlayer} />
 </div>
 
 <style>
-
 	.chatbot-page {
 		position: absolute;
-		top:0;
-		left:0;
-		right:0;
-		bottom:0;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
 		z-index: 10;
 		backdrop-filter: blur(2px);
 	}
@@ -178,15 +192,17 @@
 		padding: var(--page-padding);
 		margin-bottom: calc(var(--page-padding) + var(--button-size));
 		box-sizing: border-box;
+		margin-top: 150px;
 	}
 
 	.scroll-container {
-		top:0;
-		left:0;
-		right:0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		top: auto;
+		height: 100%;
 		background-color: #c3eed9;
 		border-radius: var(--border-radius);
-		padding-top: 50px;
 	}
 
 	.reset-button-container {
@@ -221,9 +237,10 @@
 		position: fixed;
 		top: 0;
 		display: flex;
-    	justify-content: center;
-    	padding: var(--small-padding);
-		width:100%;
+		justify-content: center;
+		padding: var(--small-padding);
+		height: var(--button-size);
+		width: 100%;
 		background: #6c9e85;
 		border-radius: var(--border-radius) var(--border-radius) 0 0;
 	}

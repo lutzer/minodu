@@ -102,7 +102,7 @@
 				<button class="expand-button" onclick={() => (expanded = !expanded)}>
 					<img
 						src={expandPostButton}
-						alt={expanded ? 'collapse' : 'expand'}
+						alt={expanded ? t('alt.collapse', $language) : t('alt.expand', $language)}
 						class:rotated={expanded}
 					/>
 				</button>
