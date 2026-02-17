@@ -59,9 +59,9 @@
 					{/each}
 				</ul>
 			{:else}
-			<div class="no-data">
-				<p>{t('agriculture.noPosts', $language)}</p>
-			</div>
+				<div class="no-data">
+					<p>{t('agriculture.noPosts', $language)}</p>
+				</div>
 			{/if}
 		</div>
 	</div>
@@ -73,9 +73,12 @@
 						class={`color ${category.name}`}
 						class:selected={selectedCategoryIds.has(category.id)}
 						onclick={() => toggleCategory(category.id)}
-					>	
+					>
 						{#if categoryIcons[category.name]}
-						<img src={categoryIcons[category.name]} alt="category icon for {category.name}" />
+							<img
+								src={categoryIcons[category.name]}
+								alt="{t('alt.categoryIcon', $language)} {category.name}"
+							/>
 						{/if}
 						<span>{category.name}</span>
 					</button>

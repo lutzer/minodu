@@ -16,14 +16,18 @@
 
 
 	onMount(async () => {
+		contact = await BackendApi.getContactPerson();
 		demands = await BackendApi.getProductDemands();
+
+		console.log(contact)
 	});
 </script>
 
 <div>
 	<div class="scroll-container" bind:this={scrollContainer}>
 		<div class="contact-container">
-
+			<h2>{contact?.fullname}</h2>
+			<p>{contact?.phone}</p>
 		</div>
 		<div class="post-container content-width">
 			{#if demands.length > 0}
