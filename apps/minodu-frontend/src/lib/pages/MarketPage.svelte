@@ -4,7 +4,9 @@
 	import FloatingButton from '$lib/components/common/FloatingButton.svelte';
 	import { language } from '$lib/stores';
 	import { t } from '$lib/translations';
+
 	import callButton from '$lib/assets/call_button.png';
+	import contactBackground from '$lib/assets/market_contact_backgroud.png'
 
 	let demands: BackendProductDemand[] = [];
 	let contact: BackendContact;
@@ -17,17 +19,18 @@
 
 	onMount(async () => {
 		contact = await BackendApi.getContactPerson();
-		demands = await BackendApi.getProductDemands();
-
-		console.log(contact)
+		demands = await BackendApi.getProductDemands()
 	});
 </script>
 
 <div>
 	<div class="scroll-container" bind:this={scrollContainer}>
-		<div class="contact-container">
+		<div class="contact-container content-width" style="background-image: url({contactBackground}">
+			<h1>Contact</h1>
 			<h2>{contact?.fullname}</h2>
-			<p>{contact?.phone}</p>
+			<button class="call-button shadow">
+				{contact?.phone}
+			</button>
 		</div>
 		<div class="post-container content-width">
 			{#if demands.length > 0}
@@ -60,5 +63,32 @@
 
 	.scroll-container {
 		background-color: #FDF2E7;
+	}
+
+	.contact-container {
+		height:200px;
+		width: 100%;
+		background-color: #F1B78D;
+		border-radius: 0 0 var(--border-radius) var(--border-radius);
+		background-size: auto 100%;
+		background-repeat: no-repeat;
+		background-position: 100%;
+		padding: var(--page-padding);
+		box-sizing: border-box;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+	}
+
+	.contact-container h1, h2 {
+		color: #ffffff;
+		text-align: left;
+		margin: 0;
+	}
+
+	.call-button {
+		background-color: #F2A65A;
+		width: auto;
+		flex-grow: 0;
 	}
 </style>
