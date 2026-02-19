@@ -13,16 +13,20 @@ rag:
     If the user asks a follow-up question or refers to something said earlier,
     use what was already discussed to give a better answer.
 
+    Answer the question below in simple language. Keep your answer short and helpful. Use examples from everyday life when possible.
+
     Context:
-    {context}<|eot_id|>
+    {context}
 
     Conversation so far:
-    {history}<|start_header_id|>user<|end_header_id|>
-
+    {history}<|eot_id|>
+    
+    <|start_header_id|>user<|end_header_id|>
     Users's Question:
-    {question}<|eot_id|><|start_header_id|>assistant<|end_header_id|>
-
-    Answer the question in simple language. Keep your answer short and helpful. Use examples from everyday life when possible.
+    {question}<|eot_id|>
+    
+    <|start_header_id|>assistant<|end_header_id|>
+    
 
   welcome_static: |
     Hello and welcome! I am your farming helper.

@@ -6,6 +6,7 @@
 	import { t } from '$lib/translations';
 
 	import callButton from '$lib/assets/call_button.png';
+	import phoneIcon from '$lib/assets/phone_icon.png';
 	import contactBackground from '$lib/assets/market_contact_backgroud.png'
 
 	let demands: BackendProductDemand[] = [];
@@ -28,9 +29,10 @@
 		<div class="contact-container content-width" style="background-image: url({contactBackground}">
 			<h1>Contact</h1>
 			<h2>{contact?.fullname}</h2>
-			<button class="call-button shadow">
-				{contact?.phone}
-			</button>
+			<a href="tel:{contact?.phone}" class="button call-button shadow">
+				<img src={phoneIcon}/>
+				<span>{contact?.phone}</span>
+			</a>
 		</div>
 		<div class="post-container content-width">
 			{#if demands.length > 0}
@@ -88,7 +90,21 @@
 
 	.call-button {
 		background-color: #F2A65A;
-		width: auto;
+		width: fit-content;
 		flex-grow: 0;
+		padding: 0 var(--small-padding);
+		--box-shadow-color: #E5792C;
+		color: #ffffff;
+		margin: var(--small-padding) 0;
+		display: flex;
+		align-items: center;
+		gap: 3px;
+	}
+
+	.call-button img {
+		margin-left: -3px;
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
 	}
 </style>
