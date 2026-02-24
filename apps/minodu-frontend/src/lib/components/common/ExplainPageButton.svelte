@@ -12,6 +12,7 @@
 
 	let audio: HTMLAudioElement;
 	let isPlaying: boolean = false;
+	let mounted: boolean = false;
 
 	function languageButtonClicked() {
 		language.set($language == 'kb' ? 'fr' : 'kb');
@@ -37,6 +38,7 @@
 	// set initial language
 	onMount(() => {
 		language.refresh();
+		mounted = true;
 	});
 </script>
 
@@ -48,14 +50,16 @@
 				alt={t('alt.speakPageInfo', $language)}
 			/>
 		</button>
-		<button class="button" onclick={languageButtonClicked}>
-			<img
-				src={$language === 'kb' ? languageKbButton : languageFrButton}
-				alt={t('alt.switchLanguage', $language)}
-			/>
-		</button>
-		<audio bind:this={audio} src={$language == 'kb' ? audioKb : audioFr} onended={handleAudioEnded}>
-		</audio>
+		{#if mounted}
+			<button class="button" onclick={languageButtonClicked}>
+				<img
+					src={$language === 'kb' ? languageKbButton : languageFrButton}
+					alt={t('alt.switchLanguage', $language)}
+				/>
+			</button>
+			<audio bind:this={audio} src={$language == 'kb' ? audioKb : audioFr} onended={handleAudioEnded}>
+			</audio>
+		{/if}
 	</div>
 </div>
 

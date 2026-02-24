@@ -13,14 +13,20 @@
 	let contact: BackendContact;
 
 	let scrollContainer: HTMLDivElement;
+	let ttsPlayer: TextToSpeechPlayer;
 
 	import type { BackendProductDemand } from '$lib/apis/backend/models/backendProductDemand';
 	import type { BackendContact } from '$lib/apis/backend/models/backendContact';
+	import { mockProductDemands } from '$lib/mocks';
+	import MarketDemandElement from '$lib/components/market/MarketDemandElement.svelte';
+	import TextToSpeechPlayer from '$lib/components/common/TextToSpeechPlayer.svelte';
 
 
 	onMount(async () => {
 		contact = await BackendApi.getContactPerson();
-		demands = await BackendApi.getProductDemands()
+		demands = import.meta.env.DEV ?
+			(await import('$lib/mocks')).mockProductDemands : 
+			await BackendApi.getProductDemands();
 	});
 </script>
 
@@ -39,7 +45,7 @@
 				<ul>
 					{#each demands as demand}
 						<li>
-							<p>{JSON.stringify(demand)}
+							<MarketDemandElement demand={demand} ttsPlayer={ttsPlayer}/>
 						</li>
 					{/each}
 				</ul>
@@ -51,13 +57,14 @@
 		</div>
 	</div>
 	
+	<TextToSpeechPlayer bind:this={ttsPlayer} />
 	<FloatingButton icon={callButton} onclick={() => {}} />
 </div>
 
 <style>
 
 	.post-container {
-		margin-top: var(--header-height);
+		margin-top: var(--medium-padding);
 		padding: 0 var(--page-padding);
 		margin-bottom: calc(var(--page-padding) + var(--button-size) + var(--medium-padding) * 2);
 		box-sizing: border-box;

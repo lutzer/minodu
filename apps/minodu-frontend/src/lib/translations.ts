@@ -163,6 +163,18 @@ const translations: TranslationStrings = {
 		fr: 'Pas de demandes de produits disponibles.',
 		kb: 'Nta bisabwa biboneka.'
 	},
+	'product.demand-image': {
+		fr: 'Image du produit demandé',
+		kb: 'Ishusho y\'igicuruzwa gisabwa'
+	},
+	'product.demand-hand-product': {
+		fr: 'Quantité demandée',
+		kb: 'Ingano isabwa'
+	},
+	'product.demand-hand-money': {
+		fr: 'Prix proposé',
+		kb: 'Igiciro gitangwa'
+	},
 
 	// Accessibility / Alt texts
 	'alt.playPauseAudio': {
