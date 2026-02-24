@@ -4,7 +4,10 @@
 	import FloatingButton from '$lib/components/common/FloatingButton.svelte';
 	import { language } from '$lib/stores';
 	import { t } from '$lib/translations';
+
 	import callButton from '$lib/assets/call_button.png';
+	import phoneIcon from '$lib/assets/phone_icon.png';
+	import contactBackground from '$lib/assets/market_contact_backgroud.png'
 
 	let demands: BackendProductDemand[] = [];
 	let contact: BackendContact;
@@ -17,17 +20,19 @@
 
 	onMount(async () => {
 		contact = await BackendApi.getContactPerson();
-		demands = await BackendApi.getProductDemands();
-
-		console.log(contact)
+		demands = await BackendApi.getProductDemands()
 	});
 </script>
 
 <div>
 	<div class="scroll-container" bind:this={scrollContainer}>
-		<div class="contact-container">
+		<div class="contact-container content-width" style="background-image: url({contactBackground}">
+			<h1>Contact</h1>
 			<h2>{contact?.fullname}</h2>
-			<p>{contact?.phone}</p>
+			<a href="tel:{contact?.phone}" class="button call-button shadow">
+				<img src={phoneIcon}/>
+				<span>{contact?.phone}</span>
+			</a>
 		</div>
 		<div class="post-container content-width">
 			{#if demands.length > 0}
@@ -60,5 +65,46 @@
 
 	.scroll-container {
 		background-color: #FDF2E7;
+	}
+
+	.contact-container {
+		height:200px;
+		width: 100%;
+		background-color: #F1B78D;
+		border-radius: 0 0 var(--border-radius) var(--border-radius);
+		background-size: auto 100%;
+		background-repeat: no-repeat;
+		background-position: 100%;
+		padding: var(--page-padding);
+		box-sizing: border-box;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+	}
+
+	.contact-container h1, h2 {
+		color: #ffffff;
+		text-align: left;
+		margin: 0;
+	}
+
+	.call-button {
+		background-color: #F2A65A;
+		width: fit-content;
+		flex-grow: 0;
+		padding: 0 var(--small-padding);
+		--box-shadow-color: #E5792C;
+		color: #ffffff;
+		margin: var(--small-padding) 0;
+		display: flex;
+		align-items: center;
+		gap: 3px;
+	}
+
+	.call-button img {
+		margin-left: -3px;
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
 	}
 </style>
