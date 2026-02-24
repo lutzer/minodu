@@ -20,6 +20,7 @@
 	import { mockProductDemands } from '$lib/mocks';
 	import MarketDemandElement from '$lib/components/market/MarketDemandElement.svelte';
 	import TextToSpeechPlayer from '$lib/components/common/TextToSpeechPlayer.svelte';
+	import { goto } from '$app/navigation';
 
 
 	onMount(async () => {
@@ -28,6 +29,10 @@
 			(await import('$lib/mocks')).mockProductDemands : 
 			await BackendApi.getProductDemands();
 	});
+
+	function onPhoneButtonClicked() {
+		window.location.href = `tel:${contact?.phone}`;
+	}
 </script>
 
 <div>
@@ -35,10 +40,10 @@
 		<div class="contact-container content-width" style="background-image: url({contactBackground}">
 			<h1>Contact</h1>
 			<h2>{contact?.fullname}</h2>
-			<a href="tel:{contact?.phone}" class="button call-button shadow">
-				<img src={phoneIcon}/>
+			<button onclick={onPhoneButtonClicked} class="button call-button shadow">
+				<img src={phoneIcon} alt={t('market.phone-icon',$language)}/>
 				<span>{contact?.phone}</span>
-			</a>
+			</button>
 		</div>
 		<div class="post-container content-width">
 			{#if demands.length > 0}
@@ -58,7 +63,7 @@
 	</div>
 	
 	<TextToSpeechPlayer bind:this={ttsPlayer} />
-	<FloatingButton icon={callButton} onclick={() => {}} />
+	<FloatingButton icon={callButton} onclick={onPhoneButtonClicked} />
 </div>
 
 <style>

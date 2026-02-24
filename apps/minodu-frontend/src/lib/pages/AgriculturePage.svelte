@@ -70,7 +70,7 @@
 			{#each categories as category (category.id)}
 				<li>
 					<button
-						class={`color ${category.name}`}
+						class={`color ${category.name} shadow`}
 						class:selected={selectedCategoryIds.has(category.id)}
 						onclick={() => toggleCategory(category.id)}
 					>
@@ -126,7 +126,6 @@
 		display: flex;
 		align-items: center;
 		gap: calc(var(--small-padding) * 0.5);
-		box-shadow: 2px 2px 2px #00000033;
 	}
 
 	#categories button.selected {
