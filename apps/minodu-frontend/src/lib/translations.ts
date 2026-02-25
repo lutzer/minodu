@@ -163,6 +163,10 @@ const translations: TranslationStrings = {
 		fr: 'Pas de demandes de produits disponibles.',
 		kb: 'Nta bisabwa biboneka.'
 	},
+	'market.phone-icon': {
+		fr: 'Appelez l\'administrateur.',
+		kb: 'Nta bisabwa biboneka.'
+	},
 	'product.demand-image': {
 		fr: 'Image du produit demandé',
 		kb: 'Ishusho y\'igicuruzwa gisabwa'
@@ -268,6 +272,10 @@ const translations: TranslationStrings = {
 	'alt.categoryIcon': {
 		fr: 'Icône de catégorie pour',
 		kb: 'Ishusho yicyiciro cya'
+	},
+	'alt.cancelResponse': {
+		fr: 'Annuler la réponse du chatbot',
+		kb: 'annuler la réponse du chatbot'
 	}
 };
 

@@ -39,7 +39,9 @@
 		<div class="message-text">
 			<h3>{t('chatbot.botName', $language)}</h3>
 			{#if message.audio && $language}
-				<AudioPlayer audioSource={message.audio[$language]} />
+				<div class="audio-player">
+					<AudioPlayer audioSource={message.audio[$language]} />
+				</div>
 			{/if}
 			<p class={isError ? 'error' : ''}>
 				{message.text}
@@ -129,6 +131,10 @@
 		gap: var(--small-padding);
 		padding: var(--small-padding);
 		width: auto;
+	}
+
+	.audio-player {
+		padding: var(--small-padding) 0;
 	}
 
 	/* .stop-button img {

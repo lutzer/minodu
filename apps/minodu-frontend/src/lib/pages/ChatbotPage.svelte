@@ -146,7 +146,7 @@
 			transition:fly={{ y: '100%', duration: TRANSITION_TIME }}
 		>
 			<button class="close-button" onclick={() => closeBot()}>
-				<img src={crossIcon} />
+				<img src={crossIcon} alt={t('alt.cancelResponse', $language)}/>
 			</button>
 			<div class="message-container content-width">
 				<ul>
@@ -155,7 +155,7 @@
 							<BotMessageElement message={msg} {ttsPlayer} onCancelResponse={stopAnswer} />
 						</li>
 					{/each}
-					{#if messages.length > 0}
+					{#if messages.length > 0 && !post}
 						<li>
 							<div class="reset-button-container">
 								<button class="reset-button long shadow" onclick={clearChat}>
@@ -164,12 +164,13 @@
 								</button>
 							</div>
 						</li>
-					{:else}
-						<div class="no-data">
-							<p>{t('chatbot.noMessages', $language)}</p>
-						</div>
 					{/if}
 				</ul>
+				{#if messages.length == 0}
+					<div class="no-data">
+						<p>{t('chatbot.noMessages', $language)}</p>
+					</div>
+				{/if}
 			</div>
 			<BotInputElement onMessageSubmitted={submitMessage} enabled={!generating} />
 		</div>
