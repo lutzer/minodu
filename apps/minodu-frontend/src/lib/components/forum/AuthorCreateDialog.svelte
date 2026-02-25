@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { ForumApi } from '$lib/apis/forum/api';
-	import type { ForumAvatar } from '$lib/apis/forum/models/forumAvatarr';
+	import type { ForumAvatar } from '$lib/apis/forum/models/forumAvatar';
 	import { Storage } from '$lib/storage';
 	import { language } from '$lib/stores';
 	import type { Optional } from '$lib/types';
@@ -26,8 +26,6 @@
 
 	async function loadAvatars() {
 		avatarList = await ForumApi.getAvatars();
-
-		console.log(avatarList)
 	}
 
 	async function createAuthor(name: string, avatar: number) {
