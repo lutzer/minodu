@@ -1,4 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Signika:wght@300..700&display=swap');
+@font-face {
+  font-family: 'Signika';
+  src: url('$lib/assets/fonts/Signika-VariableFont_wght.woff2') format('woff2');
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
 
 body {
 	margin: 0;
