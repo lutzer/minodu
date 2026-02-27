@@ -235,13 +235,15 @@ class SttResponse(BaseModel):
 
 @app.post("/stt/transcribe", response_model=SttResponse)
 async def stt_transcribe(file: UploadFile, language: str = Form(...)):
-    transcriber = SttTranscriber(language=language)
-
     content = await file.read()
 
-    data = io.BytesIO(content)
+    def do_transcribe():
+        transcriber = SttTranscriber(language=language)
+        data = io.BytesIO(content)
+        return transcriber.transcribe_file_buffer(data, file.filename)
 
-    result = transcriber.transcribe_file_buffer(data, file.filename)
+    loop = asyncio.get_event_loop()
+    result = await loop.run_in_executor(None, do_transcribe)
 
     return SttResponse(
         text=result.text,
