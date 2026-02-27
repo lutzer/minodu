@@ -4,7 +4,7 @@ import logging
 from langchain_ollama.llms import OllamaLLM
 from langchain_ollama import OllamaEmbeddings
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnableParallel, RunnablePassthrough
+from langchain_core.runnables import RunnableParallel
 from langchain.schema.output_parser import StrOutputParser
 from langchain_chroma import Chroma
 import chromadb
@@ -22,7 +22,19 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 logging.getLogger("chromadb").setLevel(logging.ERROR)
 logging.getLogger("chromadb.telemetry").setLevel(logging.CRITICAL)
 
-NUMBER_OF_RETRIEVED_CHUNKS = 5
+NUMBER_OF_RETRIEVED_CHUNKS = 2
+MAX_HISTORY_EXCHANGES = 2  # Limit conversation history for faster inference
+
+
+def truncate_history(history: str, max_exchanges: int = MAX_HISTORY_EXCHANGES) -> str:
+    """Truncate conversation history to last N exchanges for faster inference."""
+    if not history or not history.strip():
+        return ""
+    lines = history.strip().split('\n')
+    # Keep last max_exchanges * 2 lines (user + assistant pairs)
+    truncated = lines[-(max_exchanges * 2):]
+    return '\n'.join(truncated)
+
 
 class RAG:
     @dataclass
@@ -59,7 +71,7 @@ class RAG:
             RunnableParallel({
                 "context": lambda x: self.get_retriever(x["source_id"]).invoke(x["question"]),
                 "question": lambda x: x["question"],
-                "history": lambda x: x["history"]
+                "history": lambda x: truncate_history(x["history"])
             })
             | self.prompt
             | self.llm
