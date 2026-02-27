@@ -43,7 +43,7 @@
 	});
 
 	$: generating = messages.reduce((prev, val) => prev || !val.final, false);
-	$: conversation = messages.slice(-8).reduce((acc, val) => {
+	$: conversation = messages.reduce((acc, val) => {
 		return `${acc} \n ${val.type == BotMessageType.USER ? 'USER' : 'BOT'}: ${val.text} \n`;
 	}, '');
 

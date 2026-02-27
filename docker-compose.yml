@@ -74,6 +74,7 @@ services:
       - EMBEDDING_DATABASE_PATH=/app/data/minodu-ai-services
     volumes:
       - shared-data:/app/data
+      - log-data:/app/logs
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3002/api/services/"]

@@ -2,6 +2,7 @@ import asyncio
 from dataclasses import asdict
 from enum import Enum
 import json
+import time
 from typing import Any, Optional
 from fastapi import FastAPI, UploadFile, HTTPException, Request
 from pydantic import BaseModel
@@ -23,10 +24,20 @@ from .stt.stt_transcriber import SttTranscriber
 from .tts.speech_generator import SpeechGenerator
 
 from .vars import LanguageEnum
+from .config import Config
 
 api_prefix = os.getenv('API_PREFIX', "/api/services")
 
 logger = logging.getLogger(__name__)
+
+# Set up dedicated file logger for RAG questions
+rag_logger = logging.getLogger("rag_questions")
+rag_logger.setLevel(logging.INFO)
+rag_log_path = Config().rag_log_path
+os.makedirs(os.path.dirname(rag_log_path), exist_ok=True)
+rag_file_handler = logging.FileHandler(rag_log_path)
+rag_file_handler.setFormatter(logging.Formatter('%(asctime)s|%(message)s'))
+rag_logger.addHandler(rag_file_handler)
 
 # Initialize FastAPI app with root_path prefix
 app = FastAPI(root_path=api_prefix)
@@ -48,16 +59,27 @@ class RagRequest(BaseModel):
 
 @app.post("/rag/ask")
 async def rag_ask(request: RagRequest):
+    start_time = time.time()
+    rag_logger.info(json.dumps({"event": "request", **request.model_dump()}, default=str))
     rag = RAG(language=request.language)
 
     def generate_stream():
         data = RAG.RagRequestData(request.question, request.conversation, request.source_id)
+        response_text = []
         try:
             for chunk in rag.ask_streaming(data):
+                response_text.append(chunk)
                 yield chunk
         except Exception as e:
             logging.error(f"Error in RAG streaming: {e}", exc_info=True)
             yield f"\n\n[ERROR: {str(e)}]"
+        finally:
+            duration = time.time() - start_time
+            rag_logger.info(json.dumps({
+                "event": "response",
+                "text": "".join(response_text),
+                "duration_seconds": round(duration, 2)
+            }, default=str))
 
     return StreamingResponse(
         generate_stream(),

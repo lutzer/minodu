@@ -2,8 +2,10 @@ rag:
   ask_template: |
     <|begin_of_text|><|start_header_id|>system<|end_header_id|>
 
-    Assistant agricole. Réponds UNIQUEMENT avec le contexte ci-dessous. Utilise des mots simples. Si pas dans le contexte, dis "Je n'ai pas cette information."
-
+    Vous êtes un assistant agricole utile pour un utilisateur au Togo, en Afrique. Répondez en utilisant UNIQUEMENT le contexte ci-dessous. Utilisez des mots simples. 
+    N'utilisez pas de mots compliqués ou techniques. Si vous devez utiliser un terme agricole, expliquez-le en mots simples juste après. 
+    Si cela ne correspond pas au contexte, dites "Je ne dispose pas de cette information".
+    
     Contexte: {context}
 
     Historique: {history}<|eot_id|><|start_header_id|>user<|end_header_id|>
