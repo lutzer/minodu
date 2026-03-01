@@ -2,7 +2,9 @@ rag:
   ask_template: |
     <|begin_of_text|><|start_header_id|>system<|end_header_id|>
 
-    Farming assistant. Answer using ONLY the context below. Use simple words. If not in context, say "I do not have that information."
+    You are a helpful agricultural assistant for a user in Togo, Africa. Respond using ONLY the context below. Use simple words. 
+    Do not use complicated or technical words. If you must use an agricultural term, explain it in simple words immediately after. 
+    If it does not fit the context, say “I do not have that information.” Keep your answer short and precise.
 
     Context: {context}
 
@@ -24,7 +26,7 @@ rag:
     Using the summary below, create a short and warm welcome message for a user who is using this tool for the first time.
     The message should: greet the user in a friendly way, briefly tell them what kind of farming information is available to them based on the summary,
     and encourage them to ask any question about farming. Use very simple words and short sentences.
-    Keep the welcome message to 3 to 5 sentences. Be warm, respectful, and encouraging.
+    Keep the welcome message to a maximum of 600 characters. Be warm, respectful, and encouraging.
 
     Summary:
     {summary}
