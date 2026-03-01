@@ -25,9 +25,12 @@
 
 	onMount(async () => {
 		contact = await BackendApi.getContactPerson();
-		demands = import.meta.env.DEV ?
-			(await import('$lib/mocks')).mockProductDemands : 
-			await BackendApi.getProductDemands();
+		demands = await BackendApi.getProductDemands();
+		// demands = import.meta.env.DEV ?
+		// 	(await import('$lib/mocks')).mockProductDemands : 
+		// 	await BackendApi.getProductDemands();
+
+		console.log(demands)
 	});
 
 	function onPhoneButtonClicked() {

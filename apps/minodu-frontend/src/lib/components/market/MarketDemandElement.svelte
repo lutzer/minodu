@@ -18,7 +18,9 @@
     <div class="header">
         <div class="title">
             <h2>{demand.product.name}</h2>
+            {#if demand.partner}
             <h4>{demand.partner.name}</h4>
+            {/if}
             <span class="date">{format(demand.updatedAt)}</span>
         </div>
         <div>
