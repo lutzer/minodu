@@ -66,19 +66,24 @@ async def rag_ask(request: RagRequest):
     def generate_stream():
         data = RAG.RagRequestData(request.question, request.conversation, request.source_id)
         response_text = []
+        first_token_time = None
         try:
             for chunk in rag.ask_streaming(data):
                 response_text.append(chunk)
+                if first_token_time == None:
+                    first_token_time = time.time()
                 yield chunk
         except Exception as e:
             logging.error(f"Error in RAG streaming: {e}", exc_info=True)
             yield f"\n\n[ERROR: {str(e)}]"
         finally:
             duration = time.time() - start_time
+            first_token_seconds = first_token_time - start_time
             rag_logger.info(json.dumps({
                 "event": "response",
                 "text": "".join(response_text),
-                "duration_seconds": round(duration, 2)
+                "duration_seconds": round(duration, 2),
+                "first_token_seconds" : first_token_seconds
             }, default=str))
 
     return StreamingResponse(
