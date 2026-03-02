@@ -31,7 +31,7 @@
 	<div class="vertical-layout">
 		<div class="horizontal-layout">
 			<div class="post-image">
-				<img src={post.image} alt="{t('alt.imageFor', $language)} {post.title}" />
+				<img src={post.image} alt="{t('alt.imageFor', $language)} {post.title}" loading="lazy" />
 			</div>
 			<div class="post-content">
 				<div class="title">
@@ -45,9 +45,9 @@
 				<AudioPlayer audioSource={$language === 'kb' ? post.attachment_kb : post.attachment} />
 			</div>
 			<div class="chat-button">
-				<button class="small" onclick={() => goto(`/agriculture/bot/${post.id}`)}>
+				<a class="button small" href={`/agriculture/bot/${post.id}`}>
 					<img src={chatbotButtonSmall} alt={t('alt.chatbotIcon', $language)} />
-				</button>
+				</a>
 			</div>
 		</div>
 	</div>

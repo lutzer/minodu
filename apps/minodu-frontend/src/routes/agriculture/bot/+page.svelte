@@ -4,5 +4,5 @@
 </script>
 
 <div>
-	<ChatbotPage saveChat={true}/>
+	<ChatbotPage saveChat={true} />
 </div>

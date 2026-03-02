@@ -126,9 +126,7 @@ export class ForumApi {
 		return new EventSource(`${ForumApi.API_PREFIX}/events/`);
 	}
 
-	public static async checkToken(
-		token: string
-	): Promise<Optional<ForumAuthor>> {
+	public static async checkToken(token: string): Promise<Optional<ForumAuthor>> {
 		if (!token) {
 			return undefined;
 		} else {

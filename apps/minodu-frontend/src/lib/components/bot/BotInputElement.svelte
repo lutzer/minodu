@@ -12,12 +12,12 @@
 	import { AiServicesApi } from '$lib/apis/ai_services/api';
 
 	export let onMessageSubmitted: (text: string) => void;
-	export let expanded : boolean = false;
-	export let enabled : boolean = true;
+	export let expanded: boolean = false;
+	export let enabled: boolean = true;
 
 	let fileInput: HTMLInputElement;
 	let text: string = '';
-	let transcribing = false
+	let transcribing = false;
 
 	onMount(() => {
 		text = Storage.botMessageText;
@@ -32,7 +32,7 @@
 
 	function close() {
 		Storage.botMessageText = text;
-		expanded = false
+		expanded = false;
 	}
 
 	export function reset() {
@@ -47,63 +47,63 @@
 		const target = e.target as HTMLInputElement;
 		const file = target.files?.[0];
 		if (file && file.type.startsWith('audio/')) {
-			transcribe(file)
+			transcribe(file);
 		}
 	}
 
 	async function transcribe(audio: Blob) {
-		transcribing = true
+		transcribing = true;
 		let response = await AiServicesApi.transcribeSpeech(audio, 'fr');
 		text += response.text;
-		transcribing = false
+		transcribing = false;
 	}
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div class="bot-input-container {!enabled && "disabled"}">
+<div class="bot-input-container {!enabled && 'disabled'}">
 	{#if expanded}
-	<div class="message-overlay" onclick={handleBackdropClick}>
-	</div>
+		<div class="message-overlay" onclick={handleBackdropClick}></div>
 	{/if}
 	<div class="create-message-container content-width">
 		<div class="message-input-container">
-				<div class="input-element-field">
-					<div class="input-textarea {!expanded && "minimized"}">
-						<textarea id="text" bind:value={text} maxlength={1000} onclick={() => expanded = true}></textarea>
-						<div class="record-button">
-							<input
-								bind:this={fileInput}
-								type="file"
-								accept="audio/*"
-								capture="environment"
-								onchange={(e) => handleCapture(e)}
-								style="display: none;"
-							/>
-							<button class="button shadow" onclick={() => fileInput.click()} disabled={transcribing}>
-								<img src={micButton}/>
-							</button>
-						</div>
+			<div class="input-element-field">
+				<div class="input-textarea {!expanded && 'minimized'}">
+					<textarea id="text" bind:value={text} maxlength={1000} onclick={() => (expanded = true)}
+					></textarea>
+					<div class="record-button">
+						<input
+							bind:this={fileInput}
+							type="file"
+							accept="audio/*"
+							capture="environment"
+							onchange={(e) => handleCapture(e)}
+							style="display: none;"
+						/>
+						<button class="button shadow" onclick={() => fileInput.click()} disabled={transcribing}>
+							<img src={micButton} />
+						</button>
 					</div>
-					
 				</div>
-				<div class="input-button-group">
-					<button
-						class="submit-button shadow"
-						onclick={() => submitMessage()}
-						disabled={!enabled || text.length <= 2}
-					>
-						<img src={submitButton} alt={t('alt.submitForumPost', $language)} />
-					</button>
-					{#if expanded}
+			</div>
+			<div class="input-button-group">
+				<button
+					class="submit-button shadow"
+					onclick={() => submitMessage()}
+					disabled={!enabled || text.length <= 2}
+				>
+					<img src={submitButton} alt={t('alt.submitForumPost', $language)} />
+				</button>
+				{#if expanded}
 					<button class="back-button shadow" onclick={() => close()}>
 						<img src={backButton} alt={t('alt.backForumPost', $language)} />
 					</button>
-					{/if}
-				</div>
+				{/if}
+			</div>
 		</div>
 	</div>
 </div>
+
 <style>
 	.message-overlay {
 		position: fixed;
@@ -166,7 +166,6 @@
 	}
 
 	.record-button button {
-		background: #278A58;
+		background: #278a58;
 	}
-
 </style>

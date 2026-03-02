@@ -54,23 +54,23 @@
 <div>
 	<div class="scroll-container" bind:this={scrollContainer}>
 		{#if loading}
-			<LoadingSpinner text={t('agriculture.loadingText',$language)}/>
+			<LoadingSpinner text={t('agriculture.loadingText', $language)} />
 		{:else}
-		<div class="post-container content-width">
-			{#if filteredPosts.length > 0}
-				<ul>
-					{#each filteredPosts as post (post.id)}
-						<li>
-							<AgriculturePostElement {post} />
-						</li>
-					{/each}
-				</ul>
-			{:else}
-				<div class="no-data">
-					<p>{t('agriculture.noPosts', $language)}</p>
-				</div>
-			{/if}
-		</div>
+			<div class="post-container content-width">
+				{#if filteredPosts.length > 0}
+					<ul>
+						{#each filteredPosts as post (post.id)}
+							<li>
+								<AgriculturePostElement {post} />
+							</li>
+						{/each}
+					</ul>
+				{:else}
+					<div class="no-data">
+						<p>{t('agriculture.noPosts', $language)}</p>
+					</div>
+				{/if}
+			</div>
 		{/if}
 	</div>
 	<div id="categories" class="content-width">
@@ -94,15 +94,17 @@
 			{/each}
 		</ul>
 	</div>
-	<FloatingButton icon={chatbotButton} onclick={() => goto('/agriculture/bot/')} />
+	<FloatingButton icon={chatbotButton} link="/agriculture/bot/"/>
 </div>
 
 <style>
-	/* @media screen and (min-width: 550px) {
-		.scroll-container {
-			bottom: 0;
-		}
-	} */
+	.floating-button {
+		position: fixed;
+		bottom: 20%;
+		right:10%;
+	}
+
+
 
 	#categories {
 		position: fixed;

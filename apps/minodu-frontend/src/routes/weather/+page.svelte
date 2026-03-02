@@ -1,7 +1,6 @@
 <script>
-	import ExplainPageButton from "$lib/components/common/ExplainPageButton.svelte";
-	import WeatherPage from "$lib/pages/WeatherPage.svelte";
-
+	import ExplainPageButton from '$lib/components/common/ExplainPageButton.svelte';
+	import WeatherPage from '$lib/pages/WeatherPage.svelte';
 </script>
 
 <div>

@@ -42,7 +42,7 @@
 	let createPostType: ForumPostType = ForumPostType.TEXT;
 	let deletePostId: Optional<number>;
 
-	let loading : boolean = true
+	let loading: boolean = true;
 
 	onMount(() => {
 		initialLoad();
@@ -71,7 +71,7 @@
 		hasMore = result.has_more;
 
 		loading = false;
-		
+
 		await login();
 
 		await waitForAnimationFrame();
@@ -198,39 +198,38 @@
 
 <div class="forum-page">
 	<div class="scroll-container" bind:this={scrollContainer} on:scroll={onScroll}>
-	{#if loading}
-		<LoadingSpinner text={t('forum.loadingText',$language)}/>
-	{:else}
-		<div class="post-container content-width">
-			{#if isLoadingMore}
-				<div class="loading-more">
-					<span class="spinner"></span>
-				</div>
-			{/if}
-			{#if posts.length > 0}
-				<ul>
-					{#each posts as post (post.id)}
-						<li>
-							<ForumPostElement
-								{post}
-								isOwn={author?.id == post.author.id}
-								onDeleteClicked={() => {
-									showDialog('deletePost');
-									deletePostId = post.id;
-								}}
-								{ttsPlayer}
-							/>
-						</li>
-					{/each}
-				</ul>
-			{:else}
-				<div class="no-data">
-					<p>{t('forum.noPosts', $language)}</p>
-				</div>
-				
-			{/if}
-		</div>
-	{/if}
+		{#if loading}
+			<LoadingSpinner text={t('forum.loadingText', $language)} />
+		{:else}
+			<div class="post-container content-width">
+				{#if isLoadingMore}
+					<div class="loading-more">
+						<span class="spinner"></span>
+					</div>
+				{/if}
+				{#if posts.length > 0}
+					<ul>
+						{#each posts as post (post.id)}
+							<li>
+								<ForumPostElement
+									{post}
+									isOwn={author?.id == post.author.id}
+									onDeleteClicked={() => {
+										showDialog('deletePost');
+										deletePostId = post.id;
+									}}
+									{ttsPlayer}
+								/>
+							</li>
+						{/each}
+					</ul>
+				{:else}
+					<div class="no-data">
+						<p>{t('forum.noPosts', $language)}</p>
+					</div>
+				{/if}
+			</div>
+		{/if}
 	</div>
 	{#if showFloatingButtons}
 		<FloatingForumButtons

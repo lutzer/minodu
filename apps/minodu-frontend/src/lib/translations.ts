@@ -164,7 +164,7 @@ const translations: TranslationStrings = {
 		kb: 'needs-translation'
 	},
 	'market.phone-icon': {
-		fr: 'Appelez l\'administrateur.',
+		fr: "Appelez l'administrateur.",
 		kb: 'needs-translation'
 	},
 	'product.demand-image': {

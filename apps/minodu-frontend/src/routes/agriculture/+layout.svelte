@@ -1,10 +1,10 @@
 <script>
 	import AgriculturePage from '$lib/pages/AgriculturePage.svelte';
 
-    let { children } = $props();
+	let { children } = $props();
 </script>
 
 <div>
 	<AgriculturePage />
-    {@render children?.()}
+	{@render children?.()}
 </div>

@@ -7,16 +7,15 @@
 	import { onMount } from 'svelte';
 
 	const postId = Number(page.params.id);
-	let post : BackendPost;
-	
+	let post: BackendPost;
+
 	onMount(async () => {
 		post = await BackendApi.getPost(postId);
 	});
-
 </script>
 
 <div>
 	{#if post}
-		<ChatbotPage post={post} saveChat={false}/>
+		<ChatbotPage {post} saveChat={false} />
 	{/if}
 </div>

@@ -12,10 +12,11 @@ export type BotMessage = {
 export type MultiLanguageString = {
 	fr: string;
 	kb: string;
-}
+};
 
-export enum BotMessageType{
-	USER, BOT
+export enum BotMessageType {
+	USER,
+	BOT
 }
 
 export enum ForumPostType {

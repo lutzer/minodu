@@ -1,6 +1,5 @@
 <script>
-	import ExplainPageButton from "$lib/components/common/ExplainPageButton.svelte";
-
+	import ExplainPageButton from '$lib/components/common/ExplainPageButton.svelte';
 </script>
 
 <ExplainPageButton

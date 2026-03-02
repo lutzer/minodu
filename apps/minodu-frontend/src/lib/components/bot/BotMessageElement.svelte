@@ -44,16 +44,16 @@
 					<AudioPlayer audioSource={message.audio[$language]} />
 				</div>
 			{/if}
-			{#if message.text.length > 100}
-			<p class={isError ? 'error' : ''}>
-				{message.text}
-				{#if !message.final}
-					<span class="cursor">...</span>
-				{/if}
-			</p>
+			{#if message.text.length > 0}
+				<p class={isError ? 'error' : ''}>
+					{message.text}
+					{#if !message.final}
+						<span class="cursor">...</span>
+					{/if}
+				</p>
 			{:else}
 				<div class="spinner">
-					<LoadingSpinner fullscreen={false}/>
+					<LoadingSpinner fullscreen={false} />
 				</div>
 			{/if}
 			{#if !message.final}

@@ -8,7 +8,7 @@
 
 	onDestroy(() => {
 		stop();
-	})
+	});
 
 	let cleanupQueue: { cleanup: () => void }[] = [];
 

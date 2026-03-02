@@ -1,13 +1,22 @@
 <script lang="ts">
+	import type { Optional } from "$lib/types";
+
 	export let icon: string;
-	export let onclick: () => void;
+	export let onclick: Optional<() => void> = undefined;
+	export let link: Optional<string> = undefined
 </script>
 
 <div class="floating-button">
 	<div class="content-width">
-		<button class="big" {onclick}>
-			<img src={icon} alt="create new forum post" />
+		{#if link}
+		<a class="button big" href={link}>
+			<img src={icon} alt="floating button" />
+		</a>
+		{:else}
+		<button class="big" onclick={onclick}>
+			<img src={icon} alt="floating button" />
 		</button>
+		{/if}
 	</div>
 </div>
 
@@ -23,6 +32,11 @@
 
 	.floating-button button {
 		pointer-events: auto;
+	}
+
+	.floating-button a {
+		pointer-events: auto;
+		display: inline-block;
 	}
 
 	.floating-button .content-width {

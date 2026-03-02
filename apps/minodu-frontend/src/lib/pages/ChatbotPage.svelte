@@ -146,7 +146,7 @@
 			transition:fly={{ y: '100%', duration: TRANSITION_TIME }}
 		>
 			<button class="close-button" onclick={() => closeBot()}>
-				<img src={crossIcon} alt={t('alt.cancelResponse', $language)}/>
+				<img src={crossIcon} alt={t('alt.cancelResponse', $language)} />
 			</button>
 			<div class="message-container content-width">
 				<ul>

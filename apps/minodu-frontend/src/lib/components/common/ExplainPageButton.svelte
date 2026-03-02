@@ -57,7 +57,11 @@
 					alt={t('alt.switchLanguage', $language)}
 				/>
 			</button>
-			<audio bind:this={audio} src={$language == 'kb' ? audioKb : audioFr} onended={handleAudioEnded}>
+			<audio
+				bind:this={audio}
+				src={$language == 'kb' ? audioKb : audioFr}
+				onended={handleAudioEnded}
+			>
 			</audio>
 		{/if}
 	</div>

@@ -1,7 +1,6 @@
 <script>
-	import ExplainPageButton from "$lib/components/common/ExplainPageButton.svelte";
-	import MarketPage from "$lib/pages/MarketPage.svelte";
-
+	import ExplainPageButton from '$lib/components/common/ExplainPageButton.svelte';
+	import MarketPage from '$lib/pages/MarketPage.svelte';
 </script>
 
 <div>

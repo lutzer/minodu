@@ -35,24 +35,15 @@
 				icon={agricultureIcon}
 				iconSelected={agricultureIconDisabled}
 			/>
-			<FooterMenuButton 
-				link="/forum" 
-				icon={forumIcon} 
-				iconSelected={forumIconDisabled} />
+			<FooterMenuButton link="/forum" icon={forumIcon} iconSelected={forumIconDisabled} />
 			<FooterMenuButton
 				link="/"
 				icon={treeIcon}
 				iconSelected={treeIconDisabled}
 				strictRoute={true}
 			/>
-			<FooterMenuButton 
-				link="/weather" 
-				icon={weatherIcon} 
-				iconSelected={weatherIconDisabled} />
-			<FooterMenuButton 
-				link="/market" 
-				icon={marketIcon} 
-				iconSelected={marketIconDisabled} />
+			<FooterMenuButton link="/weather" icon={weatherIcon} iconSelected={weatherIconDisabled} />
+			<FooterMenuButton link="/market" icon={marketIcon} iconSelected={marketIconDisabled} />
 		</div>
 	</div>
 </div>
