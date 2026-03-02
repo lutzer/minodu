@@ -26,10 +26,8 @@ export class ProductCategoriesService {
       await BaseConfig.processImage(createProductCategoryDto.image);
       return category.save();
     } catch (error) {
-      if (error.code === '11000' || error.code === '23505') {
-        throw new ConflictException(`La categorie ( ${createProductCategoryDto.name} ) existe déja !}`);
-      }
       console.log('ProductCategory.create.error', error);
+      throw new ConflictException(`La categorie ( ${createProductCategoryDto.name} ) existe déja !}`);
       throw error;
     }
   }
