@@ -92,7 +92,7 @@ export class PartnerService {
     });
 
     if (!partner) {
-      throw new NotFoundException(`Partner with ID ${id} not found`);
+      throw new NotFoundException(`Le partner avec l'ID ${id} est introuvale!`);
     }
 
     // Check if partner has any associated product demands
