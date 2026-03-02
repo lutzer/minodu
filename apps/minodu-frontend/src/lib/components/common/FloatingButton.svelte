@@ -1,21 +1,23 @@
 <script lang="ts">
-	import type { Optional } from "$lib/types";
+	import { language } from '$lib/stores';
+	import { t } from '$lib/translations';
+	import type { Optional } from '$lib/types';
 
 	export let icon: string;
 	export let onclick: Optional<() => void> = undefined;
-	export let link: Optional<string> = undefined
+	export let link: Optional<string> = undefined;
 </script>
 
 <div class="floating-button">
 	<div class="content-width">
 		{#if link}
-		<a class="button big" href={link}>
-			<img src={icon} alt="floating button" />
-		</a>
+			<a class="button big" href={link}>
+				<img src={icon} alt={t('alt.floatingButton', $language)} />
+			</a>
 		{:else}
-		<button class="big" onclick={onclick}>
-			<img src={icon} alt="floating button" />
-		</button>
+			<button class="big" {onclick}>
+				<img src={icon} alt={t('alt.floatingButton', $language)} />
+			</button>
 		{/if}
 	</div>
 </div>

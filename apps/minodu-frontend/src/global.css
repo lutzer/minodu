@@ -132,17 +132,20 @@ button:disabled {
 	filter: grayscale(1);
 }
 
-button.big, .button.big {
+button.big,
+.button.big {
 	width: var(--button-big-size);
 	height: var(--button-big-size);
 }
 
-button.small, .button.small {
+button.small,
+.button.small {
 	width: 40px;
 	height: 40px;
 }
 
-button.long, .button.long {
+button.long,
+.button.long {
 	width: 90px;
 	height: 48px;
 }

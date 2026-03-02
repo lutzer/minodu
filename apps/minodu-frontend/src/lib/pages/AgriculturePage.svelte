@@ -94,17 +94,15 @@
 			{/each}
 		</ul>
 	</div>
-	<FloatingButton icon={chatbotButton} link="/agriculture/bot/"/>
+	<FloatingButton icon={chatbotButton} link="/agriculture/bot/" />
 </div>
 
 <style>
 	.floating-button {
 		position: fixed;
 		bottom: 20%;
-		right:10%;
+		right: 10%;
 	}
-
-
 
 	#categories {
 		position: fixed;
