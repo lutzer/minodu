@@ -23,7 +23,7 @@ logging.getLogger("chromadb").setLevel(logging.ERROR)
 logging.getLogger("chromadb.telemetry").setLevel(logging.CRITICAL)
 
 NUMBER_OF_RETRIEVED_CHUNKS = 3
-MAX_HISTORY_EXCHANGES = 2  # Limit conversation history for faster inference
+MAX_HISTORY_EXCHANGES = 5  # Limit conversation history for faster inference
 
 
 def truncate_history(history: str, max_exchanges: int = MAX_HISTORY_EXCHANGES) -> str:
