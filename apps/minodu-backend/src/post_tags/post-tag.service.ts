@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { DataFormater } from '../utils/data.formatter'
@@ -100,12 +100,30 @@ export class PostTagService {
 
   async remove(id: number) {
     try {
-      const one = await this.findOne(id);
-      return one.softRemove();
+      // Load tag with their posts to check for dependencies
+      const tag = await this.postTagRepository.findOne({
+        where: { id },
+        relations: {
+          posts:true
+        }
+      });
+  
+      if (!tag) {
+        throw new NotFoundException(`Le tag avec l'ID ${id} est introuvable!`);
+      }
+  
+      // Check if tag has any associated posts
+      if (tag.posts?.length > 0) {
+        throw new BadRequestException(
+          `Impossible de supprimer le tag ${tag.name} car il a ${tag.posts.length} publication(s) dans le système.`
+        );
+      }
+  
+      return await tag.softRemove();
     } catch (error) {
-      console.log('Tag.delete.error', error);
+      console.error(`Failed to delete Tag ID ${id}:`, error.message);
       throw error;
     }
-  }
+    }
 
 }
