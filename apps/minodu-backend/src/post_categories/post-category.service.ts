@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { DataFormater } from '../utils/data.formatter'
@@ -85,13 +85,31 @@ export class PostCategoryService {
   }
 
   async remove(id: number) {
-    try {
-      const one = await this.findOne(id);
-      return one.softRemove();
-    } catch (error) {
-      console.log('PostCategory.delete.error', error);
-      throw error;
+  try {
+    // Load postCategory with their posts to check for dependencies
+    const postCategory = await this.postCategoryRepository.findOne({
+      where: { id },
+      relations: {
+        posts:true
+      }
+    });
+
+    if (!postCategory) {
+      throw new NotFoundException(`La catégorie avec l'ID ${id} est introuvable!`);
     }
+
+    // Check if postCategory has any associated posts
+    if (postCategory.posts?.length > 0) {
+      throw new BadRequestException(
+        `Impossible de supprimer la catégorie ${postCategory.name} car elle a ${postCategory.posts.length} publication(s) dans le système.`
+      );
+    }
+
+    return await postCategory.softRemove();
+  } catch (error) {
+    console.error(`Failed to delete PostCategory ID ${id}:`, error.message);
+    throw error;
+  }
   }
 
 }
