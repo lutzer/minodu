@@ -56,13 +56,16 @@
 <style>
 	.post {
 		position: relative;
-		padding: var(--small-padding);
+		padding: var(--medium-padding);
 		margin-bottom: var(--medium-padding);
 		border-radius: var(--border-radius);
 	}
 
 	.vertical-layout {
 		width: 100%;
+		display: flex;
+		flex-direction: column;
+		gap: var(--small-padding);
 	}
 
 	.horizontal-layout {

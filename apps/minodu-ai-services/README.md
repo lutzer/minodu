@@ -5,6 +5,7 @@
 * install olama `curl -fsSL https://ollama.com/install.sh | sh` or on mac: `brew install ollama`
 * add olama to autostart: `sudo systemctl enable ollama` (or manually start ollama with `ollama serve`)
 * install models: `ollama pull llama3.2:1b && ollama pull nomic-embed-text && ollama pull all-minilm:l6-v2`
+* **For fastest inference**: use `llama3.2:1b-instruct-q4_0` - lower quantization for faster first token generation
 * install ffmpeg: `sudo apt-get install ffmpeg`
 
 ## Docker Setup

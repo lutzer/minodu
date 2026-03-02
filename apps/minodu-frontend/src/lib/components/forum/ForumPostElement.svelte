@@ -82,7 +82,9 @@
 						{:else if file.processing_state == 'error'}
 							<div class="processing-error">{t('forum.errorProcessingFile', $language)}</div>
 						{:else if file.content_type.startsWith('audio')}
-							<AudioPlayer audioSource={file.file_urlpath}></AudioPlayer>
+							<div class="audio-player">
+								<AudioPlayer audioSource={file.file_urlpath}></AudioPlayer>
+							</div>
 						{:else if file.content_type.startsWith('image')}
 							<div class="image">
 								<img src={file.file_urlpath} alt={t('alt.noDescription', $language)} />
@@ -102,7 +104,7 @@
 				<button class="expand-button" onclick={() => (expanded = !expanded)}>
 					<img
 						src={expandPostButton}
-						alt={expanded ? 'collapse' : 'expand'}
+						alt={expanded ? t('alt.collapse', $language) : t('alt.expand', $language)}
 						class:rotated={expanded}
 					/>
 				</button>
@@ -186,6 +188,10 @@
 		object-fit: contain;
 		border-radius: var(--border-radius);
 		overflow: hidden;
+	}
+
+	.audio-player {
+		padding: var(--small-padding) 0;
 	}
 
 	.processing {

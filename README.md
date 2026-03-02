@@ -87,9 +87,12 @@ or run all three steps with
 MYSQL_USER=minodu_user
 MYSQL_PASSWORD=<password>
 MYSQL_ROOT_PASSWORD=<rootpassword>
+DB_NAME=minodu
 JWT_SECRET_KEY=secret
-ENVIRONMENT=production
 FORUM_ADMIN_PASSWORD=<some_password>
+ADMIN_PASSWORD=<admin_password>
+ADMIN_PHONE=<90000000>
+ENVIRONMENT=production
 ```
 * setup ollama
 ```

@@ -97,6 +97,7 @@ This file contains guidelines, practices, and principles that should be consider
 - Keep commits focused on single changes
 - Test before committing
 - Dont do a commit when tests are failing
+- make sure that files that appear in .gitattributes are propely pushed as lfs pointers
 
 ---
 

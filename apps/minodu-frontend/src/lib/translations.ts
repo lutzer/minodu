@@ -47,6 +47,18 @@ const translations: TranslationStrings = {
 		fr: 'Réponse',
 		kb: 'Igisubizo'
 	},
+	'chatbot.noMessages': {
+		fr: "Il n'y a pas encore de messages dans cette conversation",
+		kb: 'Nta butumwa buriho muri iki kiganiro'
+	},
+	'chatbot.you': {
+		fr: 'Vous',
+		kb: 'Wowe'
+	},
+	'chatbot.botName': {
+		fr: 'Minodu Bot',
+		kb: 'Minodu Bot'
+	},
 
 	// Actions
 	'action.record': {
@@ -146,6 +158,28 @@ const translations: TranslationStrings = {
 		kb: 'Nta butumwa mu cyiciro wahisemo. Hitamo ikindi cyiciro.'
 	},
 
+	// Market
+	'market.noDemands': {
+		fr: 'Pas de demandes de produits disponibles.',
+		kb: 'Nta bisabwa biboneka.'
+	},
+	'market.phone-icon': {
+		fr: 'Appelez l\'administrateur.',
+		kb: 'Nta bisabwa biboneka.'
+	},
+	'product.demand-image': {
+		fr: 'Image du produit demandé',
+		kb: 'Ishusho y\'igicuruzwa gisabwa'
+	},
+	'product.demand-hand-product': {
+		fr: 'Quantité demandée',
+		kb: 'Ingano isabwa'
+	},
+	'product.demand-hand-money': {
+		fr: 'Prix proposé',
+		kb: 'Igiciro gitangwa'
+	},
+
 	// Accessibility / Alt texts
 	'alt.playPauseAudio': {
 		fr: "Bouton pour démarrer/mettre en pause l'audio",
@@ -222,6 +256,26 @@ const translations: TranslationStrings = {
 	'alt.iconTextPost': {
 		fr: 'Icône pour les messages texte',
 		kb: 'Ishusho yo kohereza inyandiko'
+	},
+	'alt.clearChatIcon': {
+		fr: 'Icône pour effacer la conversation',
+		kb: 'Ishusho yo gusiba ikiganiro'
+	},
+	'alt.expand': {
+		fr: 'Développer',
+		kb: 'Kwerekana byose'
+	},
+	'alt.collapse': {
+		fr: 'Réduire',
+		kb: 'Kugabanya'
+	},
+	'alt.categoryIcon': {
+		fr: 'Icône de catégorie pour',
+		kb: 'Ishusho yicyiciro cya'
+	},
+	'alt.cancelResponse': {
+		fr: 'Annuler la réponse du chatbot',
+		kb: 'annuler la réponse du chatbot'
 	}
 };
 

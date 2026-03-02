@@ -22,6 +22,7 @@ class Config:
         self._ollama_host = None
         self._embedding_model = None
         self._database_path = None
+        self._rag_log_path = None
 
     @property
     def port(self):
@@ -57,4 +58,15 @@ class Config:
                 script_dir = os.path.dirname(os.path.abspath(__file__))
                 self._database_path = os.path.join(script_dir, "..", env_dir)
         return self._database_path
+
+    @property
+    def rag_log_path(self):
+        if self._rag_log_path is None:
+            env_path = os.getenv("RAG_LOG_PATH", "logs/rag_requests.log")
+            if os.path.isabs(env_path):
+                self._rag_log_path = env_path
+            else:
+                script_dir = os.path.dirname(os.path.abspath(__file__))
+                self._rag_log_path = os.path.join(script_dir, "..", env_path)
+        return self._rag_log_path
 

@@ -3,6 +3,7 @@
 	import TextToSpeechButton from '../common/TextToSpeechButton.svelte';
 	import TextToSpeechPlayer from '../common/TextToSpeechPlayer.svelte';
 	import { language } from '$lib/stores';
+	import { t } from '$lib/translations';
 
 	import botAvatarImage from '$lib/assets/chatbot-avatar.png';
 	import crossIcon from '$lib/assets/cross_icon_white.png';
@@ -15,47 +16,47 @@
 	let isError: boolean = false;
 
 	$: isError = message.type == BotMessageType.BOT && message.text.trimStart().startsWith('[ERROR:');
-	
 </script>
 
-<div class="bot-message shadow {message.type == BotMessageType.USER ? "user" : "bot"}">
+<div class="bot-message shadow {message.type == BotMessageType.USER ? 'user' : 'bot'}">
 	{#if message.type == BotMessageType.USER}
-	<div class="message-text">
-		<h3>You</h3>
-		<p>{message.text}</p>
-	</div>
-	<div class="message-side">
-		<TextToSpeechButton text={message.text} {ttsPlayer} />
-	</div>
+		<div class="message-text">
+			<h3>{t('chatbot.you', $language)}</h3>
+			<p>{message.text}</p>
+		</div>
+		<div class="message-side">
+			<TextToSpeechButton text={message.text} {ttsPlayer} />
+		</div>
 	{:else}
-	<div class="message-side">
-		<div class="chatbot-avatar"> 
-			<img src={botAvatarImage} alt="Icon of the chatbot"/>
-		</div>
-		{#if message.final}
-		<TextToSpeechButton text={message.text} {ttsPlayer} />
-		{/if}
-	</div>
-	<div class="message-text">
-		<h3>Minodu Bot</h3>
-		{#if message.audio && $language}
-		<AudioPlayer
-			audioSource={message.audio[$language]}/>
-		{/if}
-		<p class={isError ? 'error' : ''}>
-			{message.text}
-			{#if !message.final}
-			<span class="cursor">...</span>
+		<div class="message-side">
+			<div class="chatbot-avatar">
+				<img src={botAvatarImage} alt={t('alt.chatbotIcon', $language)} />
+			</div>
+			{#if message.final}
+				<TextToSpeechButton text={message.text} {ttsPlayer} />
 			{/if}
-		</p>
-		{#if !message.final}
-		<div class="stop-button-container">
-			<button class="stop-button small shadow" onclick={onCancelResponse}>
-				<img src={crossIcon}/>
-			</button>
 		</div>
-		{/if}
-	</div>
+		<div class="message-text">
+			<h3>{t('chatbot.botName', $language)}</h3>
+			{#if message.audio && $language}
+				<div class="audio-player">
+					<AudioPlayer audioSource={message.audio[$language]} />
+				</div>
+			{/if}
+			<p class={isError ? 'error' : ''}>
+				{message.text}
+				{#if !message.final}
+					<span class="cursor">...</span>
+				{/if}
+			</p>
+			{#if !message.final}
+				<div class="stop-button-container">
+					<button class="stop-button small shadow" onclick={onCancelResponse}>
+						<img src={crossIcon} />
+					</button>
+				</div>
+			{/if}
+		</div>
 	{/if}
 </div>
 
@@ -69,8 +70,8 @@
 	}
 
 	.bot-message.user {
-		background-color: #FFE9B3;
-		--box-shadow-color: #D9C38C;
+		background-color: #ffe9b3;
+		--box-shadow-color: #d9c38c;
 		margin-left: calc(var(--medium-padding) + var(--small-padding));
 	}
 
@@ -110,7 +111,8 @@
 		color: white;
 		background-color: red;
 		padding: var(--small-padding);
-		border-radius: var(--border-radius)
+		border-radius: var(--border-radius);
+		white-space: normal;
 	}
 
 	.stop-button-container {
@@ -129,6 +131,10 @@
 		gap: var(--small-padding);
 		padding: var(--small-padding);
 		width: auto;
+	}
+
+	.audio-player {
+		padding: var(--small-padding) 0;
 	}
 
 	/* .stop-button img {

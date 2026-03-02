@@ -4,7 +4,7 @@
     let { children } = $props();
 </script>
 
-<div class="agriculture-page-container">
+<div>
 	<AgriculturePage />
     {@render children?.()}
 </div>

@@ -92,14 +92,12 @@
 		onloadedmetadata={onLoadedMetadata}
 		onended={onEnded}
 	></audio>
-	<div class="button">
-		<button class="play-button" onclick={() => (isPlaying ? pausePlayback() : startPlayback())}>
-			<img
-				src={isPlaying ? pauseButtonImage : playButtonImage}
-				alt={t('alt.playPauseAudio', $language)}
-			/>
-		</button>
-	</div>
+	<button class="play-button" onclick={() => (isPlaying ? pausePlayback() : startPlayback())}>
+		<img
+			src={isPlaying ? pauseButtonImage : playButtonImage}
+			alt={t('alt.playPauseAudio', $language)}
+		/>
+	</button>
 	<div
 		class="slider"
 		bind:this={progressBar}
@@ -128,7 +126,6 @@
 		background-color: #fff8e5;
 		display: flex;
 		align-items: center;
-		margin: var(--small-padding) 0;
 	}
 
 	.play-button {

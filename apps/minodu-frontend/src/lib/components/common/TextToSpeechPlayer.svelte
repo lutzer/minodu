@@ -1,9 +1,14 @@
 <script lang="ts">
 	import { Config } from '$lib';
 	import { AiServicesApi } from '$lib/apis/ai_services/api';
+	import { onDestroy } from 'svelte';
 	import { writable } from 'svelte/store';
 
 	export const playbackReset = writable<{ timestamp: number } | null>(null);
+
+	onDestroy(() => {
+		stop();
+	})
 
 	let cleanupQueue: { cleanup: () => void }[] = [];
 
