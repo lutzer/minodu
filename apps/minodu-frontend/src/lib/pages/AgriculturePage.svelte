@@ -17,10 +17,13 @@
 
 	let scrollContainer: HTMLDivElement;
 
+	let loading: boolean = true;
+
 	import solIcon from '$lib/assets/agriculture-cat-sol-icon.png';
 	import autresIcon from '$lib/assets/agriculture-cat-autres-icon.png';
 	import elevageIcon from '$lib/assets/agriculture-cat-elevage-icon.png';
 	import plantesIcon from '$lib/assets/agriculture-cat-plantes-icon.png';
+	import LoadingSpinner from '$lib/components/common/LoadingSpinner.svelte';
 
 	const categoryIcons: Record<string, string> = {
 		SOL: solIcon,
@@ -33,6 +36,7 @@
 		posts = await BackendApi.getPosts();
 		categories = await BackendApi.getCategories();
 		selectedCategoryIds = new SvelteSet(categories.map((c) => c.id));
+		loading = false;
 	});
 
 	function toggleCategory(id: number) {
@@ -49,6 +53,9 @@
 
 <div>
 	<div class="scroll-container" bind:this={scrollContainer}>
+		{#if loading}
+			<LoadingSpinner text={t('agriculture.loadingText',$language)}/>
+		{:else}
 		<div class="post-container content-width">
 			{#if filteredPosts.length > 0}
 				<ul>
@@ -64,6 +71,7 @@
 				</div>
 			{/if}
 		</div>
+		{/if}
 	</div>
 	<div id="categories" class="content-width">
 		<ul>

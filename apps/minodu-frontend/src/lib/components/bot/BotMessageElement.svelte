@@ -8,6 +8,7 @@
 	import botAvatarImage from '$lib/assets/chatbot-avatar.png';
 	import crossIcon from '$lib/assets/cross_icon_white.png';
 	import AudioPlayer from '../common/AudioPlayer.svelte';
+	import LoadingSpinner from '../common/LoadingSpinner.svelte';
 
 	export let message: BotMessage;
 	export let ttsPlayer: TextToSpeechPlayer;
@@ -43,12 +44,18 @@
 					<AudioPlayer audioSource={message.audio[$language]} />
 				</div>
 			{/if}
+			{#if message.text.length > 100}
 			<p class={isError ? 'error' : ''}>
 				{message.text}
 				{#if !message.final}
 					<span class="cursor">...</span>
 				{/if}
 			</p>
+			{:else}
+				<div class="spinner">
+					<LoadingSpinner fullscreen={false}/>
+				</div>
+			{/if}
 			{#if !message.final}
 				<div class="stop-button-container">
 					<button class="stop-button small shadow" onclick={onCancelResponse}>
@@ -135,6 +142,10 @@
 
 	.audio-player {
 		padding: var(--small-padding) 0;
+	}
+
+	.spinner {
+		margin: calc(2 * var(--medium-padding)) 0;
 	}
 
 	/* .stop-button img {

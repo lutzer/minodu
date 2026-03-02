@@ -16,6 +16,7 @@
 	import AuthorDeleteDialog from '$lib/components/forum/AuthorDeleteDialog.svelte';
 	import FloatingForumButtons from '$lib/components/forum/FloatingForumButtons.svelte';
 	import DeletePostDialog from '$lib/components/forum/DeletePostDialog.svelte';
+	import LoadingSpinner from '$lib/components/common/LoadingSpinner.svelte';
 
 	let ttsPlayer: TextToSpeechPlayer;
 
@@ -40,6 +41,8 @@
 
 	let createPostType: ForumPostType = ForumPostType.TEXT;
 	let deletePostId: Optional<number>;
+
+	let loading : boolean = true
 
 	onMount(() => {
 		initialLoad();
@@ -66,6 +69,8 @@
 		const result = await ForumApi.getPostsPaginated();
 		posts = result.posts;
 		hasMore = result.has_more;
+
+		loading = false;
 		
 		await login();
 
@@ -193,6 +198,9 @@
 
 <div class="forum-page">
 	<div class="scroll-container" bind:this={scrollContainer} on:scroll={onScroll}>
+	{#if loading}
+		<LoadingSpinner text={t('forum.loadingText',$language)}/>
+	{:else}
 		<div class="post-container content-width">
 			{#if isLoadingMore}
 				<div class="loading-more">
@@ -222,6 +230,7 @@
 				
 			{/if}
 		</div>
+	{/if}
 	</div>
 	{#if showFloatingButtons}
 		<FloatingForumButtons
