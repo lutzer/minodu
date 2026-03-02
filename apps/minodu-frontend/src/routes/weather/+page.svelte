@@ -1,9 +1,13 @@
-<script lang="ts">
-	import { language } from '$lib/stores';
-	import { t } from '$lib/translations';
+<script>
+	import ExplainPageButton from "$lib/components/common/ExplainPageButton.svelte";
+	import WeatherPage from "$lib/pages/WeatherPage.svelte";
+
 </script>
 
 <div>
-	<a href="/">{t('nav.home', $language)}</a>
-	<h2>{t('nav.weather', $language)}</h2>
+	<WeatherPage />
+	<ExplainPageButton
+		audioFr="https://audio-samples.github.io/samples/mp3/blizzard_unconditional/sample-0.mp3"
+		audioKb="https://audio-samples.github.io/samples/mp3/blizzard_unconditional/sample-1.mp3"
+	/>
 </div>
