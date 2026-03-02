@@ -15,22 +15,21 @@
 	let scrollContainer: HTMLDivElement;
 	let ttsPlayer: TextToSpeechPlayer;
 
+	let loading : boolean = true;
+
 	import type { BackendProductDemand } from '$lib/apis/backend/models/backendProductDemand';
 	import type { BackendContact } from '$lib/apis/backend/models/backendContact';
 	import { mockProductDemands } from '$lib/mocks';
 	import MarketDemandElement from '$lib/components/market/MarketDemandElement.svelte';
 	import TextToSpeechPlayer from '$lib/components/common/TextToSpeechPlayer.svelte';
 	import { goto } from '$app/navigation';
+	import LoadingSpinner from '$lib/components/common/LoadingSpinner.svelte';
 
 
 	onMount(async () => {
 		contact = await BackendApi.getContactPerson();
 		demands = await BackendApi.getProductDemands();
-		// demands = import.meta.env.DEV ?
-		// 	(await import('$lib/mocks')).mockProductDemands : 
-		// 	await BackendApi.getProductDemands();
-
-		console.log(demands)
+		loading = false;
 	});
 
 	function onPhoneButtonClicked() {
@@ -40,6 +39,9 @@
 
 <div>
 	<div class="scroll-container" bind:this={scrollContainer}>
+	{#if loading}
+		<LoadingSpinner text={t('market.loadingText',$language)}/>
+	{:else}
 		<div class="contact-container content-width" style="background-image: url({contactBackground}">
 			<h1>Contact</h1>
 			<h2>{contact?.fullname}</h2>
@@ -63,6 +65,7 @@
 			</div>
 			{/if}
 		</div>
+	{/if}
 	</div>
 	
 	<TextToSpeechPlayer bind:this={ttsPlayer} />

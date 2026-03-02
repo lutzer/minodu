@@ -118,10 +118,8 @@ async def extract_sources(request: RagSourceRequest):
         score=score
     )
 
-
 class WelcomeResponse(BaseModel):
     text: str
-
 
 @app.get("/rag/welcome/{language}/", response_model=WelcomeResponse)
 async def get_welcome_message(language: LanguageEnum):
@@ -160,7 +158,6 @@ async def get_welcome_message_stream(language: LanguageEnum):
             'Transfer-Encoding': 'chunked'
         }
     )
-
 
 @app.get("/rag/welcome/{language}/{source_id}/stream")
 async def get_welcome_message_with_source_stream(source_id: int, language: LanguageEnum):
@@ -263,7 +260,6 @@ class TtsRequest(BaseModel):
     text: str
     return_header: bool = True
     format: str = "wav"
-
 
 @app.post("/tts/synthesize")
 async def synthesize_speech(request: TtsRequest):

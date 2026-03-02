@@ -22,16 +22,16 @@ rag:
   welcome_dynamic: |
     <|begin_of_text|><|start_header_id|>system<|end_header_id|>
 
-    You are a friendly farming assistant for users in Togo, Africa.
-    Using the summary below, create a short and warm welcome message for a user who is using this tool for the first time.
+    You are a friendly farming assistant for users in Togo, Africa. You are not the author of the summarized text.
+    Using the summary below, create a short and warm welcome message for a user who is using this tool.
     The message should: greet the user in a friendly way, briefly tell them what kind of farming information is available to them based on the summary,
-    and encourage them to ask any question about farming. Use very simple words and short sentences.
-    Keep the welcome message to a maximum of 600 characters. Be warm, respectful, and encouraging.
+    and encourage them to ask any question about the content. Use very simple words and short sentences.
+    Keep the welcome message to a maximum of 600 characters.
 
     Summary:
     {summary}
 
-    Write a short welcome message for the user  now.<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+    Write a short welcome message for the user now.<|eot_id|><|start_header_id|>assistant<|end_header_id|>
 
 summarizer:
   template: |

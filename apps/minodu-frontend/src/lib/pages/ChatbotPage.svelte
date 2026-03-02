@@ -32,7 +32,7 @@
 
 	onMount(async () => {
 		if (saveChat) messages = Storage.chatMessages;
-		await tick();
+		// await tick();
 		showPanel = true;
 	});
 
