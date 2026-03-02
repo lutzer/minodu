@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { DataFormater } from '../utils/data.formatter'
@@ -93,10 +93,28 @@ export class ProductCategoriesService {
 
   async remove(id: number) {
     try {
-      const one = await this.findOne(id);
-      return one.softRemove();
+      // Load product category with their products to check for dependencies
+      const productCategory = await this.productCategoryRepository.findOne({
+        where: { id },
+        relations: {
+          products:true
+        }
+      });
+  
+      if (!productCategory) {
+        throw new NotFoundException(`La catégorie de produit avec l'ID ${id} est introuvable!`);
+      }
+  
+      // Check if tag has any associated posts
+      if (productCategory.products?.length > 0) {
+        throw new BadRequestException(
+          `Impossible de supprimer la catégorie de produit ${productCategory.name} car elle a ${productCategory.products.length} produit(s) dans le système.`
+        );
+      }
+  
+      return await productCategory.softRemove();
     } catch (error) {
-      console.log('ProductCategory.delete.error', error);
+      console.error(`Failed to delete Product Category ID ${id}:`, error.message);
       throw error;
     }
   }
