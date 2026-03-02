@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { DataFormater } from '../utils/data.formatter'
@@ -22,10 +22,8 @@ export class PartnerService {
       partner.phone = createPartnerDto.phone;
       return partner.save();
     } catch (error) {
-      if (error.code === '11000' || error.code === '23505') {
-        throw new ConflictException(`Le partenaire ( ${createPartnerDto.name} ) existe déja !}`);
-      }
       console.log('Partner.create.error', error);
+      throw new ConflictException(`Le partenaire ( ${createPartnerDto.name} ) existe déja !}`);
       throw error;
     }
   }
@@ -84,13 +82,31 @@ export class PartnerService {
   }
 
   async remove(id: number) {
-    try {
-      const one = await this.findOne(id);
-      return one.softRemove();
-    } catch (error) {
-      console.log('Partner.delete.error', error);
-      throw error;
+  try {
+    // Load partner with their demands to check for dependencies
+    const partner = await this.partnerRepository.findOne({
+      where: { id },
+      relations: {
+        productDemands:true
+      }
+    });
+
+    if (!partner) {
+      throw new NotFoundException(`Partner with ID ${id} not found`);
     }
+
+    // Check if partner has any associated product demands
+    if (partner.productDemands?.length > 0) {
+      throw new BadRequestException(
+        `Impossible de supprimer le partenaire ${partner.name} car il/elle a ${partner.productDemands.length} demande(s) de produit dans le système.`
+      );
+    }
+
+    return await partner.softRemove();
+  } catch (error) {
+    console.error(`Failed to delete partner ID ${id}:`, error.message);
+    throw error;
   }
+}
 
 }
