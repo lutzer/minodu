@@ -11,271 +11,271 @@ const translations: TranslationStrings = {
 	// Navigation
 	'nav.home': {
 		fr: 'Accueil',
-		kb: 'Ahabanza'
+		kb: 'needs-translation'
 	},
 	'nav.forum': {
 		fr: 'Forum',
-		kb: 'Inama'
+		kb: 'needs-translation'
 	},
 	'nav.weather': {
 		fr: 'Météo',
-		kb: 'Ikirere'
+		kb: 'needs-translation'
 	},
 	'nav.agriculture': {
 		fr: 'Agriculture',
-		kb: 'Ubuhinzi'
+		kb: 'needs-translation'
 	},
 	'nav.market': {
 		fr: 'Marché',
-		kb: 'Isoko'
+		kb: 'needs-translation'
 	},
 
 	// Chatbot
 	'chatbot.title': {
 		fr: 'Chatbot',
-		kb: 'Chatbot'
+		kb: 'needs-translation'
 	},
 	'chatbot.forPost': {
 		fr: 'Chatbot pour id',
-		kb: 'Chatbot ku id'
+		kb: 'needs-translation'
 	},
 	'chatbot.question': {
 		fr: 'Question',
-		kb: 'Ikibazo'
+		kb: 'needs-translation'
 	},
 	'chatbot.answer': {
 		fr: 'Réponse',
-		kb: 'Igisubizo'
+		kb: 'needs-translation'
 	},
 	'chatbot.noMessages': {
 		fr: "Il n'y a pas encore de messages dans cette conversation",
-		kb: 'Nta butumwa buriho muri iki kiganiro'
+		kb: 'needs-translation'
 	},
 	'chatbot.you': {
 		fr: 'Vous',
-		kb: 'Wowe'
+		kb: 'needs-translation'
 	},
 	'chatbot.botName': {
 		fr: 'Minodu Bot',
-		kb: 'Minodu Bot'
+		kb: 'needs-translation'
 	},
 
 	// Actions
 	'action.record': {
 		fr: 'Enregistrer',
-		kb: 'Fata amajwi'
+		kb: 'needs-translation'
 	},
 	'action.stop': {
 		fr: 'Arrêter',
-		kb: 'Hagarika'
+		kb: 'needs-translation'
 	},
 	'action.cancel': {
 		fr: 'Annuler',
-		kb: 'Kureka'
+		kb: 'needs-translation'
 	},
 	'action.send': {
 		fr: 'Envoyer',
-		kb: 'Ohereza'
+		kb: 'needs-translation'
 	},
 	'action.submit': {
 		fr: 'Soumettre',
-		kb: 'Ohereza'
+		kb: 'needs-translation'
 	},
 	'action.clearChat': {
 		fr: 'Effacer le chat',
-		kb: 'Siba ikiganiro'
+		kb: 'needs-translation'
 	},
 	'action.ok': {
 		fr: 'Ok',
-		kb: 'Yego'
+		kb: 'needs-translation'
 	},
 	'action.delete': {
 		fr: 'Supprimer',
-		kb: 'Supprimer'
+		kb: 'needs-translation'
 	},
 
 	// Forum
 	'forum.noPosts': {
 		fr: 'Pas encore de messages. Cliquez sur le bouton ci-dessous pour commencer une conversation.',
-		kb: 'Nta butumwa buriho. Kanda kuri buto hepfo utangire ikiganiro.'
+		kb: 'needs-translation'
 	},
 	'forum.processingFile': {
 		fr: 'Traitement du fichier',
-		kb: 'Gutunganya dosiye'
+		kb: 'needs-translation'
 	},
 	'forum.errorProcessingFile': {
 		fr: 'Erreur lors du traitement du fichier',
-		kb: 'Ikosa mu gutunganya dosiye'
+		kb: 'needs-translation'
 	},
 	'forum.createAuthor': {
 		fr: 'Créer un auteur',
-		kb: 'Kora umwanditsi'
+		kb: 'needs-translation'
 	},
 	'forum.name': {
 		fr: 'Nom',
-		kb: 'Izina'
+		kb: 'needs-translation'
 	},
 	'forum.avatar': {
 		fr: 'Avatar',
-		kb: 'Ishusho'
+		kb: 'needs-translation'
 	},
 	'forum.yourName': {
 		fr: 'Votre nom',
-		kb: 'Votre nom'
+		kb: 'needs-translation'
 	},
 	'forum.deleteAuthor': {
 		fr: 'Supprimer le profil ?',
-		kb: 'Supprimer le profil ?'
+		kb: 'needs-translation'
 	},
 	'forum.transcription': {
 		fr: 'Transcription',
-		kb: 'Transcription'
+		kb: 'needs-translation'
 	},
 	'forum.deletePost': {
 		fr: 'Supprimer le message',
-		kb: 'Supprimer le message'
+		kb: 'needs-translation'
 	},
 	'forum.errorFileTooLarge': {
 		fr: 'Le fichier est trop volumineux (max 5 Mo)',
-		kb: 'Dosiye irenze urugero (max 5 Mo)'
+		kb: 'needs-translation'
 	},
 	'forum.errorFileUpload': {
 		fr: "Erreur lors de l'envoi du fichier",
-		kb: 'Ikosa mu kohereza dosiye'
+		kb: 'needs-translation'
 	},
 	'forum.errorTextTooLong': {
 		fr: 'Le texte est trop long (max 5000 caractères)',
-		kb: 'Inyandiko ni ndende cyane (max 5000)'
+		kb: 'needs-translation'
 	},
 	'forum.errorCreatePost': {
 		fr: 'Erreur lors de la création du message',
-		kb: 'Ikosa mu gukora ubutumwa'
+		kb: 'needs-translation'
 	},
 
 	// Agriculture
 	'agriculture.noPosts': {
 		fr: 'Pas de messages dans la catégorie sélectionnée. Veuillez sélectionner une autre catégorie.',
-		kb: 'Nta butumwa mu cyiciro wahisemo. Hitamo ikindi cyiciro.'
+		kb: 'needs-translation'
 	},
 
 	// Market
 	'market.noDemands': {
 		fr: 'Pas de demandes de produits disponibles.',
-		kb: 'Nta bisabwa biboneka.'
+		kb: 'needs-translation'
 	},
 	'market.phone-icon': {
 		fr: 'Appelez l\'administrateur.',
-		kb: 'Nta bisabwa biboneka.'
+		kb: 'needs-translation'
 	},
 	'product.demand-image': {
 		fr: 'Image du produit demandé',
-		kb: 'Ishusho y\'igicuruzwa gisabwa'
+		kb: 'needs-translation'
 	},
 	'product.demand-hand-product': {
 		fr: 'Quantité demandée',
-		kb: 'Ingano isabwa'
+		kb: 'needs-translation'
 	},
 	'product.demand-hand-money': {
 		fr: 'Prix proposé',
-		kb: 'Igiciro gitangwa'
+		kb: 'needs-translation'
 	},
 
 	// Accessibility / Alt texts
 	'alt.playPauseAudio': {
 		fr: "Bouton pour démarrer/mettre en pause l'audio",
-		kb: 'Buto yo gutangira/guhagarika amajwi'
+		kb: 'needs-translation'
 	},
 	'alt.audioProgress': {
 		fr: 'Progression audio',
-		kb: 'Aho amajwi ageze'
+		kb: 'needs-translation'
 	},
 	'alt.speakPageInfo': {
 		fr: 'Bouton pour lire les informations de la page',
-		kb: "Buto yo gusoma amakuru y'urupapuro"
+		kb: 'needs-translation'
 	},
 	'alt.switchLanguage': {
 		fr: 'Bouton pour changer de langue',
-		kb: 'Buto yo guhindura ururimi'
+		kb: 'needs-translation'
 	},
 	'alt.submitForumPost': {
 		fr: 'Soumettre le message du forum',
-		kb: "Ohereza ubutumwa bw'inama"
+		kb: 'needs-translation'
 	},
 	'alt.deleteForumPost': {
 		fr: 'Supprimer le message du forum',
-		kb: "Siba ubutumwa bw'inama"
+		kb: 'needs-translation'
 	},
 	'alt.chatbotIcon': {
 		fr: 'Icône du chatbot',
-		kb: 'Ishusho ya chatbot'
+		kb: 'needs-translation'
 	},
 	'alt.avatarOfUser': {
 		fr: "Avatar de l'utilisateur",
-		kb: "Ishusho y'ukoresha"
+		kb: 'needs-translation'
 	},
 	'alt.avatarImage': {
 		fr: "Image d'un avatar",
-		kb: "Image d'un avatar"
+		kb: 'needs-translation'
 	},
 	'alt.imageFor': {
 		fr: 'Image pour',
-		kb: 'Ishusho ya'
+		kb: 'needs-translation'
 	},
 	'alt.noDescription': {
 		fr: 'Pas de description',
-		kb: 'Nta bisobanuro'
+		kb: 'needs-translation'
 	},
 	'alt.tilesShowingApps': {
 		fr: '4 tuiles minodu montrant différentes applications',
-		kb: '4 tiles za minodu zerekana porogaramu zitandukanye'
+		kb: 'needs-translation'
 	},
 	'alt.rainyCloud': {
 		fr: 'Un nuage pluvieux dans le ciel',
-		kb: 'Igicu gifite imvura mu kirere'
+		kb: 'needs-translation'
 	},
 	'alt.speechBubble': {
 		fr: 'Deux personnes et une bulle de dialogue',
-		kb: "Abantu babiri n'igishushanyo cy'ikiganiro"
+		kb: 'needs-translation'
 	},
 	'alt.backForumPost': {
 		fr: 'retour',
-		kb: 'retour'
+		kb: 'needs-translation'
 	},
 	'alt.createForumPost': {
 		fr: 'Créer un nouveau message',
-		kb: 'Kora ubutumwa bushya'
+		kb: 'needs-translation'
 	},
 	'alt.iconAudioPost': {
 		fr: 'Icône pour les messages audio',
-		kb: 'Ishusho yo kohereza amajwi'
+		kb: 'needs-translation'
 	},
 	'alt.iconImagePost': {
 		fr: 'Icône pour les messages photo',
-		kb: 'Ishusho yo kohereza ifoto'
+		kb: 'needs-translation'
 	},
 	'alt.iconTextPost': {
 		fr: 'Icône pour les messages texte',
-		kb: 'Ishusho yo kohereza inyandiko'
+		kb: 'needs-translation'
 	},
 	'alt.clearChatIcon': {
 		fr: 'Icône pour effacer la conversation',
-		kb: 'Ishusho yo gusiba ikiganiro'
+		kb: 'needs-translation'
 	},
 	'alt.expand': {
 		fr: 'Développer',
-		kb: 'Kwerekana byose'
+		kb: 'needs-translation'
 	},
 	'alt.collapse': {
 		fr: 'Réduire',
-		kb: 'Kugabanya'
+		kb: 'needs-translation'
 	},
 	'alt.categoryIcon': {
 		fr: 'Icône de catégorie pour',
-		kb: 'Ishusho yicyiciro cya'
+		kb: 'needs-translation'
 	},
 	'alt.cancelResponse': {
 		fr: 'Annuler la réponse du chatbot',
-		kb: 'annuler la réponse du chatbot'
+		kb: 'needs-translation'
 	}
 };
 
