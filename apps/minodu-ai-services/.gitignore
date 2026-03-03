@@ -8,5 +8,7 @@ minodu_ai_services/models/stt_models/*.*
 minodu_ai_services/models/stt_models/*.zip
 minodu_ai_services/data
 minodu_ai_services/documents
+minodu_ai_services/logs
 
 tests/testdata
+

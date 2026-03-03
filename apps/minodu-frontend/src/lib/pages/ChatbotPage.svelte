@@ -32,7 +32,6 @@
 
 	onMount(async () => {
 		if (saveChat) messages = Storage.chatMessages;
-		// await tick();
 		showPanel = true;
 	});
 
@@ -80,45 +79,49 @@
 		};
 		messages = [...messages, welcome];
 
-		streamAbortController = new AbortController();
-		let stream = streamResponseGenerator(
-			await AiServicesApi.getWelcomeMessageStream(Config.language, post?.id),
-			streamAbortController.signal
-		);
+		try {
+			streamAbortController = new AbortController();
+			let stream = streamResponseGenerator(
+				await AiServicesApi.getWelcomeMessageStream(Config.language, post?.id),
+				streamAbortController.signal
+			);
 
-		for await (const chunk of stream) {
-			welcome.text += chunk;
+			for await (const chunk of stream) {
+				welcome.text += chunk;
+				messages = messages;
+			}
+		} finally {
+			welcome.final = true;
 			messages = messages;
+			streamAbortController = undefined;
 		}
-
-		welcome.final = true;
-		messages = messages;
-		streamAbortController = undefined;
 	}
 
 	async function requestAnswer(question: string, conversation: string) {
 		let response = { text: '', type: BotMessageType.BOT, final: false };
 		messages = [...messages, response];
-
 		streamAbortController = new AbortController();
-		let stream = streamResponseGenerator(
-			await AiServicesApi.generateRagResponse({
-				language: Config.language,
-				conversation: conversation,
-				question: question,
-				source_id: post?.id
-			}),
-			streamAbortController.signal
-		);
 
-		for await (const chunk of stream) {
-			response.text += chunk;
+		try {
+			const stream = streamResponseGenerator(
+				await AiServicesApi.generateRagResponse({
+					language: Config.language,
+					conversation: conversation,
+					question: question,
+					source_id: post?.id
+				}),
+				streamAbortController.signal
+			);
+
+			for await (const chunk of stream) {
+				response.text += chunk;
+				messages = messages;
+			}
+		} finally {
+			response.final = true;
 			messages = messages;
+			streamAbortController = undefined;
 		}
-
-		response.final = true;
-		messages = messages;
-		streamAbortController = undefined;
 	}
 
 	export function stopAnswer() {

@@ -42,6 +42,7 @@ docker exec -it minodu-ai /bin/sh
 
 ### Add Documents to chatbot
 
+* enter docker container with `docker exec -it minodu-minodu-ai-services-1 /bin/bash`
 * add documents with `python src/rag.py --add-docs data/documents/fr/ --language=fr`
 * add documents with `python src/rag.py --add-docs data/documents/en/ --language=en`
 

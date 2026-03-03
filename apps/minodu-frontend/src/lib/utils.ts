@@ -76,5 +76,6 @@ export async function* streamResponseGenerator(
 		}
 	} finally {
 		reader.releaseLock();
+		return "";
 	}
 }

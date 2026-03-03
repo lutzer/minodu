@@ -14,8 +14,6 @@
 	export let ttsPlayer: TextToSpeechPlayer;
 	export let onCancelResponse: () => void;
 
-	let isError: boolean = false;
-
 	$: isError = message.type == BotMessageType.BOT && message.text.trimStart().startsWith('[ERROR:');
 </script>
 
@@ -44,22 +42,22 @@
 					<AudioPlayer audioSource={message.audio[$language]} />
 				</div>
 			{/if}
-			{#if message.text.length > 0}
+			{#if message.text.length == 0}
+				<div class="spinner">
+					<LoadingSpinner fullscreen={false} />
+				</div>
+			{:else}
 				<p class={isError ? 'error' : ''}>
 					{message.text}
 					{#if !message.final}
 						<span class="cursor">...</span>
 					{/if}
 				</p>
-			{:else}
-				<div class="spinner">
-					<LoadingSpinner fullscreen={false} />
-				</div>
 			{/if}
 			{#if !message.final}
 				<div class="stop-button-container">
 					<button class="stop-button small shadow" onclick={onCancelResponse}>
-						<img src={crossIcon} />
+						<img src={crossIcon} alt={t('chatbot.cancelButton', $language)}/>
 					</button>
 				</div>
 			{/if}

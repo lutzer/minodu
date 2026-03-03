@@ -28,12 +28,9 @@
     onMount(async () => {
 		const data = await BackendApi.getWeatherCurrent()
 		if (data.length > 0) weather = data[0]
-
-        console.log(weather)
-
-        // weather.wind_direction = 0;
     })
 
+	$: loading = weather === undefined
 	$: cloud = cloudSunny;
 	$: wind = treeWind3;
 
@@ -41,6 +38,9 @@
 
 <div>
 	<div class="scroll-container">
+	{#if loading}
+		<LoadingSpinner text={t('weather.loadingText', $language)} />
+	{:else}
         {#if !weather}
             <LoadingSpinner text={t("weather.loadingText", $language)}/>
         {:else}
@@ -67,6 +67,7 @@
 			</div>
 		</div>
         {/if}
+	{/if}
 	</div>
 </div>
 
