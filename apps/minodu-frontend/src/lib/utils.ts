@@ -15,8 +15,8 @@ export function waitForAnimationFrame(): Promise<void> {
 	});
 }
 
-export function pickRandom<T>(arr: T[]) : T {
-  return arr[Math.floor(Math.random() * arr.length)];
+export function pickRandom<T>(arr: T[]): T {
+	return arr[Math.floor(Math.random() * arr.length)];
 }
 
 export function mimeTypeToFileExtension(mimeType: string): string {
@@ -80,6 +80,6 @@ export async function* streamResponseGenerator(
 		}
 	} finally {
 		reader.releaseLock();
-		return "";
+		return '';
 	}
 }

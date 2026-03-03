@@ -57,7 +57,7 @@
 			{#if !message.final}
 				<div class="stop-button-container">
 					<button class="stop-button small shadow" onclick={onCancelResponse}>
-						<img src={crossIcon} alt={t('chatbot.cancelButton', $language)}/>
+						<img src={crossIcon} alt={t('chatbot.cancelButton', $language)} />
 					</button>
 				</div>
 			{/if}

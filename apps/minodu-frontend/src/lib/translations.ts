@@ -59,6 +59,10 @@ const translations: TranslationStrings = {
 		fr: 'Minodu Bot',
 		kb: 'needs-translation'
 	},
+	'chatbot.cancelButton': {
+		fr: 'Annuler la réponse',
+		kb: 'needs-translation'
+	},
 
 	// Actions
 	'action.record': {
@@ -95,6 +99,10 @@ const translations: TranslationStrings = {
 	},
 
 	// Forum
+	'forum.loadingText': {
+		fr: 'Chargement des messages...',
+		kb: 'needs-translation'
+	},
 	'forum.noPosts': {
 		fr: 'Pas encore de messages. Cliquez sur le bouton ci-dessous pour commencer une conversation.',
 		kb: 'needs-translation'
@@ -153,12 +161,20 @@ const translations: TranslationStrings = {
 	},
 
 	// Agriculture
+	'agriculture.loadingText': {
+		fr: 'Chargement des articles...',
+		kb: 'needs-translation'
+	},
 	'agriculture.noPosts': {
 		fr: 'Pas de messages dans la catégorie sélectionnée. Veuillez sélectionner une autre catégorie.',
 		kb: 'needs-translation'
 	},
 
 	// Market
+	'market.loadingText': {
+		fr: 'Chargement du marché...',
+		kb: 'needs-translation'
+	},
 	'market.noDemands': {
 		fr: 'Pas de demandes de produits disponibles.',
 		kb: 'needs-translation'
@@ -177,6 +193,28 @@ const translations: TranslationStrings = {
 	},
 	'product.demand-hand-money': {
 		fr: 'Prix proposé',
+		kb: 'needs-translation'
+	},
+
+	// Weather
+	'weather.loadingText': {
+		fr: 'Chargement de la météo...',
+		kb: 'needs-translation'
+	},
+	'weather.cloud': {
+		fr: 'Nuage avec précipitations',
+		kb: 'needs-translation'
+	},
+	'weather.pressureArrow': {
+		fr: 'Indicateur de pression',
+		kb: 'needs-translation'
+	},
+	'weather.bird': {
+		fr: 'Oiseau météo',
+		kb: 'needs-translation'
+	},
+	'weather.thermometer': {
+		fr: 'Thermomètre',
 		kb: 'needs-translation'
 	},
 
@@ -275,6 +313,26 @@ const translations: TranslationStrings = {
 	},
 	'alt.cancelResponse': {
 		fr: 'Annuler la réponse du chatbot',
+		kb: 'needs-translation'
+	},
+	'alt.compassNeedle': {
+		fr: 'Aiguille de boussole',
+		kb: 'needs-translation'
+	},
+	'alt.soilImage': {
+		fr: 'Image du sol',
+		kb: 'needs-translation'
+	},
+	'alt.windTree': {
+		fr: 'Arbre au vent',
+		kb: 'needs-translation'
+	},
+	'alt.pressureLine': {
+		fr: 'Ligne de pression',
+		kb: 'needs-translation'
+	},
+	'alt.floatingButton': {
+		fr: 'Bouton flottant',
 		kb: 'needs-translation'
 	}
 };

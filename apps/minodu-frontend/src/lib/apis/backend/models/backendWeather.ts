@@ -16,4 +16,4 @@ export interface BackendWeather {
 	time: string | null;
 	description: string | null;
 	createdAt: string;
-
+}
