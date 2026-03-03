@@ -15,6 +15,10 @@ export function waitForAnimationFrame(): Promise<void> {
 	});
 }
 
+export function pickRandom<T>(arr: T[]) : T {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
 export function mimeTypeToFileExtension(mimeType: string): string {
 	const mimeToExtension: Record<string, string> = {
 		// Images

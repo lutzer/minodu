@@ -24,3 +24,7 @@ export enum ForumPostType {
 	AUDIO,
 	IMAGE
 }
+
+export enum WeatherAirPressure {
+	LOW = 0, MEDIUM = 1, HIGH = 2
+}

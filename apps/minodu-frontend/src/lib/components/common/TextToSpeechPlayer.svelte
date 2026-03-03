@@ -4,6 +4,8 @@
 	import { onDestroy } from 'svelte';
 	import { writable } from 'svelte/store';
 
+	let { speaking = $bindable(false) }: { speaking?: boolean } = $props();
+
 	export const playbackReset = writable<{ timestamp: number } | null>(null);
 
 	onDestroy(() => {
@@ -13,6 +15,7 @@
 	let cleanupQueue: { cleanup: () => void }[] = [];
 
 	export async function stop() {
+		speaking = false;
 		playbackReset.set({ timestamp: Date.now() });
 
 		cleanupQueue.forEach((element) => {
@@ -22,6 +25,7 @@
 
 	export async function speak(text: string) {
 		stop();
+		speaking = true;
 
 		let response = await AiServicesApi.generateTextToSpeechStream({
 			text: text,
@@ -108,6 +112,7 @@
 	}
 
 	function onMediaEnded() {
+		speaking = false;
 		playbackReset.set({ timestamp: Date.now() });
 	}
 </script>
