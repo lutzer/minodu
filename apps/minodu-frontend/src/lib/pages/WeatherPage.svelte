@@ -54,17 +54,68 @@
 
 	$: loading = weather === undefined
 	$: cloud = pickRandom([cloudSunny,cloudRain, cloudCovered, cloudSun]);
-	$: wind = pickRandom([treeWind0,treeWind1, treeWind2, treeWind3]);
-	$: soil = pickRandom([soilDry, soilMoist, soilVeryDry, soilVeryMoist]);
+	$: wind = weather?.wind_speed && getWindIcon(weather.wind_speed);
+	$: soil = weather?.humidity != null && getHumidityIcon(weather.humidity);
 
-	$: pressure = pickRandom([WeatherAirPressure.HIGH, WeatherAirPressure.LOW, WeatherAirPressure.MEDIUM]);
-	$: thermometer = pickRandom([thermometer1, thermometer2, thermometer3, thermometer4, thermometer5]);
+	$: pressure = weather?.pressure != null && getPressureLevel(weather.pressure);
+	$: thermometer = weather?.temperature != null && getTemperatureIcon(weather.temperature);
 
 	function toggleSpeakWeather() {
 		if (ttsSpeaking)
 			ttsPlayer.stop();
 		else if (typeof(weather.description) === "string") {
 			ttsPlayer.speak(weather.description);
+		}
+	}
+
+	function format(val: number| null) {
+		return val == null ? "NaN" : Math.round(val);
+	}
+
+	function getTemperatureIcon(temperature: number) : string {
+		if (temperature < 23)
+		 	return thermometer1;
+		else if (temperature < 27)
+			return thermometer2;
+		else if (temperature < 31)
+			return thermometer3;
+		else if (temperature < 35)
+			return thermometer4;
+		else
+			return thermometer5;
+	}
+
+	function getPressureLevel(airPressure: number) : WeatherAirPressure {
+		if (airPressure < 1000) {
+			return WeatherAirPressure.LOW;
+		} else if (airPressure < 1014) {
+			return WeatherAirPressure.MEDIUM;
+		} else {
+			return WeatherAirPressure.HIGH;
+		}
+	}
+
+	function getHumidityIcon(humidity: number) : string {
+		if (humidity < 25) {
+			return soilVeryDry;
+		} else if (humidity < 50) {
+			return soilDry;
+		} else if (humidity < 80) {
+			return soilMoist;
+		} else {
+			return soilVeryMoist;
+		}
+	}
+
+	function getWindIcon(windSpeed: number) : string {
+		if (windSpeed < 3.6) {
+			return treeWind0;
+		} else if (windSpeed < 10.8) {
+			return treeWind1;
+		} else if (windSpeed < 21.6) {
+			return treeWind2;
+		} else {
+			return treeWind3;
 		}
 	}
 
@@ -88,19 +139,19 @@
 				<div class="compass" style="background-image: url({compassBackground}">
 					<img class="needle" src={compassNeedle} alt={t('alt.compassNeedle', $language)} 
 						style="--wind-angle: {weather.wind_direction}deg"/>
-					<span class="label">{weather.wind_direction}°</span>
+					<span class="label">{format(weather.wind_direction)}°</span>
 				</div>
 			{/if}
 			{#if soil}
 				<div class="soil">
 					<img src={soil} alt={t('alt.soilImage', $language)}/>
-					<span class="label">{weather.humidity}%</span>
+					<span class="label">{format(weather.humidity)}%</span>
 				</div>
 			{/if}
 			{#if wind}
 				<div class="tree" style:margin-bottom={ wind == treeWind3 ? "-30px" : "none"}>
 					<img src={wind} alt={t('alt.windTree', $language)}/>
-					<span class="label">{weather.wind_speed} km/h</span>
+					<span class="label">{format(weather.wind_speed)} km/h</span>
 				</div>
 			{/if}
 			{#if pressure !== undefined}
@@ -116,14 +167,14 @@
 					<div class="bird {`pos-${pressure}`}">
 						<img src={weatherBird} alt={t('weather.bird', $language)}/>
 					</div>
-					<span class="label">{weather.pressure} hPa</span>
+					<span class="label">{format(weather.pressure)} hPa</span>
 				</div>
 				
 			{/if}
 			{#if thermometer}
 				<div class="thermometer">
 					<img src={thermometer} alt={t('weather.thermometer', $language)}/>
-					<span class="label">{weather.temperature} °C</span>
+					<span class="label">{format(weather.temperature)} °C</span>
 				</div>
 			{/if}
 			</div>
