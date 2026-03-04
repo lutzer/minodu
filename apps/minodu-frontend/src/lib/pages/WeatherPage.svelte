@@ -223,7 +223,7 @@
 	}
 
 	.compass .label {
-		bottom: 10%;
+		top: 20%;
 		right: 10%;
 		background-color: #666666;
 	}
@@ -366,7 +366,7 @@
 
 	.thermometer .label {
 		right: -40px;
-		top: 0px;
+		bottom: -10px;
 		background-color: #47bbf7;
 	}
 
