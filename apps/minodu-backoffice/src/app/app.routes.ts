@@ -16,7 +16,7 @@ import { ProductDetailsComponent } from './product-details/product-details.compo
 import { ProductRequestsComponent } from './product-requests/product-requests.component';
 import { ProductDemandsComponent } from './product-demands/product-demands.component';
 import { ForumComponent } from './forum/forum.component';
-// import { LogsComponent } from './logs/logs.component';
+import { LogsComponent } from './logs/logs.component';
 import { AuthGuard } from './_helpers/auth.guard';
 
 export const routes: Routes = [
@@ -36,7 +36,7 @@ export const routes: Routes = [
     { path: 'post-tags', component: PostTagsComponent, data: { activeMenu: 'posts' }, canActivate: [AuthGuard] },
     { path: 'post-details/:id', component: PostDetailsComponent, data: { activeMenu: 'posts' }, canActivate: [AuthGuard] },
     { path: 'forum', component: ForumComponent, data: { activeMenu: 'forum' }, canActivate: [AuthGuard] },
-    // { path: 'logs', component: LogsComponent, data: { activeMenu: 'logs' }, canActivate: [AuthGuard] },
+    { path: 'logs', component: LogsComponent, data: { activeMenu: 'logs' }, canActivate: [AuthGuard] },
     { path: 'login', component: LoginComponent, data: { activeMenu: null } },
     { path: '', redirectTo: '/admin', pathMatch: 'full' },
     { path: '**', redirectTo: '/admin' },

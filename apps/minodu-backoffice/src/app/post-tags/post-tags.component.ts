@@ -66,7 +66,10 @@ export class PostTagsComponent implements OnInit {
     this.resetForm();
     this.modalTitle = 'Ajouter un tag';
     this.selectedTag = null;
-    (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-tag')).show();
+    const modal = document.getElementById('modal-tag');
+    if (modal && (window as any).bootstrap) {
+      (window as any).bootstrap.Modal.getOrCreateInstance(modal).show();
+    }
   }
 
   openEditModal(tag: Tag, event?: Event) {
@@ -78,7 +81,10 @@ export class PostTagsComponent implements OnInit {
     this.form.patchValue({
       name: tag.name
     });
-    (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-tag')).show();
+    const modal = document.getElementById('modal-tag');
+    if (modal && (window as any).bootstrap) {
+      (window as any).bootstrap.Modal.getOrCreateInstance(modal).show();
+    }
   }
 
   onFileChange(event: any) {
@@ -129,7 +135,10 @@ export class PostTagsComponent implements OnInit {
   confirmDelete(id: number, event?: Event) {
     if (event) event.preventDefault();
     this.deleteId = id;
-    (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-delete-tag')).show();
+    const modal = document.getElementById('modal-delete-tag');
+    if (modal && (window as any).bootstrap) {
+      (window as any).bootstrap.Modal.getOrCreateInstance(modal).show();
+    }
   }
 
   deleteTag() {
@@ -151,10 +160,16 @@ export class PostTagsComponent implements OnInit {
 
   closeModal(type: 'delete' | 'form' = 'form') {
     if (type === 'form') {
-      (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-tag')).hide();
+      const modal = document.getElementById('modal-tag');
+      if (modal && (window as any).bootstrap) {
+        (window as any).bootstrap.Modal.getOrCreateInstance(modal).hide();
+      }
       this.resetForm();
     } else {
-      (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-delete-tag')).hide();
+      const modal = document.getElementById('modal-delete-tag');
+      if (modal && (window as any).bootstrap) {
+        (window as any).bootstrap.Modal.getOrCreateInstance(modal).hide();
+      }
       this.deleteId = null;
     }
   }

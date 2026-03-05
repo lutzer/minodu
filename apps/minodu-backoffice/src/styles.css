@@ -25,3 +25,27 @@
   margin-top: 12px;
   cursor: pointer;
 }
+
+.image-preview{
+  width: 150px; 
+  height: 150px; 
+  object-fit: cover; 
+  border-radius: 8px;
+}
+
+.current-image-container {
+  position: relative;
+  display: inline-block;
+}
+
+.btn-remove-image {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  padding: 5px;
+  line-height: 0;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.8);
+  border: none;
+  border-radius: 50%;
+}

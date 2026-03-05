@@ -66,7 +66,10 @@ export class PostCategoriesComponent implements OnInit {
     this.resetForm();
     this.modalTitle = 'Ajouter une catégorie';
     this.selectedCategory = null;
-    (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-category')).show();
+    const modal = document.getElementById('modal-category');
+    if (modal && (window as any).bootstrap) {
+      (window as any).bootstrap.Modal.getOrCreateInstance(modal).show();
+    }
   }
 
   openEditModal(category: Category, event?: Event) {
@@ -79,7 +82,10 @@ export class PostCategoriesComponent implements OnInit {
       name: category.name,
       nameKb: category.nameKb
     });
-    (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-category')).show();
+    const modal = document.getElementById('modal-category');
+    if (modal && (window as any).bootstrap) {
+      (window as any).bootstrap.Modal.getOrCreateInstance(modal).show();
+    }
   }
 
   onFileChange(event: any) {
@@ -131,7 +137,10 @@ export class PostCategoriesComponent implements OnInit {
   confirmDelete(id: number, event?: Event) {
     if (event) event.preventDefault();
     this.deleteId = id;
-    (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-delete-category')).show();
+    const modal = document.getElementById('modal-delete-category');
+    if (modal && (window as any).bootstrap) {
+      (window as any).bootstrap.Modal.getOrCreateInstance(modal).show();
+    }
   }
 
   deleteCategory() {
@@ -153,10 +162,16 @@ export class PostCategoriesComponent implements OnInit {
 
   closeModal(type: 'delete' | 'form' = 'form') {
     if (type === 'form') {
-      (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-category')).hide();
+      const modal = document.getElementById('modal-category');
+      if (modal && (window as any).bootstrap) {
+        (window as any).bootstrap.Modal.getOrCreateInstance(modal).hide();
+      }
       this.resetForm();
     } else {
-      (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-delete-category')).hide();
+      const modal = document.getElementById('modal-delete-category');
+      if (modal && (window as any).bootstrap) {
+        (window as any).bootstrap.Modal.getOrCreateInstance(modal).hide();
+      }
       this.deleteId = null;
     }
   }

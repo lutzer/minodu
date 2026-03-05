@@ -18,7 +18,11 @@
               <span *ngIf="syncing" class="spinner-border spinner-border-sm"></span>
             </button>
           </div>
-          <div *ngIf="syncMessage" class="alert alert-info alert-dismissible mt-2" role="alert">
+        </div>
+      </div>
+      <div class="row mt-3" *ngIf="syncMessage">
+        <div class="col-12">
+          <div [ngClass]="{'alert': true, 'alert-dismissible': true, 'alert-danger': syncError, 'alert-success': !syncError}" role="alert">
             {{ syncMessage }}
             <a href="#" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></a>
           </div>
@@ -218,8 +222,8 @@
             </div>
 
               <!-- Weather History Table -->
-              <div class="mt-5 px-5 mx-3">
-                <h3 class="mb-3">Historique des données météo</h3>
+              <div class="mt-5">
+                <h3 class="">Historique des données météo</h3>
                 <div class="row mb-3">
                   <div class="col-auto ms-auto">
                     <div class="btn-group">

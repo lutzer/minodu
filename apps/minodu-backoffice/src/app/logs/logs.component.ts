@@ -82,9 +82,10 @@ export class LogsComponent implements OnInit {
 
   confirmClearLogs(event?: Event) {
     if (event) event.preventDefault();
-    (window as any).bootstrap.Modal.getOrCreateInstance(
-      document.getElementById('clear-logs-modal')
-    ).show();
+    const modal = document.getElementById('clear-logs-modal');
+    if (modal && (window as any).bootstrap) {
+      (window as any).bootstrap.Modal.getOrCreateInstance(modal).show();
+    }
   }
 
   clearLogs() {
@@ -97,9 +98,10 @@ export class LogsComponent implements OnInit {
         this.successMessage = 'Logs vidés avec succès';
         this.logsText = '';
         this.isClearing = false;
-        (window as any).bootstrap.Modal.getOrCreateInstance(
-          document.getElementById('clear-logs-modal')
-        ).hide();
+        const modal = document.getElementById('clear-logs-modal');
+        if (modal && (window as any).bootstrap) {
+          (window as any).bootstrap.Modal.getOrCreateInstance(modal).hide();
+        }
         setTimeout(() => (this.successMessage = ''), 3000);
       },
       error: err => {

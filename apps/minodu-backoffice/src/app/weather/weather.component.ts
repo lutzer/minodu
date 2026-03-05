@@ -19,6 +19,7 @@ export class WeatherComponent implements OnInit {
     loading: boolean = false;
     syncing: boolean = false;
     syncMessage: string = '';
+    syncError: boolean = false;
     weather: Weather | null = null;
     weatherHistory: Weather[] = [];
     selectedWeather: Weather | null = null;
@@ -43,11 +44,13 @@ export class WeatherComponent implements OnInit {
   syncWeatherManually() {
     this.syncing = true;
     this.syncMessage = 'Synchronisation en cours...';
+    this.syncError = false;
     
     this.weatherService.syncWeatherManual().subscribe({
       next: (data) => {
         this.syncing = false;
         this.syncMessage = 'Synchronisation réussie!';
+        this.syncError = false;
         // console.log('Weather sync successful:', data);
         
         // Reload weather data
@@ -62,6 +65,7 @@ export class WeatherComponent implements OnInit {
       error: (err) => {
         this.syncing = false;
         this.syncMessage = 'Erreur lors de la synchronisation: ' + (err.error?.message || err.message);
+        this.syncError = true;
         // console.log('Weather sync error:', err);
         
         // Clear message after 5 seconds

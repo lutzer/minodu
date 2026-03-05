@@ -75,17 +75,19 @@ export class ForumComponent implements OnInit {
   confirmDelete(id: number, event?: Event) {
     if (event) event.preventDefault();
     this.deleteId = id;
-    (window as any).bootstrap.Modal.getOrCreateInstance(
-      document.getElementById('delete-modal')
-    ).show();
+    const modal = document.getElementById('delete-modal');
+    if (modal && (window as any).bootstrap) {
+      (window as any).bootstrap.Modal.getOrCreateInstance(modal).show();
+    }
   }
 
   viewForum(post: Forum, event?: Event) {
     if (event) event.preventDefault();
     this.selectedPost = post;
-    (window as any).bootstrap.Modal.getOrCreateInstance(
-      document.getElementById('view-forum-modal')
-    ).show();
+    const modal = document.getElementById('view-forum-modal');
+    if (modal && (window as any).bootstrap) {
+      (window as any).bootstrap.Modal.getOrCreateInstance(modal).show();
+    }
   }
 
   isAudio(file: { filename: string; content_type: string }): boolean {
@@ -102,9 +104,10 @@ export class ForumComponent implements OnInit {
 
   closeViewModal(event?: Event) {
     if (event) event.preventDefault();
-    (window as any).bootstrap.Modal.getOrCreateInstance(
-      document.getElementById('view-forum-modal')
-    ).hide();
+    const modal = document.getElementById('view-forum-modal');
+    if (modal && (window as any).bootstrap) {
+      (window as any).bootstrap.Modal.getOrCreateInstance(modal).hide();
+    }
     this.selectedPost = null;
   }
 
@@ -112,9 +115,10 @@ export class ForumComponent implements OnInit {
     if (this.selectedPost) {
       this.deleteId = this.selectedPost.id;
       this.closeViewModal();
-      (window as any).bootstrap.Modal.getOrCreateInstance(
-        document.getElementById('delete-modal')
-      ).show();
+      const modal = document.getElementById('delete-modal');
+      if (modal && (window as any).bootstrap) {
+        (window as any).bootstrap.Modal.getOrCreateInstance(modal).show();
+      }
     }
   }
 
@@ -125,9 +129,10 @@ export class ForumComponent implements OnInit {
       next: () => {
         this.successMessage = 'Entrée du forum supprimée avec succès';
         this.loadForum();
-        (window as any).bootstrap.Modal.getOrCreateInstance(
-          document.getElementById('delete-modal')
-        ).hide();
+        const modal = document.getElementById('delete-modal');
+        if (modal && (window as any).bootstrap) {
+          (window as any).bootstrap.Modal.getOrCreateInstance(modal).hide();
+        }
         this.deleteId = null;
         setTimeout(() => (this.successMessage = ''), 3000);
       },

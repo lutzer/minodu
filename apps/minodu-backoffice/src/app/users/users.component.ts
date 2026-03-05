@@ -86,9 +86,8 @@ export class UsersComponent implements OnInit {
     this.isEditSubmitting = false;
     // Ouvre la modale Bootstrap
     const modal = document.getElementById('editUserModal');
-    if (modal) {
-      // @ts-ignore
-      const bsModal = new window.bootstrap.Modal(modal);
+    if (modal && (window as any).bootstrap) {
+      const bsModal = new (window as any).bootstrap.Modal(modal);
       bsModal.show();
     }
   }
@@ -97,7 +96,14 @@ export class UsersComponent implements OnInit {
     if (event) event.preventDefault();
     this.isEditMode = false;
     this.editUserId = null;
-    this.editUserForm.reset();
+    this.editUserForm.reset({
+      fullName: '',
+      gender: '',
+      phone: '',
+      password: '',
+      isContactPerson: false
+    });
+    this.editUserForm.updateValueAndValidity();
     // En mode création, le champ password est requis
     this.editUserForm.get('password')?.setValidators([Validators.required]);
     this.editUserForm.get('password')?.updateValueAndValidity();
@@ -106,9 +112,8 @@ export class UsersComponent implements OnInit {
     this.isEditSubmitting = false;
     // Ouvre la modale Bootstrap
     const modal = document.getElementById('editUserModal');
-    if (modal) {
-      // @ts-ignore
-      const bsModal = new window.bootstrap.Modal(modal);
+    if (modal && (window as any).bootstrap) {
+      const bsModal = new (window as any).bootstrap.Modal(modal);
       bsModal.show();
     }
   }
@@ -116,8 +121,10 @@ export class UsersComponent implements OnInit {
 
   closeModal() {
     const modalEl = document.getElementById('editUserModal');
-    const modal = bootstrap.Modal.getInstance(modalEl);
-    modal?.hide();
+    if (modalEl && (window as any).bootstrap) {
+      const modal = (window as any).bootstrap.Modal.getInstance(modalEl);
+      modal?.hide();
+    }
   }
 
   submitEditUser() {

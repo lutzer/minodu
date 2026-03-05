@@ -51,6 +51,18 @@ export class ProductsComponent implements OnInit {
     this.loadCategories();
   }
 
+  updateImageValidation(): void {
+    const imageControl = this.addProductForm.get('image');
+    if (!this.currentImageUrl) {
+      // If no image URL, image is required
+      imageControl?.setValidators([Validators.required]);
+    } else {
+      // If image URL exists, image is optional
+      imageControl?.clearValidators();
+    }
+    imageControl?.updateValueAndValidity();
+  }
+
   loadProducts(): void {
     this.loading = true;
     this.productsService.getProducts().subscribe({
@@ -141,6 +153,7 @@ export class ProductsComponent implements OnInit {
       'sales-unit': product.salesUnit
     });
     this.image = null;
+    this.updateImageValidation();
   }
 
   confirmDelete(product: Product): void {
@@ -168,13 +181,18 @@ export class ProductsComponent implements OnInit {
 
   onFileChange(event: any) {
     if (event.target.files && event.target.files.length > 0) {
-      const file = event.target.files[0];
-      this.image = file;
+      this.image = event.target.files[0];
+
+       if (this.image && this.image.type.split('/')[0] !== 'image') {
+      this.addProductForm.get('image')!.setValue('');
+      this.addProductForm.get('image')!.setErrors({ 'invalidFileType': true });
+      }else{
       const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.currentImageUrl = e.target.result;
-      };
-      reader.readAsDataURL(file);
+        reader.onload = () => {
+          this.currentImageUrl = reader.result as string;
+        };
+        reader.readAsDataURL(this.image!!);
+      }
     }
   }
 
@@ -196,7 +214,15 @@ export class ProductsComponent implements OnInit {
     this.isEditMode = false;
     this.currentProductId = null;
     this.currentImageUrl = null;
-    this.addProductForm.reset();
+    this.addProductForm.reset({
+      name: '',
+      description: '',
+      category: '',
+      image: '',
+      price: '',
+      'sales-unit': ''
+    });
+    this.addProductForm.updateValueAndValidity();
     this.image = null;
     this.isFormSubmitted = false;
     this.errorMessage = '';
@@ -222,5 +248,15 @@ export class ProductsComponent implements OnInit {
 
   getSubmitButtonText(): string {
     return this.isEditMode ? 'Modifier' : 'Soumettre';
+  }
+
+  removeImage() {
+    this.currentImageUrl= null; 
+    this.image= null; 
+    
+    // Réinitialiser le FormControl pour obliger l'utilisateur à uploader un nouveau fichier
+    this.addProductForm.controls['image'].setValue(null);
+    this.addProductForm.controls['image'].markAsTouched();
+    this.updateImageValidation();
   }
 }

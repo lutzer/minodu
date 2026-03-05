@@ -118,7 +118,13 @@ export class ProductDemandsComponent implements OnInit {
   openAddModal(): void {
     this.isEditMode = false;
     this.currentDemandId = null;
-    this.addDemandForm.reset();
+    this.addDemandForm.reset({
+      productId: '',
+      quantity: '',
+      partnerId: '',
+      deadline: ''
+    });
+    this.addDemandForm.updateValueAndValidity();
     this.isFormSubmitted = false;
     this.isAdded = false;
     this.isUpdated = false;
