@@ -42,6 +42,7 @@ export class PostsComponent implements OnInit {
   currentPage: number = 1;
   pageSize: number = 10;
   fileInputId: string = 'postImageInput';
+  image: File | null = null;
 
 
   constructor(
@@ -94,6 +95,19 @@ export class PostsComponent implements OnInit {
     });
   }
 
+  updateImageValidation(): void {
+    const imageControl = this.form.get('image');
+    if (!this.currentImageUrl) {
+      // If no image URL, image is required
+      imageControl?.setValidators([Validators.required]);
+    } else {
+      // If image URL exists, image is optional
+      imageControl?.clearValidators();
+    }
+    imageControl?.updateValueAndValidity();
+  }
+
+
   openAddModal() {
     this.resetForm();
     this.modalTitle = 'Ajouter une publication';
@@ -116,25 +130,48 @@ export class PostsComponent implements OnInit {
       idCategory: post.category?.id ? Number(post.category.id) : null,
       tags: this.selectedTags
     });
+    this.imageFile = undefined;
+    this.updateImageValidation();
     (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-report')).show();
   }
 
   onFileChange(event: any, type: 'image' | 'attachment' | 'attachmentKb' | 'attachmentPdf') {
-    const file = event.target.files[0];
-    if (type === 'image') {
-      this.imageFile = file;
-      if (file) {
+      if (event.target.files && event.target.files.length > 0) {
+        const file = event.target.files[0];
+        this.imageFile = file;
+        this.imageFile = event.target.files[0];
+
+        if (this.imageFile && this.imageFile.type.split('/')[0] !== 'image') {
+        this.form.get('image')!.setValue('');
+        this.form.get('image')!.setErrors({ 'invalidFileType': true });
+        }else{
         const reader = new FileReader();
         reader.onload = (e: any) => {
           this.currentImageUrl = e.target.result;
         };
         reader.readAsDataURL(file);
+          reader.onload = () => {
+            this.currentImageUrl = reader.result as string;
+          };
+          reader.readAsDataURL(this.imageFile!!);
       }
+
+      if (type === 'attachment') this.attachmentFile = file;
+      if (type === 'attachmentKb') this.attachmentKbFile = file;
+      if (type === 'attachmentPdf') this.attachmentPdfFile = file;
     }
-    if (type === 'attachment') this.attachmentFile = file;
-    if (type === 'attachmentKb') this.attachmentKbFile = file;
-    if (type === 'attachmentPdf') this.attachmentPdfFile = file;
   }
+
+  removeImage() {
+    this.currentImageUrl= null; 
+    this.image= null; 
+    
+    // Réinitialiser le FormControl pour obliger l'utilisateur à uploader un nouveau fichier
+    this.form.controls['image'].setValue(null);
+    this.form.controls['image'].markAsTouched();
+    this.updateImageValidation();
+  }
+
 
   // Méthode pour basculer la sélection d'un tag (pour le clic sur l'image)
   toggleTag(tagId: number) {

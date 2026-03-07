@@ -6,7 +6,7 @@ import { LoaderService } from '../_helpers/loader.service';
 import { AuthService } from '../_services/auth.service';
 import { Category } from '../_models/categories';
 import { ProductCategoriesService } from '../_services/product-categories.service';
-import { FormBuilder, FormGroup, Validators, FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-product-categories',
@@ -23,7 +23,6 @@ export class ProductCategoriesComponent implements OnInit {
   categoryToDelete: Category | null = null;
   isDeleting: boolean = false;
 
-  // Ajout/édition
   addCategoryForm: FormGroup;
   isFormSubmitted = false;
   isAdded = false;
@@ -32,6 +31,8 @@ export class ProductCategoriesComponent implements OnInit {
   isEditMode = false;
   currentCategoryId: number | null = null;
   image: File | null = null;
+  currentImageUrl: string | null = null;
+  fileInputId: string = 'categoryImageInput';
 
   constructor(
     private formBuilder: FormBuilder,
@@ -61,23 +62,77 @@ export class ProductCategoriesComponent implements OnInit {
       error: err => {
         this.loading = false;
         this.errorMessage = err.error.message;
-        // console.log(err.error)
         this.authService.logout();
       }
     });
   }
 
+  updateImageValidation(): void {
+    const imageControl = this.addCategoryForm.get('image');
+    if (!this.currentImageUrl) {
+      imageControl?.setValidators([Validators.required]);
+    } else {
+      imageControl?.clearValidators();
+    }
+    imageControl?.updateValueAndValidity();
+  }
+
+  onFileChange(event: any) {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    // Vérification du type MIME
+    if (!file.type.startsWith('image/')) {
+      this.image = null;
+      this.addCategoryForm.get('image')!.setValue('');
+      this.addCategoryForm.get('image')!.setErrors({ invalidFileType: true });
+      return;
+    }
+
+    // ✅ FIX : on stocke le File correctement
+    this.image = file;
+
+    // Prévisualisation
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.currentImageUrl = reader.result as string;
+      // L'image est valide : on vide les erreurs et on met une valeur
+      this.addCategoryForm.get('image')!.setValue(file.name);
+      this.addCategoryForm.get('image')!.setErrors(null);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  removeImage() {
+    this.currentImageUrl = null;
+    this.image = null;
+    this.addCategoryForm.controls['image'].setValue(null);
+    this.addCategoryForm.controls['image'].markAsTouched();
+    // Réinitialiser le champ fichier dans le DOM
+    const fileInput = document.getElementById(this.fileInputId) as HTMLInputElement;
+    if (fileInput) fileInput.value = '';
+    this.updateImageValidation();
+  }
+
   onSubmit(): void {
     this.isFormSubmitted = true;
     const name = this.addCategoryForm.get('name')!.value;
-    // Pour l'image, on utilise this.image
+
     if (this.addCategoryForm.valid) {
       this.isSubmitting = true;
       this.errorMessage = '';
+
+      // ✅ FIX PRINCIPAL : construction du FormData ici, pas dans le service
+      const formData = new FormData();
+      formData.append('name', name);
+      if (this.image) {
+        formData.append('image', this.image, this.image.name);
+      }
+
       if (this.isEditMode && this.currentCategoryId) {
-        // Mode modification
-        this.productCategoriesService.updateCategory(this.currentCategoryId, name, this.image || null).subscribe({
-          next: data => {
+        this.productCategoriesService.updateCategory(this.currentCategoryId, formData).subscribe({
+          next: () => {
             this.isUpdated = true;
             this.resetForm();
             setTimeout(() => {
@@ -88,13 +143,11 @@ export class ProductCategoriesComponent implements OnInit {
           error: err => {
             this.isSubmitting = false;
             this.errorMessage = err.error.message;
-            // console.log(err.error)
           }
         });
       } else {
-        // Mode ajout
-        this.productCategoriesService.addCategory(name, this.image || null).subscribe({
-          next: data => {
+        this.productCategoriesService.addCategory(formData).subscribe({
+          next: () => {
             this.isAdded = true;
             this.resetForm();
             setTimeout(() => {
@@ -105,7 +158,6 @@ export class ProductCategoriesComponent implements OnInit {
           error: err => {
             this.isSubmitting = false;
             this.errorMessage = err.error.message;
-            // console.log(err.error)
           }
         });
       }
@@ -115,22 +167,17 @@ export class ProductCategoriesComponent implements OnInit {
   editCategory(category: Category): void {
     this.isEditMode = true;
     this.currentCategoryId = category.id;
-    this.addCategoryForm.patchValue({
-      name: category.name
-    });
+    this.currentImageUrl = category.image;
+    this.addCategoryForm.patchValue({ name: category.name });
     this.image = null;
-  }
-
-  onFileChange(event: any): void {
-    if (event.target.files && event.target.files.length > 0) {
-      this.image = event.target.files[0];
-    }
+    this.updateImageValidation();
   }
 
   openAddModal(): void {
     this.isEditMode = false;
     this.currentCategoryId = null;
     this.addCategoryForm.reset();
+    this.currentImageUrl = null;
     this.image = null;
     this.isFormSubmitted = false;
     this.errorMessage = '';
@@ -142,10 +189,11 @@ export class ProductCategoriesComponent implements OnInit {
       this.isSubmitting = false;
       this.isEditMode = false;
       this.currentCategoryId = null;
+      this.currentImageUrl = null;
+      this.image = null;
       this.isAdded = false;
       this.isUpdated = false;
       this.addCategoryForm.reset();
-      this.image = null;
     }, 1200);
   }
 
@@ -157,9 +205,7 @@ export class ProductCategoriesComponent implements OnInit {
       modal.setAttribute('aria-hidden', 'true');
       modal.style.display = 'none';
       document.body.classList.remove('modal-open');
-      if (backdrop) {
-        backdrop.remove();
-      }
+      if (backdrop) backdrop.remove();
     }
   }
 
@@ -188,7 +234,6 @@ export class ProductCategoriesComponent implements OnInit {
         error: err => {
           this.isDeleting = false;
           this.errorMessage = err.error.message;
-          // console.log(err.error);
         }
       });
     }

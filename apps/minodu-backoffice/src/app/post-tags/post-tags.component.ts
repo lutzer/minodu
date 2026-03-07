@@ -62,6 +62,19 @@ export class PostTagsComponent implements OnInit {
     });
   }
 
+  updateImageValidation(): void {
+    const imageControl = this.form.get('image');
+    if (!this.currentImageUrl) {
+      // If no image URL, image is required
+      imageControl?.setValidators([Validators.required]);
+    } else {
+      // If image URL exists, image is optional
+      imageControl?.clearValidators();
+    }
+    imageControl?.updateValueAndValidity();
+  }
+
+
   openAddModal() {
     this.resetForm();
     this.modalTitle = 'Ajouter un tag';
@@ -81,6 +94,8 @@ export class PostTagsComponent implements OnInit {
     this.form.patchValue({
       name: tag.name
     });
+    this.imageFile = undefined;
+    this.updateImageValidation();
     const modal = document.getElementById('modal-tag');
     if (modal && (window as any).bootstrap) {
       (window as any).bootstrap.Modal.getOrCreateInstance(modal).show();
@@ -98,6 +113,17 @@ export class PostTagsComponent implements OnInit {
       reader.readAsDataURL(file);
     }
   }
+
+  removeImage() {
+    this.currentImageUrl= null; 
+    this.imageFile= undefined; 
+    
+    // Réinitialiser le FormControl pour obliger l'utilisateur à uploader un nouveau fichier
+    this.form.controls['image'].setValue(null);
+    this.form.controls['image'].markAsTouched();
+    this.updateImageValidation();
+  }
+
 
   submitForm() {
     if (this.form.invalid) return;

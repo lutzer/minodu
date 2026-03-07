@@ -113,7 +113,6 @@
 <div *ngIf="errorMessage" class="alert alert-danger mt-2">{{errorMessage}}</div>
 
 <!-- Modale formulaire (ajout/édition) -->
-<!-- Modale formulaire (ajout/édition) -->
 <div class="modal fade" id="modal-report" tabindex="-1" aria-labelledby="modalReportLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -163,24 +162,28 @@
               </div>
             </div>
 
-            <!-- Image -->
-            <div class="col-12">
-              <div class="mb-3">
-                <label for="postImage" class="form-label">Image</label>
-                
-                <!-- Afficher l'image existante -->
-                <div *ngIf="currentImageUrl" class="mb-3">
-                  <div class="position-relative">
-                    <img [src]="currentImageUrl" alt="Image actuelle" style="width: 150px; height: 150px; object-fit: cover; border-radius: 8px;">
-                  </div>
-                  <small class="form-text text-muted d-block mt-2">Formats acceptés: JPG, PNG, GIF</small>
-                </div>
 
-                <!-- File input toujours visible -->
-                <input [id]="fileInputId" type="file" class="form-control" accept="image/*" (change)="onFileChange($event, 'image')">
-                
-                <!-- Afficher le message si pas d'image -->
-                <small *ngIf="!currentImageUrl" class="form-text text-muted">Formats acceptés: JPG, PNG, GIF</small>
+            <div class="mb-3">
+              <div class="form-label">Image</div>
+              <div *ngIf="currentImageUrl" class="current-image-container">
+                      <img [src]="currentImageUrl" alt="Image actuelle" class="image-preview"/>              
+                      <button type="button" (click)="removeImage()" class="btn-remove-image">
+                          <img src="assets/dist/icons/close.svg" alt="Supprimer" width="16" height="16"/>
+                      </button>
+              </div>
+              
+              <!-- File input toujours visible -->
+              <div *ngIf="!currentImageUrl">
+                <input [id]="fileInputId" formControlName="image" type="file" class="form-control mb-3" accept="image/*" (change)="onFileChange($event, 'image')">
+                <small class="form-text text-muted d-block mt-2">Formats acceptés: JPG, PNG</small>
+                <div *ngIf="form.get('image')?.invalid" class="mt-10 text-danger">
+                                  <p *ngIf="form.get('image')?.errors?.['required'] && isSubmitting">
+                                      * L'image du produit est requise.
+                                  </p>
+                                  <p *ngIf="form.get('image')?.errors?.['invalidFileType']">
+                                      * Sélectionnez un fichier image, s'il vous plaît.
+                                  </p>
+                </div>
               </div>
             </div>
 

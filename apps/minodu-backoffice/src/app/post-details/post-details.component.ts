@@ -75,6 +75,19 @@ export class PostDetailsComponent implements OnInit {
     this.loadTags();
   }
 
+   updateImageValidation(): void {
+    const imageControl = this.form.get('image');
+    if (!this.currentImageUrl) {
+      // If no image URL, image is required
+      imageControl?.setValidators([Validators.required]);
+    } else {
+      // If image URL exists, image is optional
+      imageControl?.clearValidators();
+    }
+    imageControl?.updateValueAndValidity();
+  }
+
+
   initForm() {
     const tags = this.post?.tags?.map((t: any) => t.id) || [];
     this.selectedTags = tags;
@@ -90,6 +103,7 @@ export class PostDetailsComponent implements OnInit {
     this.attachmentFile = null;
     this.attachmentKbFile = null;
     this.attachmentPdfFile = null;
+    this.updateImageValidation();
   }
 
   loadCategories() {
@@ -108,15 +122,27 @@ export class PostDetailsComponent implements OnInit {
 
   onFileChange(event: any, type: string) {
     const file = event.target.files && event.target.files[0];
-    if (!file) return;
-    if (type === 'image') {
+    if (event.target.files && event.target.files.length > 0) {
+      const file = event.target.files[0];
       this.imageFile = file;
+      this.imageFile = event.target.files[0];
+
+       if (this.imageFile && this.imageFile.type.split('/')[0] !== 'image') {
+      this.form.get('image')!.setValue('');
+      this.form.get('image')!.setErrors({ 'invalidFileType': true });
+      }else{
       const reader = new FileReader();
       reader.onload = (e: any) => {
         this.currentImageUrl = e.target.result;
       };
       reader.readAsDataURL(file);
+        reader.onload = () => {
+          this.currentImageUrl = reader.result as string;
+        };
+        reader.readAsDataURL(this.imageFile!!);
+      }
     }
+
     if (type === 'attachment') this.attachmentFile = file;
     if (type === 'attachmentKb') this.attachmentKbFile = file;
     if (type === 'attachmentPdf') this.attachmentPdfFile = file;
@@ -246,6 +272,17 @@ export class PostDetailsComponent implements OnInit {
         }
       });
   }
+
+  removeImage() {
+    this.currentImageUrl= null; 
+    this.imageFile= null; 
+    
+    // Réinitialiser le FormControl pour obliger l'utilisateur à uploader un nouveau fichier
+    this.form.controls['image'].setValue(null);
+    this.form.controls['image'].markAsTouched();
+    this.updateImageValidation();
+  }
+
 
 }
 

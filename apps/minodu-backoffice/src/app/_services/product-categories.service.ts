@@ -26,27 +26,38 @@ export class ProductCategoriesService {
       );
   }
 
-  addCategory(name: string, image: File | null): Observable<any> {
-    if (image) {
-      const formData = new FormData();
-      formData.append('name', name);
-      formData.append('image', image);
-      return this.http.post(`${API_URL}product-categories`, formData);
-    } else {
-      return this.http.post(`${API_URL}product-categories`, { name });
-    }
-  }
+  addCategory(formData: FormData): Observable<any> {
+  return this.http.post(`${API_URL}product-categories`, formData);
+  // ⚠️ Ne pas setter Content-Type manuellement !
+  // Angular le fait automatiquement avec le bon boundary pour multipart/form-data
+}
 
-  updateCategory(id: number, name: string, image: File | null): Observable<any> {
-    if (image) {
-      const formData = new FormData();
-      formData.append('name', name);
-      formData.append('image', image, image.name);
-      return this.http.patch(`${API_URL}product-categories/${id}`, formData);
-    } else {
-      return this.http.patch(`${API_URL}product-categories/${id}`, { name }, httpOptions);
-    }
-  }
+updateCategory(id: number, formData: FormData): Observable<any> {
+  return this.http.patch(`${API_URL}product-categories/${id}`, formData);
+  // Ou http.post si ton backend utilise POST + _method: 'PUT'
+}
+
+  // addCategory(name: string, image: File | null): Observable<any> {
+  //   if (image) {
+  //     const formData = new FormData();
+  //     formData.append('name', name);
+  //     formData.append('image', image);
+  //     return this.http.post(`${API_URL}product-categories`, formData);
+  //   } else {
+  //     return this.http.post(`${API_URL}product-categories`, { name });
+  //   }
+  // }
+
+  // updateCategory(id: number, name: string, image: File | null): Observable<any> {
+  //   if (image) {
+  //     const formData = new FormData();
+  //     formData.append('name', name);
+  //     formData.append('image', image, image.name);
+  //     return this.http.patch(`${API_URL}product-categories/${id}`, formData);
+  //   } else {
+  //     return this.http.patch(`${API_URL}product-categories/${id}`, { name }, httpOptions);
+  //   }
+  // }
 
   deleteCategory(id: number): Observable<any> {
     return this.http.delete(`${API_URL}product-categories/${id}`, 

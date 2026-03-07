@@ -115,13 +115,36 @@
             <input id="tagName" type="text" class="form-control" formControlName="name" [class.is-invalid]="form.get('name')?.invalid && form.get('name')?.touched">
             <div class="invalid-feedback" *ngIf="form.get('name')?.invalid && form.get('name')?.touched">Le nom est requis.</div>
           </div>
-          <div *ngIf="currentImageUrl" class="mb-3">
+          <!-- <div *ngIf="currentImageUrl" class="mb-3">
             <img [src]="currentImageUrl" style="width: 150px; height: 150px; object-fit: cover; border-radius: 8px;">
           </div>
           <div class="mb-3">
             <label [for]="fileInputId" class="form-label">Image (optionnelle)</label>
             <input [id]="fileInputId" type="file" class="form-control" (change)="onFileChange($event)">
-          </div>
+          </div> -->
+          <div class="mb-3">
+              <div class="form-label">Image</div>
+              <div *ngIf="currentImageUrl" class="current-image-container">
+                      <img [src]="currentImageUrl" alt="Image actuelle" class="image-preview"/>              
+                      <button type="button" (click)="removeImage()" class="btn-remove-image">
+                          <img src="assets/dist/icons/close.svg" alt="Supprimer" width="16" height="16"/>
+                      </button>
+              </div>
+              
+              <!-- File input toujours visible -->
+              <div *ngIf="!currentImageUrl">
+                <input [id]="fileInputId" formControlName="image" type="file" class="form-control mb-3" accept="image/*" (change)="onFileChange($event)">
+                <small class="form-text text-muted d-block mt-2">Formats acceptés: JPG, PNG</small>
+                <div *ngIf="form.get('image')?.invalid" class="mt-10 text-danger">
+                                  <p *ngIf="form.get('image')?.errors?.['required'] && isSubmitting">
+                                      * L'image du produit est requise.
+                                  </p>
+                                  <p *ngIf="form.get('image')?.errors?.['invalidFileType']">
+                                      * Sélectionnez un fichier image, s'il vous plaît.
+                                  </p>
+                </div>
+              </div>
+            </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeModal()">Annuler</button>

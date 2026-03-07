@@ -92,8 +92,27 @@
             </div>
           </div>
           <div class="mb-3">
-            <label class="form-label">Image (optionnelle)</label>
-            <input type="file" class="form-control" (change)="onFileChange($event)" accept="image/*">
+            <div class="form-label">Image</div>
+            <div *ngIf="currentImageUrl" class="current-image-container">
+                    <img [src]="currentImageUrl" alt="Image actuelle" class="image-preview"/>              
+                     <button type="button" (click)="removeImage()" class="btn-remove-image">
+                        <img src="assets/dist/icons/close.svg" alt="Supprimer" width="16" height="16"/>
+                    </button>
+            </div>
+            
+            <!-- File input toujours visible -->
+             <div *ngIf="!currentImageUrl">
+              <input [id]="fileInputId" formControlName="image" type="file" class="form-control mb-3" accept="image/*" (change)="onFileChange($event)">
+              <small class="form-text text-muted d-block mt-2">Formats acceptés: JPG, PNG</small>
+              <div *ngIf="addCategoryForm.get('image')?.invalid" class="mt-10 text-danger">
+                                <p *ngIf="addCategoryForm.get('image')?.errors?.['required'] && isFormSubmitted">
+                                    * L'image de la catégorie est requise.
+                                </p>
+                                <p *ngIf="addCategoryForm.get('image')?.errors?.['invalidFileType']">
+                                    * Sélectionnez un fichier image, s'il vous plaît.
+                                </p>
+              </div>
+            </div>
           </div>
           <div class="mb-3">
             <div *ngIf="isFormSubmitted && isAdded" class="alert alert-success mb-2" role="alert">
