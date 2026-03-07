@@ -58,9 +58,7 @@ async function bootstrap() {
     },
     customSiteTitle: 'MINODU BACKEND API',
   };
-  // SwaggerModule.setup('api-docs', app, document, customOptions); for online server / chickenkiller
-  SwaggerModule.setup('api/backend/api-docs', app, document, customOptions); // on Rpi
-
+  SwaggerModule.setup('api-docs', app, document, customOptions);
   await app.listen(process.env.PORT ?? 3000);
 }
 
