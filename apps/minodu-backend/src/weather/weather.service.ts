@@ -134,7 +134,7 @@ export class WeatherService {
             wind_spd: weather.wind_speed,
             uv: weather.indice_uv,
             battery: weather.battery,
-            time: new Date(weather.time).toLocaleString('fr-FR'),
+            time: weather.time,
             description: weather.description,
           };
           i++;
