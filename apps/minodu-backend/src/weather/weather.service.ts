@@ -148,12 +148,14 @@ export class WeatherService {
       // Generer le fichier Excel en memoire
       const buffer = await workbook.xlsx.writeBuffer();
 
+      this.loggerService.log(`Weather data downloaded (${rows.length} records)`, WeatherService.name);
+
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
       res.setHeader('Content-Disposition', `attachment; filename="weather_data.xlsx"`);
       return res.send(buffer);
 
     }catch (error) {
-      console.log('Weather.download.error', error);
+      this.loggerService.error(`Error occurred while downloading weather data: ${error.message}`, WeatherService.name);
       throw error;
     }
   }
@@ -162,7 +164,7 @@ export class WeatherService {
     try {
       return this.weatherRepository.find({ take: limit });
     } catch (error) {
-      console.log('Weather.all.error', error);
+      this.loggerService.error(`Error occurred while fetching weather data: ${error.message}`, WeatherService.name);
       throw error;
     }
   }
@@ -171,11 +173,11 @@ export class WeatherService {
     try {
       const one = await this.weatherRepository.findOne({ where: { id } });
       if (!one) {
-        throw new NotFoundException();
+        throw new NotFoundException('Donnée météo non trouvée !');
       }
       return one;
     } catch (error) {
-      console.log('Weather.one.error', error);
+      this.loggerService.error(`Error occurred while fetching weather data: ${error.message}`, WeatherService.name);
       throw error;
     }
   }
@@ -185,12 +187,13 @@ export class WeatherService {
       const latest = await this.weatherRepository.find({order:{createdAt:'DESC'}, take:1});
   
       if (!latest) {
-        throw new NotFoundException('No weather data found');
+        this.loggerService.error('No weather data found', WeatherService.name);
+        throw new NotFoundException('Aucune donnée météo trouvée !');
       }
 
       return latest;
     } catch (error) {
-      console.log('Weather.one.error', error);
+      this.loggerService.error(`Error occurred while fetching current weather data: ${error.message}`, WeatherService.name);
       throw error;
     }
   }
@@ -198,9 +201,10 @@ export class WeatherService {
   async removeAll() {
     try {
       await this.weatherRepository.clear();
+      this.loggerService.log('All weather records have been deleted successfully', WeatherService.name);
       return { message: 'All records have been deleted successfully.' };
     } catch (error) {
-      console.log('Weather.delete.error', error);
+      this.loggerService.error(`Error occurred while removing all weather data: ${error.message}`, WeatherService.name);
       throw error;
     }
   }

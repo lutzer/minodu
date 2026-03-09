@@ -13,7 +13,7 @@ export class ForumService {
       const response = await axios.get(url);
       return response.data;
     } catch (error) {
-      this.loggerService.error(error, ForumService.name)
+      this.loggerService.error(`Error occurred while fetching forum posts: ${error.message}`, ForumService.name);
       throw new Error('Failed to fetch forum posts.'); 
     }
   }
@@ -29,7 +29,7 @@ export class ForumService {
 
       return response.data;
     } catch (error) {
-      this.loggerService.error(error, ForumService.name)
+      this.loggerService.error(`Error occurred while deleting forum post: ${error.message}`, ForumService.name);
       throw new Error('Failed to delete forum post'); 
     }
   }

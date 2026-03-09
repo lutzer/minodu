@@ -5,6 +5,7 @@ import { DataFormater } from '../utils/data.formatter'
 import { PostCategory } from './entities/post_categories.entity';
 import { CreatePostCategoryDto } from './dto/create-post-category.dto';
 import { UpdatePostCategoryDto } from './dto/update-post-category..dto';
+import { LoggerService } from 'src/logs/logger.service';
 
 @Injectable()
 export class PostCategoryService {
@@ -12,21 +13,21 @@ export class PostCategoryService {
   constructor(
     @InjectRepository(PostCategory)
     private readonly postCategoryRepository: Repository<PostCategory>,
+    private readonly loggerService: LoggerService
   ) { }
 
-  create(createPostCategoryDto: CreatePostCategoryDto) {
+  async create(createPostCategoryDto: CreatePostCategoryDto) {
     try {
       const category = new PostCategory();
       category.name = createPostCategoryDto.name.toUpperCase();
       category.nameKb = createPostCategoryDto.nameKb.toUpperCase();
       category.image = createPostCategoryDto.image;
-      return category.save();
+      const savedCategory = await category.save();
+      this.loggerService.log('Post category created successfully', PostCategoryService.name);
+      return savedCategory;
     } catch (error) {
-      if (error.code === '11000' || error.code === '23505') {
+      this.loggerService.error(`Error occurred while creating post category: ${error.message}`, PostCategoryService.name);
         throw new ConflictException(`La categorie ( ${createPostCategoryDto.name} ) existe déja !}`);
-      }
-      console.log('PostCategory.create.error', error);
-      throw error;
     }
   }
 
@@ -39,7 +40,7 @@ export class PostCategoryService {
         }
       })
     } catch (error) {
-      console.log('PostCategory.all.error', error);
+      this.loggerService.error(`Error occurred while fetching post categories: ${error.message}`, PostCategoryService.name);
       throw error;
     }
   }
@@ -52,7 +53,7 @@ export class PostCategoryService {
       }
       return one;
     } catch (error) {
-      console.log('PostCategory.one.error', error);
+      this.loggerService.error(`Error occurred while fetching post category: ${error.message}`, PostCategoryService.name);
       throw error;
     }
   }
@@ -65,7 +66,7 @@ export class PostCategoryService {
       }
       return DataFormater.getPostCategory(one);
     } catch (error) {
-      console.log('PostCategory.one.error', error);
+      this.loggerService.error(`Error occurred while fetching post category: ${error.message}`, PostCategoryService.name);
       throw error;
     }
   }
@@ -79,7 +80,7 @@ export class PostCategoryService {
         one.image = updatePostCategoryDto.image;
       return one.save();
     } catch (error) {
-      console.log('PostCategory.update.error', error);
+      this.loggerService.error(`Error occurred while updating post category: ${error.message}`, PostCategoryService.name);
       throw error;
     }
   }
@@ -95,11 +96,13 @@ export class PostCategoryService {
     });
 
     if (!postCategory) {
+      this.loggerService.error(`Attempted to delete non-existent post category with ID ${id}`, PostCategoryService.name);
       throw new NotFoundException(`La catégorie avec l'ID ${id} est introuvable!`);
     }
 
     // Check if postCategory has any associated posts
     if (postCategory.posts?.length > 0) {
+      this.loggerService.error(`Attempted to delete post category with associated posts: ${id}`, PostCategoryService.name);
       throw new BadRequestException(
         `Impossible de supprimer la catégorie ${postCategory.name} car elle a ${postCategory.posts.length} publication(s) dans le système.`
       );
@@ -107,7 +110,7 @@ export class PostCategoryService {
 
     return await postCategory.softRemove();
   } catch (error) {
-    console.error(`Failed to delete PostCategory ID ${id}:`, error.message);
+    this.loggerService.error(`Failed to delete PostCategory ID ${id}: ${error.message}`, PostCategoryService.name);
     throw error;
   }
   }

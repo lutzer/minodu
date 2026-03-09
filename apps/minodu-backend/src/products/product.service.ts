@@ -7,6 +7,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductCategoriesService } from 'src/product_categories/product_category.service';
 import { BaseConfig } from 'src/utils/common.util';
+import { LoggerService } from 'src/logs/logger.service';
 
 @Injectable()
 export class ProductsService {
@@ -15,13 +16,15 @@ export class ProductsService {
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
     private readonly productCategoriesService: ProductCategoriesService,
+    private readonly loggerService: LoggerService
   ) { }
 
   async create(createProductDto: CreateProductDto) {
     try {
       const category = await this.productCategoriesService.findOne(createProductDto.categoryId);
      if (!category) {
-       throw new NotFoundException('Catégorie non trouvé !');
+        this.loggerService.error(`Product category not found with id: ${createProductDto.categoryId}`, ProductsService.name);
+        throw new NotFoundException('Catégorie non trouvé !');
      }
 
       const product = new Product();
@@ -32,12 +35,12 @@ export class ProductsService {
       product.productCategory = category;
       product.image = createProductDto.image;
       await BaseConfig.processImage(createProductDto.image);
-      let res = await product.save();
+      const res = await product.save();
+      this.loggerService.log('Product created successfully', ProductsService.name);
       return DataFormater.getProduct(res);
-
     } catch (error) {
+        this.loggerService.error(`Error occurred while creating product: ${error.message}`, ProductsService.name);
         throw new ConflictException(`Le produit ( ${createProductDto.name} ) existe déja !}`);
-      throw error;
     }
   }
 
@@ -46,6 +49,7 @@ export class ProductsService {
       const count = await this.productRepository.count();
       return count;
     } catch (error) {
+      this.loggerService.error(`Error occurred while counting products: ${error.message}`, ProductsService.name);
       throw new Error(`Échec de la récupération du nombre de produits : ${error.message}`);
     }
   }
@@ -62,7 +66,7 @@ export class ProductsService {
         }
       })
     } catch (error) {
-      console.log('Product.all.error', error);
+      this.loggerService.error(`Error occurred while fetching products: ${error.message}`, ProductsService.name );
       throw error;
     }
   }
@@ -75,7 +79,7 @@ export class ProductsService {
       }
       return one;
     } catch (error) {
-      console.log('Product.one.error', error);
+      this.loggerService.error(`Error occurred while fetching product: ${error.message}`, ProductsService.name);
       throw error;
     }
   }
@@ -91,7 +95,7 @@ export class ProductsService {
       }
       return DataFormater.getProduct(one);
     } catch (error) {
-      console.log('Product.one.error', error);
+      this.loggerService.error(`Error occurred while fetching product: ${error.message}`, ProductsService.name);
       throw error;
     }
   }
@@ -114,9 +118,11 @@ export class ProductsService {
         await BaseConfig.processImage(updateProductDto.image);
       }
 
-      return one.save();
+      const res = await one.save();
+      this.loggerService.log('Product updated successfully', ProductsService.name);
+      return DataFormater.getProduct(res);
     } catch (error) {
-      console.log('Product.update.error', error);
+      this.loggerService.error(`Error occurred while updating product: ${error.message}`, ProductsService.name);
       throw error;
     }
   }
@@ -126,7 +132,7 @@ export class ProductsService {
       const one = await this.findOne(id);
       return one.softRemove();
     } catch (error) {
-      console.log('Product.delete.error', error);
+      this.loggerService.error(`Error occurred while removing product: ${error.message}`, ProductsService.name);
       throw error;
     }
   }

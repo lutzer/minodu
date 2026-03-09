@@ -1,16 +1,17 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Configuration } from './entities/configuration.entity';
-import { CreateConfigurationDto } from './dto/create-configuration.dto';
 import { UpdateConfigurationDto } from './dto/update-configuration.dto';
+import { LoggerService } from 'src/logs/logger.service';
 
 @Injectable()
 export class ConfigurationService {
 
   constructor(
     @InjectRepository(Configuration)
-    private readonly configurationRepository: Repository<Configuration>
+    private readonly configurationRepository: Repository<Configuration>,
+    private readonly logger: LoggerService
   ) { }
 
   async findOne(id: number) {
@@ -21,7 +22,7 @@ export class ConfigurationService {
       }
       return one;
     } catch (error) {
-      console.log('Configuration.one.error', error);
+      this.logger.error(`Error occurred while fetching configuration: ${error.message}`, ConfigurationService.name);
       throw error;
     }
   }
@@ -36,10 +37,12 @@ export class ConfigurationService {
         one.location = updateConfigurationDto.location;
         one.whatsapp_link = updateConfigurationDto.whatsappLink;
         one.station_link = updateConfigurationDto.stationLink;
-        return one.save();
+        const savedConfig = await one.save();
+        this.logger.log('Configuration updated successfully', ConfigurationService.name);
+        return savedConfig;
       }
     } catch (error) {
-      console.log('Configuration.update.error', error);
+      this.logger.error(`Error occurred while updating configuration: ${error.message}`, ConfigurationService.name);
       throw error;
     }
   }
@@ -57,13 +60,12 @@ export class ConfigurationService {
         newConfig.whatsapp_link = null
         newConfig.station_link = null
         await this.configurationRepository.save(newConfig);
+        this.logger.log('Default configuration created successfully', ConfigurationService.name);
       }
+      return true;
 
     } catch (error) {
-      if (error.code === '11000' || error.code === '23505') {
-        return true;
-      }
-      console.log('Configuration.create.default.error', error);
+      this.logger.error(`Error occurred while creating default configuration: ${error.message}`, ConfigurationService.name);
       return false;
     }
   }

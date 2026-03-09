@@ -16,17 +16,16 @@ export class RolesService {
     private readonly loggerService: LoggerService
   ) { }
 
-  create(createRoleDto: CreateRoleDto) {
+  async create(createRoleDto: CreateRoleDto) {
     try {
       const role = new Role();
       role.name = createRoleDto.name.toUpperCase();
-      return role.save();
+      const res = await role.save();
+      this.loggerService.log('Role created successfully', RolesService.name);
+      return res;
     } catch (error) {
-      if (error.code === '11000' || error.code === '23505') {
+        this.loggerService.error(`Error occurred while creating role: ${error.message}`, RolesService.name);
         throw new ConflictException(`Le role utilisateur ( ${createRoleDto.name} ) existe déja !}`);
-      }
-      console.log('Role.create.error', error);
-      throw error;
     }
   }
 
@@ -34,7 +33,7 @@ export class RolesService {
     try {
       return this.roleRepository.find();
     } catch (error) {
-      console.log('Role.all.error', error);
+      this.loggerService.error(`Error occurred while fetching roles: ${error.message}`, RolesService.name);
       throw error;
     }
   }
@@ -47,7 +46,7 @@ export class RolesService {
       }
       return one;
     } catch (error) {
-      console.log('Role.one.error', error);
+      this.loggerService.error(`Error occurred while fetching role: ${error.message}`, RolesService.name);
       throw error;
     }
   }
@@ -58,7 +57,7 @@ export class RolesService {
       one.name = updateRoleDto.name;
       return one.save();
     } catch (error) {
-      console.log('Role.update.error', error);
+      this.loggerService.error(`Error occurred while updating role: ${error.message}`, RolesService.name);
       throw error;
     }
   }
@@ -68,7 +67,7 @@ export class RolesService {
       const one = await this.findOne(id);
       return one.softRemove();
     } catch (error) {
-      console.log('Role.delete.error', error);
+      this.loggerService.error(`Error occurred while removing role: ${error.message}`, RolesService.name);
       throw error;
     }
   }
@@ -84,7 +83,7 @@ export class RolesService {
       await this.roleRepository.upsert(rolesToCreate, ['name']);
       return true;
     } catch (error) {
-      this.loggerService.error(error, RolesService.name);
+      this.loggerService.error(`Error occurred while creating default roles: ${error.message}`, RolesService.name);
       return false;
     }
   }
