@@ -18,10 +18,10 @@
         "cwd": "apps/minodu-backoffice"
       }
     },
-    "dev": {
+    "serve": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "ng build --configuration=development",
+        "command": "ng serve",
         "cwd": "apps/minodu-backoffice"
       }
     }
