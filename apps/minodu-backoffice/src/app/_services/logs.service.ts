@@ -13,10 +13,12 @@ const httpOptions = {
 export class LogsService {
   constructor(private http: HttpClient) { }
 
-  getNginxLogs(type: 'default' | 'error' | 'access' = 'default', lines: number = 500, source: 'backend' | 'frontend' = 'backend'): Observable<any> {
+  getNginxLogs(type: 'default' | 'error' | 'access' = 'default', lines: number = 500, source: 'frontend' | 'backend' | 'rag' = 'frontend'): Observable<any> {
     let endpoint = `nginx-logs`;
-    if (source === 'frontend') {
-      endpoint = `nginx-logs/frontend`;
+    if (source === 'backend') {
+      endpoint = `backend-logs`;
+    } else if (source === 'rag') {
+      endpoint = `nginx-logs/rag`;
     }
     return this.http.get(`${API_URL}${endpoint}?type=${type}&lines=${lines}`, {
       ...httpOptions,
@@ -24,8 +26,15 @@ export class LogsService {
     });
   }
 
-  clearLogs(): Observable<any> {
-    return this.http.delete(`${API_URL}nginx-logs`, httpOptions);
+  clearLogs(source: 'backend' | 'frontend' | 'rag' = 'backend'): Observable<any> {
+    let endpoint = `nginx-logs`;
+    if (source === 'backend') {
+      endpoint = `backend-logs`;
+    } else if (source === 'rag') {
+      endpoint = `nginx-logs/rag`;
+    }
+    return this.http.delete(`${API_URL}${endpoint}`, httpOptions);
   }
-}
+  }
+
 

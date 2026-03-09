@@ -79,10 +79,6 @@ export class PostTagsComponent implements OnInit {
     this.resetForm();
     this.modalTitle = 'Ajouter un tag';
     this.selectedTag = null;
-    const modal = document.getElementById('modal-tag');
-    if (modal && (window as any).bootstrap) {
-      (window as any).bootstrap.Modal.getOrCreateInstance(modal).show();
-    }
   }
 
   openEditModal(tag: Tag, event?: Event) {
@@ -96,10 +92,6 @@ export class PostTagsComponent implements OnInit {
     });
     this.imageFile = undefined;
     this.updateImageValidation();
-    const modal = document.getElementById('modal-tag');
-    if (modal && (window as any).bootstrap) {
-      (window as any).bootstrap.Modal.getOrCreateInstance(modal).show();
-    }
   }
 
   onFileChange(event: any) {
@@ -161,10 +153,6 @@ export class PostTagsComponent implements OnInit {
   confirmDelete(id: number, event?: Event) {
     if (event) event.preventDefault();
     this.deleteId = id;
-    const modal = document.getElementById('modal-delete-tag');
-    if (modal && (window as any).bootstrap) {
-      (window as any).bootstrap.Modal.getOrCreateInstance(modal).show();
-    }
   }
 
   deleteTag() {
