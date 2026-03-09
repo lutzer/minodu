@@ -122,6 +122,7 @@
 <div class="modal modal-blur fade" id="delete-modal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
     <div class="modal-content">
+      
       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       <!-- <div class="modal-status bg-danger"></div> -->
       <div class="modal-body text-center py-4">
@@ -144,8 +145,10 @@
 <div class="modal modal-blur fade" id="view-forum-modal" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
     <div class="modal-content" *ngIf="selectedPost">
-      <button type="button" class="btn-close" (click)="closeViewModal($event)" aria-label="Close"></button>
-      
+      <!-- <button type="button" class="btn-close" (click)="closeViewModal($event)" aria-label="Close"></button> -->
+      <button type="button" class="btn-close" 
+          data-bs-dismiss="modal"
+          (click)="closeViewModal($event)" aria-label="Close"></button>
       <div class="modal-body">
         <!-- Avatar -->
         <div class="text-center mb-4">
@@ -211,9 +214,17 @@
       </div>
 
       <div class="modal-footer">
-        <button type="button" class="btn btn-white" (click)="closeViewModal($event)">Fermer</button>
-        <button type="button" class="btn btn-danger" (click)="deleteFromModal()">Supprimer</button>
+        <button type="button" class="btn btn-white" 
+            data-bs-dismiss="modal"
+            (click)="closeViewModal($event)">Fermer</button>
+            <button type="button" class="btn btn-danger" (click)="deleteFromModal()">Supprimer</button>
       </div>
     </div>
   </div>
 </div>
+
+<button id="trigger-delete-modal" 
+        data-bs-toggle="modal" 
+        data-bs-target="#delete-modal" 
+        style="display:none">
+</button>

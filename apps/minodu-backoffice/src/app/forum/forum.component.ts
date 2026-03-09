@@ -96,34 +96,60 @@ export class ForumComponent implements OnInit {
 
   closeViewModal(event?: Event) {
     if (event) event.preventDefault();
-    const modal = document.getElementById('view-forum-modal');
-    if (modal && (window as any).bootstrap) {
-      (window as any).bootstrap.Modal.getOrCreateInstance(modal).hide();
-    }
     this.selectedPost = null;
+    const modal = document.getElementById('view-forum-modal');
+    if (modal) {
+      modal.classList.remove('show');
+      modal.setAttribute('aria-hidden', 'true');
+      modal.style.display = 'none';
+      document.body.classList.remove('modal-open');
+      document.body.style.removeProperty('overflow');
+      document.body.style.removeProperty('padding-right');
+      const backdrop = document.querySelector('.modal-backdrop');
+      if (backdrop) backdrop.remove();
+    }
   }
 
   deleteFromModal() {
     if (this.selectedPost) {
       this.deleteId = this.selectedPost.id;
-      this.closeViewModal();
-      const modal = document.getElementById('delete-modal');
-      if (modal && (window as any).bootstrap) {
-        (window as any).bootstrap.Modal.getOrCreateInstance(modal).show();
+      // Fermer le view modal manuellement
+      this.selectedPost = null;
+      const viewModal = document.getElementById('view-forum-modal');
+      if (viewModal) {
+        viewModal.classList.remove('show');
+        viewModal.setAttribute('aria-hidden', 'true');
+        viewModal.style.display = 'none';
+        document.body.classList.remove('modal-open');
+        document.body.style.removeProperty('overflow');
+        document.body.style.removeProperty('padding-right');
+        const backdrop = document.querySelector('.modal-backdrop');
+        if (backdrop) backdrop.remove();
       }
+      setTimeout(() => {
+        const deleteBtn = document.getElementById('trigger-delete-modal');
+        if (deleteBtn) deleteBtn.click();
+      }, 150);
     }
   }
 
   deletePost() {
     if (this.deleteId === null) return;
-
     this.forumService.deleteForum(this.deleteId).subscribe({
       next: () => {
         this.successMessage = 'Entrée du forum supprimée avec succès';
         this.loadForum();
+        // Fermeture manuelle du delete modal
         const modal = document.getElementById('delete-modal');
-        if (modal && (window as any).bootstrap) {
-          (window as any).bootstrap.Modal.getOrCreateInstance(modal).hide();
+        if (modal) {
+          modal.classList.remove('show');
+          modal.setAttribute('aria-hidden', 'true');
+          modal.style.display = 'none';
+          document.body.classList.remove('modal-open');
+          document.body.style.removeProperty('overflow');
+          document.body.style.removeProperty('padding-right');
+          const backdrop = document.querySelector('.modal-backdrop');
+          if (backdrop) backdrop.remove();
         }
         this.deleteId = null;
         setTimeout(() => (this.successMessage = ''), 3000);
