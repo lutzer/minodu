@@ -33,8 +33,13 @@ COPY ./nginx.conf /etc/nginx/nginx.conf
 # Create directories for apps
 RUN mkdir -p /usr/share/nginx/html/frontend
 RUN mkdir -p /usr/share/nginx/html/backoffice
+
 # Copy frontend build
 COPY --from=frontend-builder /app/build /usr/share/nginx/html/frontend
+
+# Copy captive portal probe file
+COPY ./resources/captive/hotspot-detect.html /usr/share/nginx/html/frontend/hotspot-detect.html
+
 # Copy backoffice build  
 COPY --from=backoffice-builder /app/dist/minodu-backoffice/browser /usr/share/nginx/html/backoffice
 
