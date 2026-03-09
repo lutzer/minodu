@@ -15,7 +15,7 @@ class DocumentStoreException(Exception):
     pass
 
 
-CHUNK_SIZE = 500
+CHUNK_SIZE = 400
 
 
 class DocumentStore:
