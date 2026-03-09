@@ -35,10 +35,8 @@ export class NginxLogsService {
       // Check if file exists
       await fs.access(logPath);
       
-      // Read entire file
       const fileContent = await fs.readFile(logPath, 'utf8');
       
-      // Split into lines
       const allLines = fileContent.split('\n').filter(line => line.trim() !== '');
       
       // Apply offset and limit
@@ -51,13 +49,13 @@ export class NginxLogsService {
     } catch (error) {
       if (error.code === 'ENOENT') {
         throw new HttpException(
-          `Log file not found: ${logPath}`,
+          `Fichier de log non trouvé: ${logPath}`,
           HttpStatus.NOT_FOUND
         );
       }
       
       throw new HttpException(
-        `Error reading log file: ${error.message}`,
+        `Erreur lors de la lecture du fichier de log : ${error.message}`,
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
@@ -76,19 +74,19 @@ export class NginxLogsService {
       
       return {
         success: true,
-        message: `All log files emptied successfully.`
+        message: `Logs nettoyés avec succès.`
       };
 
     } catch (error) {
       if (error.code === 'ENOENT') {
         throw new HttpException(
-          `One or more log files not found.`,
+          `Un ou plusieurs fichiers de log sont introuvables.`,
           HttpStatus.NOT_FOUND
         );
       }
       
       throw new HttpException(
-        `Error emptying log file: ${error.message}`,
+        `Erreur lors du nettoyage des logs : ${error.message}`,
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
