@@ -36,36 +36,36 @@ ENVIRONMENT=development
 
 ### Run apps with
 
-* install dependencies with `nx install <app>`
-* run tests with `nx test <app>`
-* servie with `nx serve <app>`
+* install dependencies with `npx nx install <app>`
+* run tests with `npx nx test <app>`
+* servie with `npx nx serve <app>`
 
 ### NX Usage
 
 ```
 # List projects with
-nx show nx show projects
+npx nx show nx show projects
 
 # install dependencies for specific project
-nx install <project>
+npx nx install <project>
 
 # Run a specific project
-nx serve <project>
+npx nx serve <project>
 
 # test a single poroject
-nx test <project>
+npx nx test <project>
 
 # Run tests across all projects
-nx run-many --target=test --all
+npx nx run-many --target=test --all
 
 # See project dependency graph
-nx graph
+npx nx graph
 
 # add python project
-nx g @nxlv/python:poetry-project <name> --directory=apps/<name> --projectType=application
+npx nx g @nxlv/python:poetry-project <name> --directory=apps/<name> --projectType=application
 
 # add node project
-nx g @nx/node:application <name> --directory=apps/<name>
+npx nx g @nx/node:application <name> --directory=apps/<name>
 ```
 
 ## Update Procedure

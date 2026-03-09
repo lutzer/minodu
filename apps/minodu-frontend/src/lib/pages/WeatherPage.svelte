@@ -53,7 +53,7 @@
 	});
 
 	$: loading = weather === undefined;
-	$: cloud = pickRandom([cloudSunny, cloudRain, cloudCovered, cloudSun]);
+	$: cloud = weather?.pressure != null && getCloudIcon(weather.pressure);
 	$: wind = weather?.wind_speed && getWindIcon(weather.wind_speed);
 	$: soil = weather?.humidity != null && getHumidityIcon(weather.humidity);
 
@@ -69,6 +69,18 @@
 
 	function format(val: number | null) {
 		return val == null ? 'NaN' : Math.round(val);
+	}
+
+	function getCloudIcon(airPressure: number) : string {
+		if (airPressure < 1000) {
+			return cloudRain
+		} else if (airPressure < 1010 ) {
+			return cloudCovered
+		} else if (airPressure < 1015) {
+			return cloudSunny
+		} else {
+			return cloudSun
+		}
 	}
 
 	function getTemperatureIcon(temperature: number): string {
@@ -302,12 +314,10 @@
 		margin-top: -50px;
 		right: 50%;
 		transform: translate(50%);
-		/* right: 20%;
-		bottom: 40%; */
 	}
 
 	.pressure .bird.pos-0 {
-		top: 0;
+		top: 100;
 	}
 
 	.pressure .bird.pos-1 {
@@ -315,7 +325,7 @@
 	}
 
 	.pressure .bird.pos-2 {
-		top: 100%;
+		top: 0%;
 	}
 
 	.pressure .lines {
@@ -338,7 +348,8 @@
 	}
 
 	.pressure .arrow.pos-0 {
-		top: 90%;
+		top: 10%;
+		transform: rotate(180deg);
 	}
 
 	.pressure .arrow.pos-1 {
@@ -346,8 +357,7 @@
 	}
 
 	.pressure .arrow.pos-2 {
-		top: 10%;
-		transform: rotate(180deg);
+		top: 90%;
 	}
 
 	.pressure .label {
