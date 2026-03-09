@@ -27,6 +27,7 @@ import { ForumModule } from './forum/forum.module';
 import { ThrottlerModule } from '@nestjs/throttler/dist/throttler.module';
 import { APP_GUARD } from '@nestjs/core/constants';
 import { ThrottlerGuard } from '@nestjs/throttler/dist/throttler.guard';
+import { RagLogsModule } from './rag-logs/rag-logs.module';
 
 @Module({
   imports: [
@@ -79,7 +80,8 @@ import { ThrottlerGuard } from '@nestjs/throttler/dist/throttler.guard';
     ProductOfferModule,
     BackupModule,
     NginxLogsModule,
-    ForumModule
+    ForumModule,
+    RagLogsModule
   ],
   controllers: [AppController],
   providers: [
