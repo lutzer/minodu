@@ -187,17 +187,21 @@ export class PostCategoriesComponent implements OnInit {
   }
 
   closeModal(type: 'delete' | 'form' = 'form') {
+    const modalId = type === 'form' ? 'modal-category' : 'modal-delete-category';
+    const modal = document.getElementById(modalId);
+    if (modal) {
+      modal.classList.remove('show');
+      modal.setAttribute('aria-hidden', 'true');
+      modal.style.display = 'none';
+      document.body.classList.remove('modal-open');
+      document.body.style.removeProperty('overflow');
+      document.body.style.removeProperty('padding-right');
+      const backdrop = document.querySelector('.modal-backdrop');
+      if (backdrop) backdrop.remove();
+    }
     if (type === 'form') {
-      const modal = document.getElementById('modal-category');
-      if (modal && (window as any).bootstrap) {
-        (window as any).bootstrap.Modal.getOrCreateInstance(modal).hide();
-      }
       this.resetForm();
     } else {
-      const modal = document.getElementById('modal-delete-category');
-      if (modal && (window as any).bootstrap) {
-        (window as any).bootstrap.Modal.getOrCreateInstance(modal).hide();
-      }
       this.deleteId = null;
     }
   }

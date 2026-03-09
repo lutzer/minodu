@@ -6,7 +6,7 @@
             Météo
           </h2>
         </div>
-        <div class="col-auto ms-auto d-print-none">
+        <!-- <div class="col-auto ms-auto d-print-none">
           <div class="btn-list">
             <button (click)="syncWeatherManually(); $event.preventDefault()" [disabled]="syncing" class="btn btn-primary d-none d-sm-inline-block">
               <svg *ngIf="!syncing" xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-refresh"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" /><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" /></svg>
@@ -18,7 +18,7 @@
               <span *ngIf="syncing" class="spinner-border spinner-border-sm"></span>
             </button>
           </div>
-        </div>
+        </div> -->
       </div>
       <div class="row mt-3" *ngIf="syncMessage">
         <div class="col-12">
@@ -222,84 +222,151 @@
             </div>
 
               <!-- Weather History Table -->
-              <div class="mt-5">
-                <h3 class="">Historique des données météo</h3>
-                <div class="row mb-3">
-                  <div class="col-auto ms-auto">
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-outline-primary" (click)="downloadWeatherData(); $event.preventDefault()">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-download"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" /><path d="M7 11l5 5l5 -5" /><path d="M12 3v12" /></svg>
-                        TÉLÉCHARGER
-                      </button>
-                      <!-- <div class="dropdown-menu dropdown-menu-end">
-                        <a
-                          class="dropdown-item"
-                          href="#"
-                          (click)="downloadWeatherData(); $event.preventDefault()"
-                        >
-                          Télécharger les données météo
-                        </a>
-                      </div> -->
-                    </div>
-                  </div>
-                </div>
-                <div class="card">
-                  <div class="table-responsive">
-                    <table class="table card-table table-vcenter text-nowrap datatable">
-                      <thead>
-                        <tr>
-                          <th class="w-1">No.</th>
-                          <th>Date</th>
-                          <th>Température</th>
-                          <th>Temp. ressentie</th>
-                          <th>Humidité</th>
-                          <th>Pression</th>
-                          <th>Luminosité</th>
-                          <th>CO</th>
-                          <th>NO₂</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr *ngFor="let weather of paginatedWeatherHistory; let i = index" (click)="viewWeatherDetail(weather, $event)" style="cursor: pointer;" class="table-hover">
-                          <td><span class="text-secondary">{{ i + 1 }}</span></td>
-                          <td>{{ weather.createdAt ? (weather.createdAt | date: 'short') : '-' }}</td>
-                          <td><span class="text-truncate">{{ weather.temperature }}°C</span></td>
-                          <td><span class="text-truncate">{{ weather.temperature1 }}°C</span></td>
-                          <td><span class="text-truncate">{{ weather.humidity }}%</span></td>
-                          <td><span class="text-truncate">{{ weather.pressure }} hPa</span></td>
-                          <td><span class="text-truncate">{{ weather.luminosity }} lux</span></td>
-                          <td><span class="text-truncate">{{ weather.co }}</span></td>
-                          <td><span class="text-truncate">{{ weather.no2 }}</span></td>
-                        </tr>
-                        <tr *ngIf="paginatedWeatherHistory.length === 0">
-                          <td colspan="9" class="text-center text-secondary py-4">
-                            Aucune donnée historique disponible
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
+              <!-- Weather History Table -->
+<div class="mt-5">
+  <h3>Historique des données météo</h3>
+  <div class="row mb-3">
+    <div class="col-auto ms-auto">
+      <button type="button" class="btn btn-outline-primary"
+              (click)="downloadWeatherData(); $event.preventDefault()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+             stroke-linejoin="round" class="icon">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+          <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"/>
+          <path d="M7 11l5 5l5 -5"/>
+          <path d="M12 3v12"/>
+        </svg>
+        TÉLÉCHARGER
+      </button>
+    </div>
+  </div>
 
-                  <!-- Pagination avec bouton Voir Plus -->
-                  <div class="card-footer d-flex align-items-center justify-content-between">
-                    <p class="text-secondary">
-                      Affichage de {{ weatherHistory.length }} données chargées
-                    </p>
-                    <button 
-                      *ngIf="hasMoreData" 
-                      (click)="loadMore()" 
-                      [disabled]="loadingMore"
-                      class="btn btn-primary">
-                      <span *ngIf="loadingMore" class="spinner-border spinner-border-sm me-2"></span>
-                      {{ loadingMore ? 'Chargement...' : 'Voir plus' }}
-                    </button>
-                    <p *ngIf="!hasMoreData" class="text-secondary ms-auto">
-                      Toutes les données sont chargées
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table card-table table-vcenter text-nowrap datatable">
+        <thead>
+          <tr>
+            <th class="w-1">No.</th>
+            <th>Date</th>
+            <th>Température</th>
+            <th>Temp. ressentie</th>
+            <th>Humidité</th>
+            <th>Pression</th>
+            <th>Luminosité</th>
+            <th>CO</th>
+            <th>NO₂</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Chargement -->
+          <tr *ngIf="loading">
+            <td colspan="9" class="text-center text-secondary py-4">
+              <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+              Chargement...
+            </td>
+          </tr>
+
+          <!-- Données paginées -->
+          <tr *ngFor="let w of paginatedWeatherHistory; let i = index"
+              data-bs-toggle="modal"
+              data-bs-target="#view-weather-modal"
+              (click)="viewWeatherDetail(w, $event)"
+              style="cursor: pointer;">
+            <td><span class="text-secondary">{{ (currentPage - 1) * pageSize + i + 1 }}</span></td>
+            <td>{{ w.createdAt ? (w.createdAt | date: 'short') : '-' }}</td>
+            <td>{{ w.temperature }}°C</td>
+            <td>{{ w.temperature1 }}°C</td>
+            <td>{{ w.humidity }}%</td>
+            <td>{{ w.pressure }} hPa</td>
+            <td>{{ w.luminosity }} lux</td>
+            <td>{{ w.co }}</td>
+            <td>{{ w.no2 }}</td>
+          </tr>
+
+          <!-- Vide -->
+          <tr *ngIf="!loading && weatherHistory.length === 0">
+            <td colspan="9" class="text-center text-secondary py-4">
+              Aucune donnée historique disponible
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="card-footer d-flex align-items-center">
+      <p class="m-0 text-secondary">
+        Affichage de
+        <span>{{ paginatedWeatherHistory.length === 0 ? 0 : (currentPage - 1) * pageSize + 1 }}</span>
+        à
+        <span>{{ Math.min(currentPage * pageSize, weatherHistory.length) }}</span>
+        de
+        <span>{{ weatherHistory.length }}</span>
+        éléments
+      </p>
+
+      <ul class="pagination m-0 ms-auto">
+        <!-- Précédent -->
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <a class="page-link" href="#" (click)="previousPage(); $event.preventDefault()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24"
+                 viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+              <path d="M15 6l-6 6l6 6"/>
+            </svg>
+            Précédent
+          </a>
+        </li>
+
+        <!-- Première page + ellipse si nécessaire -->
+        <ng-container *ngIf="pages[0] > 1">
+          <li class="page-item">
+            <a class="page-link" href="#" (click)="goToPage(1); $event.preventDefault()">1</a>
+          </li>
+          <li class="page-item disabled" *ngIf="pages[0] > 2">
+            <span class="page-link">…</span>
+          </li>
+        </ng-container>
+
+        <!-- Pages autour de la page courante -->
+        <li class="page-item"
+            *ngFor="let p of pages"
+            [class.active]="p === currentPage">
+          <a class="page-link" href="#" (click)="goToPage(p); $event.preventDefault()">{{ p }}</a>
+        </li>
+
+        <!-- Ellipse fin + dernière page si nécessaire -->
+        <ng-container *ngIf="pages[pages.length - 1] < totalPages">
+          <li class="page-item disabled" *ngIf="pages[pages.length - 1] < totalPages - 1">
+            <span class="page-link">…</span>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="#"
+               (click)="goToPage(totalPages); $event.preventDefault()">{{ totalPages }}</a>
+          </li>
+        </ng-container>
+
+        <!-- Suivant -->
+        <li class="page-item" [class.disabled]="currentPage === totalPages">
+          <a class="page-link" href="#" (click)="nextPage(); $event.preventDefault()">
+            Suivant
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24"
+                 viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+              <path d="M9 6l6 6l-6 6"/>
+            </svg>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- View weather details modal -->
+
 
 <!-- View weather details modal -->
 <div class="modal modal-blur fade" id="view-weather-modal" tabindex="-1" role="dialog" aria-hidden="true">

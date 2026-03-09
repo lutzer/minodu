@@ -18,7 +18,7 @@ export class LogsService {
     if (source === 'backend') {
       endpoint = `backend-logs`;
     } else if (source === 'rag') {
-      endpoint = `nginx-logs/rag`;
+      endpoint = `rag-logs`;
     }
     return this.http.get(`${API_URL}${endpoint}?type=${type}&lines=${lines}`, {
       ...httpOptions,
@@ -31,7 +31,7 @@ export class LogsService {
     if (source === 'backend') {
       endpoint = `backend-logs`;
     } else if (source === 'rag') {
-      endpoint = `nginx-logs/rag`;
+      endpoint = `rag-logs`;
     }
     return this.http.delete(`${API_URL}${endpoint}`, httpOptions);
   }
