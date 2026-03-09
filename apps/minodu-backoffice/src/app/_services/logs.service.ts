@@ -13,8 +13,12 @@ const httpOptions = {
 export class LogsService {
   constructor(private http: HttpClient) { }
 
-  getNginxLogs(type: 'default' | 'error' | 'access' = 'default', lines: number = 500): Observable<any> {
-    return this.http.get(`${API_URL}nginx-logs?type=${type}&lines=${lines}`, {
+  getNginxLogs(type: 'default' | 'error' | 'access' = 'default', lines: number = 500, source: 'backend' | 'frontend' = 'backend'): Observable<any> {
+    let endpoint = `nginx-logs`;
+    if (source === 'frontend') {
+      endpoint = `nginx-logs/frontend`;
+    }
+    return this.http.get(`${API_URL}${endpoint}?type=${type}&lines=${lines}`, {
       ...httpOptions,
       responseType: 'text'
     });

@@ -44,7 +44,7 @@
               <div class="row align-items-center">
                 <div class="col-10">
                   <div class="markdown text-secondary">
-                          {{weather?.description}}
+                          {{weather?.description || '⏳ Données météo en attente d’analyse…'}}
                     <!-- Votre bulletin météo agricole intelligent : l'interface centrale de monitoring des données agroclimatiques issues de la station téléagriculture, permettant aux agriculteurs d'accéder à des prévisions fiables et des alertes terrain en temps réel. -->
                   </div>
                 </div>
@@ -64,7 +64,7 @@
                       </div>
                       <div class="col">
                         <div class="font-weight-medium">
-                          {{weather?.temperature}}
+                          {{weather?.temperature || '--'}}°C
                         </div>
                         <div class="text-secondary">
                           Température
@@ -84,7 +84,7 @@
                       </div>
                       <div class="col">
                         <div class="font-weight-medium">
-                          {{weather?.temperature1}}
+                          {{weather?.temperature1 || '--'}}°C
                         </div>
                         <div class="text-secondary">
                           Température ressentie
@@ -104,8 +104,8 @@
                       </div>
                       <div class="col">
                         <div class="font-weight-medium">
-                          {{weather?.humidity}}
-                          <span class="float-right font-weight-medium text-green">+6.8%</span>
+                          {{weather?.humidity || '--'}}%
+                          <!-- <span class="float-right font-weight-medium text-green">+6.8%</span> -->
                         </div>
                         <div class="text-secondary">
                           Humidité
@@ -125,7 +125,7 @@
                       </div>
                       <div class="col">
                         <div class="font-weight-medium">
-                          {{weather?.pressure}}
+                          {{weather?.pressure || '--'}} hPa
                         </div>
                         <div class="text-secondary">
                           Pression atmosphérique
@@ -145,8 +145,8 @@
                       </div>
                       <div class="col">
                         <div class="font-weight-medium">
-                          {{weather?.luminosity}}
-                          <span class="float-right font-weight-medium text-red">-2%</span>
+                          {{weather?.luminosity || '--'}} lux
+                          <!-- <span class="float-right font-weight-medium text-red">-2%</span> -->
                         </div>
                         <div class="text-secondary">
                           Intensité Lumineuse
@@ -166,8 +166,8 @@
                       </div>
                       <div class="col">
                         <div class="font-weight-medium">
-                          {{weather?.ambient}}
-                          <span class="float-right font-weight-medium text-red">-2%</span>
+                          {{weather?.ambient || '--'}}°C
+                          <!-- <span class="float-right font-weight-medium text-red">-2%</span> -->
                         </div>
                         <div class="text-secondary">
                           Ambiant
@@ -187,8 +187,8 @@
                       </div>
                       <div class="col">
                         <div class="font-weight-medium">
-                          {{weather?.co}}
-                          <span class="float-right font-weight-medium text-red">-2%</span>
+                          {{weather?.co || '--'}} ppm
+                          <!-- <span class="float-right font-weight-medium text-red">-2%</span> -->
                         </div>
                         <div class="text-secondary">
                           Monoxyde de carbone (CO)
@@ -208,8 +208,8 @@
                       </div>
                       <div class="col">
                         <div class="font-weight-medium">
-                          {{weather?.no2}}
-                          <span class="float-right font-weight-medium text-red">-2%</span>
+                          {{weather?.no2 || '--'}} µg/m³
+                          <!-- <span class="float-right font-weight-medium text-red">-2%</span> -->
                         </div>
                         <div class="text-secondary">
                           Dioxyde d'azote (NO₂)

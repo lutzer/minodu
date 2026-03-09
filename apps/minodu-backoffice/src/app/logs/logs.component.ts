@@ -22,6 +22,7 @@ export class LogsComponent implements OnInit {
   logsText = '';
   isClearing = false;
   activeTab: 'default' | 'error' | 'access' = 'default';
+  logSource: 'backend' | 'frontend' = 'backend';
   currentLines: number = 500;
   readonly LINES_INCREMENT: number = 500;
 
@@ -41,7 +42,7 @@ export class LogsComponent implements OnInit {
     this.errorMessage = '';
     this.currentLines = 500; // Reset to default when switching tabs
     
-    this.logsService.getNginxLogs(this.activeTab, this.currentLines).subscribe({
+    this.logsService.getNginxLogs(this.activeTab, this.currentLines, this.logSource).subscribe({
       next: data => {
         this.logsText = data || 'No logs available yet';
         this.loading = false;
@@ -60,7 +61,7 @@ export class LogsComponent implements OnInit {
     this.errorMessage = '';
     this.currentLines += this.LINES_INCREMENT;
     
-    this.logsService.getNginxLogs(this.activeTab, this.currentLines).subscribe({
+    this.logsService.getNginxLogs(this.activeTab, this.currentLines, this.logSource).subscribe({
       next: data => {
         this.logsText = data || 'No logs available yet';
         this.loadingMore = false;
@@ -77,6 +78,11 @@ export class LogsComponent implements OnInit {
 
   switchTab(tab: 'default' | 'error' | 'access') {
     this.activeTab = tab;
+    this.loadLogs();
+  }
+
+  switchLogSource(source: 'backend' | 'frontend') {
+    this.logSource = source;
     this.loadLogs();
   }
 
