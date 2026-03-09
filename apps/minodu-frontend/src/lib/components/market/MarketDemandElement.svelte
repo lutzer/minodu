@@ -33,7 +33,6 @@
 		</div>
 		<div>
 			<TextToSpeechButton {ttsPlayer} text={demandText} />
-			<p>{demandText}</p>
 		</div>
 	</div>
 	<div class="product">
