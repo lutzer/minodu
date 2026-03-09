@@ -188,47 +188,4 @@ export class WeatherComponent implements OnInit {
       this.currentPage++;
     }
   }
-
-  // downloadWeatherData(format: 'csv' | 'json') {
-  //   const element = document.createElement('a');
-  //   let content = '';
-  //   let filename = '';
-  //   let type = '';
-
-  //   if (format === 'json') {
-  //     content = JSON.stringify(this.weatherHistory, null, 2);
-  //     filename = 'historique_meteo.json';
-  //     type = 'application/json';
-  //   } else {
-  //     // CSV format
-  //     const headers = ['Date', 'Température', 'Température ressentie', 'Humidité', 'Humidité 2', 'Pression', 'Luminosité', 'Ambiant', 'CO', 'NO₂', 'Description'];
-  //     const rows = this.weatherHistory.map(w => [
-  //       w.createdAt || '',
-  //       w.temperature || '',
-  //       w.temperature1 || '',
-  //       w.humidity || '',
-  //       w.humidity1 || '',
-  //       w.pressure || '',
-  //       w.luminosity || '',
-  //       w.ambient || '',
-  //       w.co || '',
-  //       w.no2 || '',
-  //       (w.description || '').replace(/"/g, '""')
-  //     ]);
-
-  //     content = [headers, ...rows].map(row => 
-  //       row.map(cell => typeof cell === 'string' && cell.includes(',') ? `"${cell}"` : cell).join(',')
-  //     ).join('\n');
-      
-  //     filename = 'historique_meteo.csv';
-  //     type = 'text/csv;charset=utf-8;';
-  //   }
-
-  //   element.setAttribute('href', 'data:' + type + ',' + encodeURIComponent(content));
-  //   element.setAttribute('download', filename);
-  //   element.style.display = 'none';
-  //   document.body.appendChild(element);
-  //   element.click();
-  //   document.body.removeChild(element);
-  // }
 }
