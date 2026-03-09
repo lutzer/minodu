@@ -23,6 +23,7 @@ import { PostService } from 'src/posts/post.service';
 import { ConfigurationService } from 'src/configuration/configuration.service';
 import { userRole } from 'src/roles/entities/user_role.enum';
 import { CreateUserDto } from './dto/create-user.dto';
+import { LoggerService } from 'src/logs/logger.service';
 
 @Injectable()
 export class UsersService {
@@ -39,7 +40,8 @@ export class UsersService {
     private readonly configurationService: ConfigurationService,
     @Inject(forwardRef(() => PostService))
     private readonly postService: PostService,
-    private readonly productsService: ProductsService
+    private readonly productsService: ProductsService,
+    private readonly loggerService: LoggerService
   ) { }
 
   async create(createUserDto: CreateUserDto) {
@@ -59,12 +61,14 @@ export class UsersService {
       user.password = await this.hashPassword(password, salt);
 
       return user.save().then((saved) => {
+        this.loggerService.log('User created successfully', UsersService.name);
         if(user.isContactPerson!)
           this.updateContactPerson(saved.id)
         return DataFormater.getUser(saved);
       });
 
     } catch (error) {
+      this.loggerService.error(`Error occurred while creating user: ${error.message}`, UsersService.name);
         throw new ConflictException(`Un compte est déjà enregistré avec le telephone ${phone} !`);
     }
   }
@@ -85,7 +89,7 @@ export class UsersService {
     }
 
     } catch (error) {
-      console.log('Admin.dashboard.error', error);
+      this.loggerService.error(`Error occurred while fetching admin dashboard data: ${error.message}`, UsersService.name);
       throw error;
     }
   }
@@ -101,6 +105,7 @@ export class UsersService {
       });
       return count;
     } catch (error) {
+      this.loggerService.error(`Error occurred while counting users: ${error.message}`, UsersService.name);
       throw new Error(`Échec de la récupération du nombre d'utilisateur inscrits : ${error.message}`);
     }
   }
@@ -120,7 +125,7 @@ export class UsersService {
         return { ...DataFormater.getUser(user) };
       });
     } catch (error) {
-      console.log('User.all.error', error);
+      this.loggerService.error(`Error occurred while fetching users: ${error.message}`, UsersService.name);
       throw error;
     }
   }
@@ -135,11 +140,12 @@ export class UsersService {
         },
       });
       if (!one) {
+        this.loggerService.error(`User not found with id: ${id}`, UsersService.name);
         throw new NotFoundException('Utilisateur non trouvé !');
       }
       return one;
     } catch (error) {
-      console.log('User.one.error', error);
+      this.loggerService.error(`Error occurred while fetching user: ${error.message}`, UsersService.name);
       throw error;
     }
   }
@@ -154,11 +160,12 @@ export class UsersService {
         },
       });
       if (!one) {
+        this.loggerService.error(`User not found with id: ${id}`, UsersService.name);
         throw new NotFoundException('Utilisateur non trouvé !');
       }
       return { ...DataFormater.getUser(one)};
     } catch (error) {
-      console.log('User_.one.error', error);
+      this.loggerService.error(`Error occurred while fetching user: ${error.message}`, UsersService.name);
       throw error;
     }
   }
@@ -173,11 +180,12 @@ export class UsersService {
         },
       });
       if (!user) {
+        this.loggerService.error(`User not found with phone: ${phone}`, UsersService.name);
         throw new NotFoundException('Utilisateur non trouvé !');
       }
       return user;
     } catch (error) {
-      console.log('User.one.error', error);
+      this.loggerService.error(`Error occurred while fetching user by phone: ${error.message}`, UsersService.name);
       throw error;
     }
   }
@@ -192,11 +200,12 @@ export class UsersService {
         },
       });
       if (!user) {
+        this.loggerService.error(`Contact person not found`, UsersService.name);
         throw new NotFoundException('Utilisateur non trouvé !');
       }
       return DataFormater.getUser(user);
     } catch (error) {
-      console.log('User.one.error', error);
+      this.loggerService.error(`Error occurred while fetching contact person: ${error.message}`, UsersService.name);
       throw error;
     }
   }
@@ -205,20 +214,23 @@ export class UsersService {
     try {
       const user = await this.userRepository.findOne({ where: { id } });
       if (!user) {
+        this.loggerService.error(`User not found with id: ${id}`, UsersService.name);
         throw new NotFoundException('Utilisateur non trouvé !');
       }
       const role = await this.roleRepository.findOne({
         where: { id: idRole },
       });
       if (!role) {
+        this.loggerService.error(`Role not found with id: ${idRole}`, UsersService.name);
         throw new NotFoundException('Role utilisateur non trouvé !');
       }
       user.role = role;
       return user.save().then((saved) => {
+        this.loggerService.log(`User role updated successfully (User ID: ${id}, Role ID: ${idRole})`, UsersService.name);
         return DataFormater.getUser(saved);
       });
     } catch (error) {
-      console.log('UserRole.update.error', error);
+      this.loggerService.error(`Error occurred while updating user role: ${error.message}`, UsersService.name);
       throw error;
     }
   }
@@ -227,12 +239,14 @@ export class UsersService {
     try {
       const user = await this.userRepository.findOne({ where: { id } });
       if (!user) {
+        this.loggerService.error(`User not found with id: ${id}`, UsersService.name);
         throw new NotFoundException('Utilisateur non trouvé !');
       }
       const userState = await this.userStatusRepository.findOne({
         where: { id: idStuatus},
       });
       if (!userState) {
+        this.loggerService.error(`User status not found with id: ${idStuatus}`, UsersService.name);
         throw new NotFoundException('Etat d\'utilisateur non trouvé !');
       }
       user.status = userState;
@@ -240,7 +254,7 @@ export class UsersService {
         return DataFormater.getUser(saved);
       });
     } catch (error) {
-      console.log('User.update.error', error);
+      this.loggerService.error(`Error occurred while updating user status: ${error.message}`, UsersService.name);
       throw error;
     }
   }
@@ -256,14 +270,16 @@ export class UsersService {
     try {
       const user = await this.userRepository.findOne({ where: { id } });
       if (!user) {
+        this.loggerService.error(`User not found with id: ${id}`, UsersService.name);
         throw new NotFoundException('Utilisateur non trouvé !');
       }
 
       return user.softRemove().then((saved) => {
+        this.loggerService.log(`User deleted successfully (User ID: ${id})`, UsersService.name);
         return DataFormater.getUser(saved);
       });
     } catch (error) {
-      console.log('User.delete.error', error);
+      this.loggerService.error(`Error occurred while deleting user: ${error.message}`, UsersService.name);
       throw error;
     }
   }
@@ -275,16 +291,20 @@ export class UsersService {
         where: { id: currentUser.id },
       });
       if (!user) {
+        this.loggerService.error(`User not found with id: ${currentUser.id}`, UsersService.name);
         throw new NotFoundException('Utilisateur non trouvé !');
       }
       if (fullName) user.fullname = fullName;
       if (phone) user.phone = phone;
       if (gender) user.gender = gender;
       return user.save().then((saved) => {
+        this.loggerService.log('Current user updated successfully', UsersService.name);
+         if(user.isContactPerson)
+          this.updateContactPerson(saved.id)
         return DataFormater.getUser(saved);
       });
     } catch (error) {
-      console.log('User.update.error', error);
+      this.loggerService.error(`Error occurred while updating current user: ${error.message}`, UsersService.name);
       throw error;
     }
   }
@@ -299,6 +319,7 @@ export class UsersService {
          },
       });
       if (!user) {
+        this.loggerService.error(`User not found with id: ${userId}`, UsersService.name);
         throw new NotFoundException('Utilisateur non trouvé ou impossible de le modifier !');
       }
       if (fullName) user.fullname = fullName;
@@ -306,12 +327,13 @@ export class UsersService {
       if (gender) user.gender = gender;
       user.isContactPerson = [true, 'true', 1, '1'].includes(isContactPerson);
       return user.save().then((saved) => {
+        this.loggerService.log('User updated successfully', UsersService.name);
          if(user.isContactPerson)
           this.updateContactPerson(saved.id)
         return DataFormater.getUser(saved);
       });
     } catch (error) {
-      console.log('User.update.error', error);
+      this.loggerService.error(`Error occurred while updating user: ${error.message}`, UsersService.name);
       throw error;
     }
   }
@@ -323,16 +345,18 @@ export class UsersService {
         where: { id },
       });
       if (!user) {
+        this.loggerService.error(`User not found with id: ${id}`, UsersService.name);
         throw new NotFoundException('Utilisateur non trouvé !');
       }
 
       const salt = await bcrypt.genSalt();
       user.password = await this.hashPassword(password, salt);
       return user.save().then((saved) => {
+        this.loggerService.log('User password updated successfully', UsersService.name);
         return DataFormater.getUser(saved);
       });
     } catch (error) {
-      console.log('User.changePwd.error', error);
+      this.loggerService.error(`Error occurred while changing user password: ${error.message}`, UsersService.name);
       throw error;
     }
   }
@@ -363,7 +387,7 @@ async createDefaultAdmin() {
   try {
     const role = await this.rolesService.adminRole();
     if (!role) {
-      console.error('Role ADMIN not found. Make sure createDefaultRoles() runs first.');
+      this.loggerService.error('Role ADMIN not found. Make sure createDefaultRoles() runs first.', UsersService.name);
       return false;
     }
 
@@ -383,12 +407,12 @@ async createDefaultAdmin() {
       if (!user.password) throw new Error("ADMIN_PASSWORD is not defined in .env");
 
       await this.userRepository.upsert(user, ['phone']);
-      console.log(`Default admin created.`);
+      this.loggerService.log(`Default admin created.`, UsersService.name);
     }
 
     return true;
   } catch (error) {
-    console.error('defaultAdmin.create.error', error);
+    this.loggerService.error(`Error occurred while creating default admin: ${error.message}`, UsersService.name);
     return false;
   }
 }

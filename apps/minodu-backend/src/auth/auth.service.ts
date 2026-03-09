@@ -30,23 +30,23 @@ export class AuthService {
   }
 
   async signIn(phone: string, password: string): Promise<any> {
-    this.logger.log(`Tentative d'authentification de ${phone}`, 'AuthController');
+    this.logger.log(`Logging attempt for ${phone}`, AuthService.name);
     const user = await this.usersService.findByPhone(phone);
 
     if (!user) {
-      this.logger.log(`Authentification de ${phone}, refusée. Le numero de télephone est invalide.`, 'AuthController');
+      this.logger.error(`Authentication failed for ${phone}, refused. The phone number is invalid.`, AuthService.name);
       throw new UnauthorizedException('Numéro de télephone ou mot de passe invalide.');
     }
 
     const isValidPwd = await user.validatePassword(password);
 
     if (!isValidPwd) {
-      this.logger.log(`Authentification de ${phone}, refusée. Le mot de passe est invalide.`, 'AuthController');
+      this.logger.error(`Authentication failed for ${phone}, refused. The password is invalid.`, AuthService.name);
       throw new UnauthorizedException('Numéro de télephone ou mot de passe invalide.');
     }
 
     if (user.status.name !== (await this.userStatusService.defaultStatus()).name) {
-      this.logger.log(`Authentification de ${phone}, refusée. le compte utilisateur est bloqué`, 'AuthController');
+      this.logger.error(`Authentication failed for ${phone}, refused. The user account is blocked.`, AuthService.name);
       throw new UnauthorizedException('Ce compte utilisateur est bloqué.');
     }
 
@@ -61,7 +61,7 @@ export class AuthService {
     const access_token = await this.jwtService.signAsync(payload);
     await this.cls.set('access_token', access_token);
     await this.addSession(access_token, user);
-    this.logger.log(`Authentification de ${phone}, réussie.`, 'AuthController');
+    this.logger.log(`Authentication successful for ${phone}.`, AuthService.name);
     return { access_token, ...DataFormater.getUser(user) };
   }
 
@@ -74,7 +74,7 @@ export class AuthService {
         }
       });
     } catch (error) {
-      console.log('signUp-Err', error);
+      this.logger.error(`Error occurred while signing up ${signUpDto.phone}`, AuthService.name);
       throw error;
     }
   }
@@ -99,9 +99,8 @@ export class AuthService {
       });
 
     } catch (error) {
-      if (error.code === '11000' || error.code === '23505') {
+      this.logger.error(`Error occurred while registering ${phone}`, AuthService.name);
         throw new ConflictException(`Un compte est déjà enregistré avec le telephone ${phone} !`);
-      }
       throw error;
     }
   }
@@ -123,7 +122,7 @@ export class AuthService {
       session.finishedAt = new Date(payload.exp * 1000);
       await session.save();
     } catch (error) {
-      console.log('addSession-Err', error);
+      this.logger.error(`Error occurred while adding session for ${user.phone}`, AuthService.name);
       throw error;
     }
   }
@@ -133,7 +132,7 @@ export class AuthService {
       await this.sessionService.deleteSessions(user);
       return {success: true, message: 'Déconnexion réussie.'};
     } catch (error) {
-      console.log('clearSessions-Err', error);
+      this.logger.error(`Error occurred while logging out ${user.phone}`, AuthService.name);
       throw error;
     }
   }

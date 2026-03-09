@@ -56,12 +56,16 @@
                   <td>{{post.author.name}}</td>
                   <!-- <td>{{ post.createdAt ? (post.createdAt | date: 'short') : '-' }}</td> -->
                   <td class="text-end">
-                    <button class="btn btn-icon btn-ghost-primary btn-sm me-2" 
+                    <button class="btn btn-icon btn-ghost-primary btn-sm me-2"
+                            data-bs-toggle="modal"
+                            data-bs-target="#view-forum-modal" 
                             (click)="viewForum(post, $event)"
                             title="Visualiser">
                             <i class="ti ti-eye"></i>
                     </button>
                     <button class="btn btn-icon btn-ghost-danger btn-sm" 
+                            data-bs-toggle="modal"
+                            data-bs-target="#delete-modal"
                             (click)="confirmDelete(post.id, $event)"
                             title="Supprimer">
                             <i class="ti ti-trash"></i>

@@ -7,6 +7,7 @@ import { Product } from 'src/products/entities/product.entity';
 import { User } from 'src/users/entities/user.entity';
 import { CreateProductOfferDto } from './dto/create-product-offer.dto';
 import { UpdateProductOfferDto } from './dto/update-product-offer.dto';
+import { LoggerService } from 'src/logs/logger.service';
 
 @Injectable()
 export class ProductOfferService {
@@ -17,7 +18,8 @@ export class ProductOfferService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     @InjectRepository(Product)
-    private readonly productRepository: Repository<Product>
+    private readonly productRepository: Repository<Product>,
+    private readonly loggerService: LoggerService
   ) { }
 
   async create(createProductOfferDto: CreateProductOfferDto) {
@@ -38,10 +40,11 @@ export class ProductOfferService {
       productOffer.quantity = createProductOfferDto.quantity;
 
       return productOffer.save().then((saved) => {
+        this.loggerService.log('Product offer created successfully', ProductOfferService.name);
         return DataFormater.getProductOffer(saved);
       });
     } catch (error) {
-      console.log('ProductOffer.create.error', error);
+      this.loggerService.error(`Error occurred while creating product offer: ${error.message}`, ProductOfferService.name);
       throw error;
     }
   }
@@ -60,7 +63,7 @@ export class ProductOfferService {
         return { ...DataFormater.getProductOffer(productOffer) };
       });
     } catch (error) {
-      console.log('ProductOffer.all.error', error);
+      this.loggerService.error(`Error occurred while fetching product offers: ${error.message}`, ProductOfferService.name);
       throw error;
     }
   }
@@ -79,7 +82,7 @@ export class ProductOfferService {
         return { ...DataFormater.getProductOffer(productOffer) };
       });
     } catch (error) {
-      console.log('ProductOffer.allArchived.error', error);
+      this.loggerService.error(`Error occurred while fetching archived product offers: ${error.message}`, ProductOfferService.name);
       throw error;
     }
   }
@@ -94,11 +97,14 @@ export class ProductOfferService {
       }
     });
       if (!one) {
-        throw new NotFoundException();
+        this.loggerService.error(`Product offer not found with id: ${id}`, ProductOfferService.name);
+        throw new NotFoundException('Offre non trouvée !');
       }
+
+      this.loggerService.log(`Product offer fetched successfully with id: ${id}`, ProductOfferService.name);
       return DataFormater.getProductOffer(one);;
     } catch (error) {
-      console.log('ProductOffer.one.error', error);
+      this.loggerService.error(`Error occurred while fetching product offer: ${error.message}`, ProductOfferService.name);
       throw error;
     }
   }
@@ -113,11 +119,12 @@ export class ProductOfferService {
       }
     });
       if (!one) {
-        throw new NotFoundException();
+        this.loggerService.error(`Product offer not found with id: ${id}`, ProductOfferService.name);
+        throw new NotFoundException('Offre non trouvée !');
       }
       return one;
     } catch (error) {
-      console.log('ProductOffer.one.error', error);
+      this.loggerService.error(`Error occurred while fetching product offer: ${error.message}`, ProductOfferService.name);
       throw error;
     }
   }
@@ -134,14 +141,15 @@ export class ProductOfferService {
       } 
       });
       if (!data) {
-        throw new NotFoundException();
+        this.loggerService.error(`No product offers found for product with id: ${productId}`, ProductOfferService.name);
+        throw new NotFoundException('Aucune offre trouvée pour ce produit !');
       }
       
        return data.map((productOffer) => {
         return { ...DataFormater.getProductOffer(productOffer) };
       });
     } catch (error) {
-      console.log('ProductOffer.byProduct.error', error);
+      this.loggerService.error(`Error occurred while fetching product offers by product: ${error.message}`, ProductOfferService.name);
       throw error;
     }
   }
@@ -158,13 +166,14 @@ export class ProductOfferService {
       }
       });
       if (!data) {
-        throw new NotFoundException();
+        this.loggerService.error(`No product offers found for farmer with id: ${userId}`, ProductOfferService.name);
+        throw new NotFoundException('Aucune offre trouvée pour ce producteur !');
       }
       return data.map((productOffer) => {
         return { ...DataFormater.getProductOffer(productOffer) };
       });
     } catch (error) {
-      console.log('ProductOffer.byFarmer.error', error);
+      this.loggerService.error(`Error occurred while fetching product offers by farmer: ${error.message}`, ProductOfferService.name);
       throw error;
     }
   }
@@ -174,6 +183,7 @@ export class ProductOfferService {
       const one =  await this._findOne(id);
 
       if (one.isArchived){
+        this.loggerService.error(`Attempted to archive a product offer that is already archived: ${id}`, ProductOfferService.name);
         throw new Error('Offre déjà archivée');
       }
 
@@ -181,10 +191,11 @@ export class ProductOfferService {
       one.archivedAt = new Date();
 
       return one.save().then((saved)=>{
+        this.loggerService.log('Product offer archived successfully', ProductOfferService.name);
         return DataFormater.getProductOffer (saved);
       });
     } catch (error){
-      console.log('ProductOffer.archive.error', error);
+      this.loggerService.error(`Error occurred while archiving product offer: ${error.message}`, ProductOfferService.name);
       throw error;
     }
   }
@@ -194,6 +205,7 @@ export class ProductOfferService {
       const one = await this._findOne(id);
       
       if (!one.isArchived) {
+        this.loggerService.error(`Attempted to unarchive a product offer that is not archived: ${id}`, ProductOfferService.name);
         throw new Error('Cet offre n\'est pas archivée');
       }
 
@@ -201,14 +213,14 @@ export class ProductOfferService {
       one.archivedAt = null;
 
       return one.save().then((saved) => {
+        this.loggerService.log('Product offer unarchived successfully', ProductOfferService.name);
         return DataFormater.getProductOffer(saved);
       });
     } catch (error) {
-      console.log('ProductOffer.unarchive.error', error);
+      this.loggerService.error(`Error occurred while unarchiving product offer: ${error.message}`, ProductOfferService.name);
       throw error;
     }
   }
-  
 
   async update(id: number, updateProductOfferDto: UpdateProductOfferDto) {
     try {
@@ -216,10 +228,11 @@ export class ProductOfferService {
       one.quantity = updateProductOfferDto.quantity;
       
       return one.save().then((saved) => {
+        this.loggerService.log('Product offer updated successfully', ProductOfferService.name);
         return DataFormater.getProductOffer(saved);
       });
     } catch (error) {
-      console.log('ProductOffer.update.error', error);
+      this.loggerService.error(`Error occurred while updating product offer: ${error.message}`, ProductOfferService.name);
       throw error;
     }
   }
@@ -229,7 +242,7 @@ export class ProductOfferService {
       const one = await this._findOne(id);
       return one.softRemove();
     } catch (error) {
-      console.log('ProductOffer.delete.error', error);
+      this.loggerService.error(`Error occurred while deleting product offer: ${error.message}`, ProductOfferService.name);
       throw error;
     }
   }

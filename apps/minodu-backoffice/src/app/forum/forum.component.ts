@@ -75,19 +75,11 @@ export class ForumComponent implements OnInit {
   confirmDelete(id: number, event?: Event) {
     if (event) event.preventDefault();
     this.deleteId = id;
-    const modal = document.getElementById('delete-modal');
-    if (modal && (window as any).bootstrap) {
-      (window as any).bootstrap.Modal.getOrCreateInstance(modal).show();
-    }
   }
 
   viewForum(post: Forum, event?: Event) {
     if (event) event.preventDefault();
     this.selectedPost = post;
-    const modal = document.getElementById('view-forum-modal');
-    if (modal && (window as any).bootstrap) {
-      (window as any).bootstrap.Modal.getOrCreateInstance(modal).show();
-    }
   }
 
   isAudio(file: { filename: string; content_type: string }): boolean {

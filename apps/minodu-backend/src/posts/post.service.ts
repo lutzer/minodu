@@ -10,6 +10,8 @@ import { PostResourceService } from 'src/post_resources/post-resource.service';
 import { PostCategoryService } from 'src/post_categories/post-category.service';
 import { UsersService } from 'src/users/user.service';
 import { BaseConfig } from 'src/utils/common.util';
+import { LoggerService } from 'src/logs/logger.service';
+import { error } from 'winston';
 
 @Injectable()
 export class PostService {
@@ -21,7 +23,8 @@ export class PostService {
     private readonly tagService: PostTagService,
     private readonly resourceService: PostResourceService,
     @Inject(forwardRef(() => UsersService))
-    private readonly userService: UsersService
+    private readonly userService: UsersService,
+    private readonly loggerService: LoggerService
   ) { }
 
   async create(createPostDto: CreatePostDto, currentUser) {
@@ -54,14 +57,12 @@ export class PostService {
       post.resources = resources;
       post.tags = tags;
 
-      let res = await post.save();
+      const res = await post.save();
+      this.loggerService.log('Post created successfully', PostService.name);  
       return DataFormater.getPost(res);
     } catch (error) {
-      if (error.code === '11000' || error.code === '23505') {
+        this.loggerService.error(`Error occurred while creating post: ${error.message}`, PostService.name);
         throw new ConflictException(`La publication avec le titre ( ${createPostDto.title} ) existe déja !}`);
-      }
-      console.log('Post.create.error', error);
-      throw error;
     }
   }
 
@@ -70,6 +71,7 @@ export class PostService {
       const count = await this.postRepository.count();
       return count;
     } catch (error) {
+      this.loggerService.error(`Error occurred while counting posts: ${error.message}`, PostService.name);
       throw new Error(`Échec de la récupération du nombre de publications : ${error.message}`);
     }
   }
@@ -85,7 +87,7 @@ export class PostService {
         }
       })
     } catch (error) {
-      console.log('Post.all.error', error);
+      this.loggerService.error(`Error occurred while fetching posts: ${error.message}`, PostService.name);
       throw error;
     }
   }
@@ -108,7 +110,7 @@ export class PostService {
         }
       })
     } catch (error) {
-      console.log('Post.allByTag.error', error);
+      this.loggerService.error(`Error occurred while fetching posts by tag: ${error.message}`, PostService.name);
       throw error;
     }
   }
@@ -131,7 +133,7 @@ export class PostService {
         }
       })
     } catch (error) {
-      console.log('Post.allByResource.error', error);
+      this.loggerService.error(`Error occurred while fetching posts by resource: ${error.message}`, PostService.name);
       throw error;
     }
   }
@@ -144,7 +146,7 @@ export class PostService {
       }
       return one;
     } catch (error) {
-      console.log('Post.one.error', error);
+      this.loggerService.error(`Error occurred while fetching post: ${error.message}`, PostService.name);
       throw error;
     }
   }
@@ -160,7 +162,7 @@ export class PostService {
       }
       return DataFormater.getPost(one);
     } catch (error) {
-      console.log('Post.one.error', error);
+      this.loggerService.error(`Error occurred while fetching post: ${error.message}`, PostService.name);
       throw error;
     }
   }
@@ -210,10 +212,11 @@ export class PostService {
       if(tags)
       one.tags = tags;
 
-      let res = await one.save();
+      const res = await one.save();
+      this.loggerService.log('Post updated successfully', PostService.name);
       return DataFormater.getPost(res);
     } catch (error) {
-      console.log('Post.update.error', error);
+      this.loggerService.error(`Error occurred while updating post: ${error.message}`, PostService.name);
       throw error;
     }
   }
@@ -223,7 +226,7 @@ export class PostService {
       const one = await this.findOne(id);
       return one.softRemove();
     } catch (error) {
-      console.log('Post.delete.error', error);
+      this.loggerService.error(`Error occurred while deleting post: ${error.message}`, PostService.name);
       throw error;
     }
   }

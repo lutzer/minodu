@@ -7,6 +7,7 @@ import { ProductCategory } from './entities/product_category.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { UpdateProductCategoryDto } from './dto/update-product-category.dto';
 import { BaseConfig } from 'src/utils/common.util';
+import { LoggerService } from 'src/logs/logger.service';
 
 @Injectable()
 export class ProductCategoriesService {
@@ -15,7 +16,8 @@ export class ProductCategoriesService {
     @InjectRepository(ProductCategory)
     private readonly productCategoryRepository: Repository<ProductCategory>,
     @InjectRepository(Product)
-    private readonly productRepository: Repository<Product>
+    private readonly productRepository: Repository<Product>,
+    private readonly loggerService: LoggerService
   ) { }
 
   async create(createProductCategoryDto: CreateProductCategoryDto) {
@@ -24,11 +26,12 @@ export class ProductCategoriesService {
       category.name = createProductCategoryDto.name.toUpperCase();
       category.image = createProductCategoryDto.image;
       await BaseConfig.processImage(createProductCategoryDto.image);
-      return category.save();
+      const res = await category.save();
+      this.loggerService.log('Product category created successfully', ProductCategoriesService.name);
+      return DataFormater.getProductCategory(res);
     } catch (error) {
-      console.log('ProductCategory.create.error', error);
+      this.loggerService.error(`Error occurred while creating product category: ${error.message}`, ProductCategoriesService.name);
       throw new ConflictException(`La categorie ( ${createProductCategoryDto.name} ) existe déja !}`);
-      throw error;
     }
   }
 
@@ -42,7 +45,7 @@ export class ProductCategoriesService {
         }
       })
     } catch (error) {
-      console.log('ProductCategory.all.error', error);
+      this.loggerService.error(`Error occurred while fetching product categories: ${error.message}`, ProductCategoriesService.name);
       throw error;
     }
   }
@@ -55,7 +58,7 @@ export class ProductCategoriesService {
       }
       return one;
     } catch (error) {
-      console.log('ProductCategory.one.error', error);
+      this.loggerService.error(`Error occurred while fetching product category: ${error.message}`, ProductCategoriesService.name);
       throw error;
     }
   }
@@ -68,7 +71,7 @@ export class ProductCategoriesService {
       }
       return DataFormater.getProductCategory(one);
     } catch (error) {
-      console.log('ProductCategory.one.error', error);
+      this.loggerService.error(`Error occurred while fetching product category: ${error.message}`, ProductCategoriesService.name);
       throw error;
     }
   }
@@ -82,9 +85,11 @@ export class ProductCategoriesService {
         one.image = updateProductCategoryDto.image;
         await BaseConfig.processImage(updateProductCategoryDto.image);
       }
-      return one.save();
+      const res = await one.save();
+      this.loggerService.log('Product category updated successfully', ProductCategoriesService.name);
+      return DataFormater.getProductCategory(res);
     } catch (error) {
-      console.log('ProductCategory.update.error', error);
+      this.loggerService.error(`Error occurred while updating product category: ${error.message}`, ProductCategoriesService.name);
       throw error;
     }
   }
@@ -100,11 +105,13 @@ export class ProductCategoriesService {
       });
   
       if (!productCategory) {
+        this.loggerService.error(`Attempted to delete product category with ID ${id} but it was not found`, ProductCategoriesService.name);
         throw new NotFoundException(`La catégorie de produit avec l'ID ${id} est introuvable!`);
       }
   
       // Check if tag has any associated posts
       if (productCategory.products?.length > 0) {
+        this.loggerService.error(`Attempted to delete product category with ID ${id} but it has ${productCategory.products.length} associated products`, ProductCategoriesService.name);
         throw new BadRequestException(
           `Impossible de supprimer la catégorie de produit ${productCategory.name} car elle a ${productCategory.products.length} produit(s) dans le système.`
         );
@@ -112,7 +119,7 @@ export class ProductCategoriesService {
   
       return await productCategory.softRemove();
     } catch (error) {
-      console.error(`Failed to delete Product Category ID ${id}:`, error.message);
+      this.loggerService.error(`Error occurred while deleting product category: ${error.message}`, ProductCategoriesService.name);
       throw error;
     }
   }

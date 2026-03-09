@@ -7,6 +7,7 @@ import { ProductDemand } from './entities/demand.entity';
 import { Partner } from 'src/partners/entities/partner.entity';
 import { CreateProductDemandDto } from './dto/create-product-demand.dto';
 import { UpdateProductDemandDto } from './dto/update-product-demand.dto';
+import { LoggerService } from 'src/logs/logger.service';
 
 @Injectable()
 export class ProductDemandService {
@@ -17,18 +18,21 @@ export class ProductDemandService {
     @InjectRepository(Partner)
     private readonly partnerRepository: Repository<Partner>,
     @InjectRepository(Product)
-    private readonly productRepository: Repository<Product>
+    private readonly productRepository: Repository<Product>,
+    private readonly loggerService: LoggerService
   ) { }
 
   async create(createProductDemandDto: CreateProductDemandDto) {
     try {
       const partner = await this.partnerRepository.findOne({ where: { id: createProductDemandDto.partnerId }})
       if (!partner) {
+        this.loggerService.error(`Attempted to create product demand with partner ID ${createProductDemandDto.partnerId} but partner was not found`, ProductDemandService.name);
         throw new NotFoundException('Partenaire non trouvé !');
       }      
 
       const product = await this.productRepository.findOne({ where: { id: createProductDemandDto.productId } })
       if (!product) {
+        this.loggerService.error(`Attempted to create product demand with product ID ${createProductDemandDto.productId} but product was not found`, ProductDemandService.name);
         throw new NotFoundException('Produit non trouvé !');
       }      
 
@@ -40,10 +44,11 @@ export class ProductDemandService {
       productDemand.isArchived = false;
 
       return productDemand.save().then((saved) => {
+        this.loggerService.log('Product demand created successfully', ProductDemandService.name);
         return DataFormater.getProductDemand(saved);
       });
     } catch (error) {
-      console.log('ProductDemand.create.error', error);
+      this.loggerService.error(`Error occurred while creating product demand: ${error.message}`, ProductDemandService.name);
       throw error;
     }
   }
@@ -62,7 +67,7 @@ export class ProductDemandService {
         return { ...DataFormater.getProductDemand(productDemand) };
       });
     } catch (error) {
-      console.log('ProductDemand.all.error', error);
+      this.loggerService.error(`Error occurred while fetching product demands: ${error.message}`, ProductDemandService.name);
       throw error;
     }
   }
@@ -84,7 +89,7 @@ export class ProductDemandService {
         return { ...DataFormater.getProductDemand(productDemand) };
       });
     } catch (error) {
-      console.log('ProductDemand.archived.error', error);
+      this.loggerService.error(`Error occurred while fetching archived product demands: ${error.message}`, ProductDemandService.name);
       throw error;
     }
   }
@@ -103,7 +108,7 @@ export class ProductDemandService {
       }
       return DataFormater.getProductDemand(one);
     } catch (error) {
-      console.log('ProductDemand.one.error', error);
+      this.loggerService.error(`Error occurred while fetching product demand: ${error.message}`, ProductDemandService.name);
       throw error;
     }
   }
@@ -122,7 +127,7 @@ export class ProductDemandService {
       }
       return one;
     } catch (error) {
-      console.log('ProductDemand.one.error', error);
+      this.loggerService.error(`Error occurred while fetching product demand: ${error.message}`, ProductDemandService.name);
       throw error;
     }
   }
@@ -147,7 +152,7 @@ export class ProductDemandService {
         return { ...DataFormater.getProductDemand(productDemand) };
       });
     } catch (error) {
-      console.log('ProductDemand.byProduct.error', error);
+      this.loggerService.error(`Error occurred while fetching product demands by product: ${error.message}`, ProductDemandService.name);
       throw error;
     }
   }
@@ -171,7 +176,7 @@ export class ProductDemandService {
         return { ...DataFormater.getProductDemand(productDemand) };
       });
     } catch (error) {
-      console.log('ProductDemand.byPartner.error', error);
+      this.loggerService.error(`Error occurred while fetching product demands by partner: ${error.message}`, ProductDemandService.name);
       throw error;
     }
   }
@@ -188,10 +193,11 @@ export class ProductDemandService {
       one.archivedAt = new Date();
 
       return one.save().then((saved) => {
+        this.loggerService.log('Product demand archived successfully', ProductDemandService.name);
         return DataFormater.getProductDemand(saved);
       });
     } catch (error) {
-      console.log('ProductDemand.archive.error', error);
+      this.loggerService.error(`Error occurred while archiving product demand: ${error.message}`, ProductDemandService.name);
       throw error;
     }
   }
@@ -208,10 +214,11 @@ export class ProductDemandService {
       one.archivedAt = null;
 
       return one.save().then((saved) => {
+        this.loggerService.log('Product demand unarchived successfully', ProductDemandService.name);
         return DataFormater.getProductDemand(saved);
       });
     } catch (error) {
-      console.log('ProductDemand.unarchive.error', error);
+      this.loggerService.error(`Error occurred while unarchiving product demand: ${error.message}`, ProductDemandService.name);
       throw error;
     }
   }
@@ -226,7 +233,7 @@ export class ProductDemandService {
         return DataFormater.getProductDemand(saved);
       });
     } catch (error) {
-      console.log('ProductDemand.update.error', error);
+      this.loggerService.error(`Error occurred while updating product demand: ${error.message}`, ProductDemandService.name);
       throw error;
     }
   }
@@ -236,7 +243,7 @@ export class ProductDemandService {
       const one = await this._findOne(id);
       return one.remove();
     } catch (error) {
-      console.log('ProductDemand.delete.error', error);
+      this.loggerService.error(`Error occurred while deleting product demand: ${error.message}`, ProductDemandService.name);
       throw error;
     }
   }

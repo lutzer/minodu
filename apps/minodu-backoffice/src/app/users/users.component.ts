@@ -85,11 +85,7 @@ export class UsersComponent implements OnInit {
     this.editUserSuccess = '';
     this.isEditSubmitting = false;
     // Ouvre la modale Bootstrap
-    const modal = document.getElementById('editUserModal');
-    if (modal && (window as any).bootstrap) {
-      const bsModal = new (window as any).bootstrap.Modal(modal);
-      bsModal.show();
-    }
+    
   }
 
   openAddModal(event?: Event) {
@@ -110,12 +106,6 @@ export class UsersComponent implements OnInit {
     this.editUserError = '';
     this.editUserSuccess = '';
     this.isEditSubmitting = false;
-    // Ouvre la modale Bootstrap
-    const modal = document.getElementById('editUserModal');
-    if (modal && (window as any).bootstrap) {
-      const bsModal = new (window as any).bootstrap.Modal(modal);
-      bsModal.show();
-    }
   }
   
 

@@ -70,7 +70,7 @@ export class BackupService {
 
     } catch (error) {
       const errorMessage = error.message.replace(/mysqldump.*?-p.*?(\s|$)/gi, 'mysqldump [credentials hidden]');
-      this.logger.error(`Backup failed: ${errorMessage}`);
+      this.logger.error(`Backup failed: ${errorMessage}`, BackupService.name);
       return {
         success: false,
         message: `Backup failed: ${errorMessage}`
@@ -93,7 +93,7 @@ export class BackupService {
         }
       }
     } catch (error) {
-      this.logger.log(`Could not clean old backups: ${error.message}`);
+      this.logger.error(`Could not clean old backups: ${error.message}`, BackupService.name);
     }
   }
 
@@ -144,7 +144,7 @@ export class BackupService {
       return dumpPath;
 
     } catch (error) {
-      this.logger.error(`Network dump failed: ${error.message}`);
+      this.logger.error(`Database dump failed: ${error.message}`, BackupService.name);
         throw new Error(`Failed to create MySQL dump: ${error.message}`);
     }
   }
@@ -178,10 +178,6 @@ export class BackupService {
       itemsToBackup.forEach(pattern => {
           archive.glob(pattern, { cwd: this.tempDir });
       });
-      // archive.glob('**/*', {
-      //       cwd: this.tempDir,
-      //       ignore: [this.backupFileName, 'minodu.sql', 'logs']
-      //   });
 
       archive.finalize();
     });

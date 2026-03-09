@@ -1,31 +1,18 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { NGINX_LOG_PATHS } from './constants';
+import { RAG_LOG } from './constants';
 import { promises as fs } from 'fs';
 import { LoggerService } from 'src/logs/logger.service';
 
 @Injectable()
-export class NginxLogsService {
+export class RagLogsService {
 
   constructor(
     private readonly logger: LoggerService
   ) { }
 
-  private getLogPath(type: string = 'default'): string {
-    switch (type) {
-      case 'access':
-        return NGINX_LOG_PATHS.ACCESS_LOG;
-      case 'error':
-        return NGINX_LOG_PATHS.ERROR_LOG;
-      default:
-        return NGINX_LOG_PATHS.DEFAULT_LOG;
-    }
-  }
-
   async readRawLogs(
-    type: string = 'default',
     lines: number
   ): Promise<string> {
-    const logPath = this.getLogPath(type);
 
     if(!lines || isNaN(lines) || lines <= 0) {
       lines = 500; // Default to 500 lines
@@ -33,9 +20,9 @@ export class NginxLogsService {
 
     try {
       // Check if file exists
-      await fs.access(logPath);
+      await fs.access(RAG_LOG.DEFAULT);
       
-      const fileContent = await fs.readFile(logPath, 'utf8');
+      const fileContent = await fs.readFile(RAG_LOG.DEFAULT, 'utf8');
       
       const allLines = fileContent.split('\n').filter(line => line.trim() !== '');
       
@@ -49,7 +36,7 @@ export class NginxLogsService {
     } catch (error) {
       if (error.code === 'ENOENT') {
         throw new HttpException(
-          `Fichier de log non trouvé: ${logPath}`,
+          `Fichier de log non trouvé: ${RAG_LOG.DEFAULT}`,
           HttpStatus.NOT_FOUND
         );
       }
@@ -62,15 +49,12 @@ export class NginxLogsService {
   }
 
   async emptyLogFile(): Promise<{ success: boolean; message: string }> {
-    const LOG_PATHS_LIST = [NGINX_LOG_PATHS.DEFAULT_LOG, NGINX_LOG_PATHS.ACCESS_LOG, NGINX_LOG_PATHS.ERROR_LOG];
 
     try {
-      for (const logPath of LOG_PATHS_LIST) {
         // Check if file exists
-        await fs.access(logPath);
+        await fs.access(RAG_LOG.DEFAULT);
         // Empty the file
-        await fs.writeFile(logPath, '', 'utf8');
-      }
+        await fs.writeFile(RAG_LOG.DEFAULT, '', 'utf8');
       
       return {
         success: true,

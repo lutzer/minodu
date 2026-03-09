@@ -6,7 +6,7 @@
       </div>
       <div class="col-auto ms-auto d-print-none">
         <div class="btn-list">
-          <button class="btn btn-primary" (click)="openAddModal()">
+          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-tag" (click)="openAddModal()">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-plus"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg>
             Ajouter
           </button>
@@ -57,10 +57,10 @@
                       <span class="dropdown">
                         <button class="btn dropdown-toggle align-text-top" data-bs-boundary="viewport" data-bs-toggle="dropdown">Actions</button>
                         <div class="dropdown-menu dropdown-menu-end">
-                          <a class="dropdown-item" href="#" (click)="openEditModal(tag, $event)">
+                          <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modal-tag" (click)="openEditModal(tag, $event)">
                             Modifier
                           </a>
-                          <a class="dropdown-item text-danger" href="#" (click)="confirmDelete(tag.id, $event)">
+                          <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#modal-delete-tag" (click)="confirmDelete(tag.id, $event)">
                             Supprimer
                           </a>
                         </div>

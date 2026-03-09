@@ -22,7 +22,7 @@ export class LogsComponent implements OnInit {
   logsText = '';
   isClearing = false;
   activeTab: 'default' | 'error' | 'access' = 'default';
-  logSource: 'backend' | 'frontend' = 'backend';
+  logSource: 'frontend' | 'backend' | 'rag' = 'frontend';
   currentLines: number = 500;
   readonly LINES_INCREMENT: number = 500;
 
@@ -81,9 +81,26 @@ export class LogsComponent implements OnInit {
     this.loadLogs();
   }
 
-  switchLogSource(source: 'backend' | 'frontend') {
+  switchLogSource(source: 'frontend' | 'backend' | 'rag') {
     this.logSource = source;
+    // Reset to default tab when switching sources
+    this.activeTab = 'default';
     this.loadLogs();
+  }
+
+  // Check if tabs should be displayed (only for frontend logs)
+  get showTabs(): boolean {
+    return this.logSource === 'frontend';
+  }
+
+  // Get the label for the current log source
+  get logSourceLabel(): string {
+    switch (this.logSource) {
+      case 'frontend': return 'Logs Frontend';
+      case 'backend': return 'Logs Backend';
+      case 'rag': return 'Logs RAG';
+      default: return 'Logs';
+    }
   }
 
   confirmClearLogs(event?: Event) {
@@ -99,7 +116,7 @@ export class LogsComponent implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
 
-    this.logsService.clearLogs().subscribe({
+    this.logsService.clearLogs(this.logSource).subscribe({
       next: () => {
         this.successMessage = 'Logs vidés avec succès';
         this.logsText = '';
