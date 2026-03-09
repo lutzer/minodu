@@ -89,6 +89,7 @@ or run all three steps with
 curl -fsSL https://ollama.com/install.sh | sh
 ollama pull llama3.2:1b && ollama pull nomic-embed-text && ollama pull all-minilm:l6-v2
 ```
+
 * edit and enable ollama service
 ```
 # edit startup service file
@@ -106,7 +107,7 @@ sudo systemctl enable ollama
 ```
 # install docker
 curl -sSL https://get.docker.com | sh
-sudo usermod -aG docker $USER
+sudo usermod -aG docker pi
 sudo systemctl enable docker
 
 # install git-lfs and get lfs files
