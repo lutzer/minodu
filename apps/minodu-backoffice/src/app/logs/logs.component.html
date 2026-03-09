@@ -7,6 +7,22 @@
         </div>
         <div class="col-auto ms-auto d-print-none">
           <div class="btn-list">
+            <div class="dropdown">
+              <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-list"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l11 0" /><path d="M9 12l11 0" /><path d="M9 18l11 0" /><path d="M5 6l0 .01" /><path d="M5 12l0 .01" /><path d="M5 18l0 .01" /></svg>
+                {{ logSource === 'backend' ? 'Logs Backend' : 'Logs Frontend' }}
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#" (click)="switchLogSource('backend'); $event.preventDefault()"
+                  [class.active]="logSource === 'backend'">
+                  Logs Backend
+                </a></li>
+                <li><a class="dropdown-item" href="#" (click)="switchLogSource('frontend'); $event.preventDefault()"
+                  [class.active]="logSource === 'frontend'">
+                  Logs Frontend
+                </a></li>
+              </ul>
+            </div>
             <button type="button" class="btn btn-danger" (click)="confirmClearLogs($event)">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-trash"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v1" /></svg>
               VIDER LES LOGS

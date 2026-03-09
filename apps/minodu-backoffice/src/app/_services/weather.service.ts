@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_URL, CONTENT_TYPE } from '../_helpers/constants';
 
@@ -20,13 +20,14 @@ export class WeatherService {
       );
   }
 
-  getWeatherDownload(): Observable<Blob> {
+  getWeatherDownload(): Observable<HttpResponse<Blob>> {
     return this.http.get(
       API_URL + 'weather/download',
       {
-        responseType: 'blob'
+        responseType: 'blob',
+        observe: 'response'
       }
-    );
+    ) as Observable<HttpResponse<Blob>>;
   }
 
 
