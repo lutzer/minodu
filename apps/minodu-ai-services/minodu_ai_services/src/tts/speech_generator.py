@@ -1,6 +1,6 @@
 from enum import Enum
 import wave
-from piper import PiperVoice
+from piper import PiperVoice, SynthesisConfig
 import os
 import io
 import struct
@@ -29,7 +29,9 @@ class SpeechGenerator:
         model_path = os.path.join(script_dir, model_path)
         self.voice = PiperVoice.load(model_path)
 
-        print(self.voice)
+        self.syn_config = SynthesisConfig(
+            length_scale=1.4,  # little slower
+        )
 
     def samplerate(self) -> int:
         return self.voice.config.sample_rate
@@ -38,12 +40,13 @@ class SpeechGenerator:
         return 1
         
     def synthesize(self, text: str, format : AudioFormat = AudioFormat.WAV):
+
         if format == SpeechGenerator.AudioFormat.WAV:
-            for chunk in self.voice.synthesize(text):
+            for chunk in self.voice.synthesize(text, self.syn_config):
                 yield chunk.audio_int16_bytes
         elif format == SpeechGenerator.AudioFormat.MP3:
             mp3_buffer = io.BytesIO()
-            for chunk in self.voice.synthesize(text):
+            for chunk in self.voice.synthesize(text, self.syn_config):
 
                 audio = AudioSegment(
                     data=chunk.audio_int16_bytes,

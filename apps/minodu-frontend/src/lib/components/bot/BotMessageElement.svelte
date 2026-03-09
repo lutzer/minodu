@@ -14,7 +14,11 @@
 	export let ttsPlayer: TextToSpeechPlayer;
 	export let onCancelResponse: () => void;
 
+	let ttsText : string = '';
+
 	$: isError = message.type == BotMessageType.BOT && message.text.trimStart().startsWith('[ERROR:');
+
+	$: ttsText = message ? message.text.replace(/\*/g, '\n') : '';
 </script>
 
 <div class="bot-message shadow {message.type == BotMessageType.USER ? 'user' : 'bot'}">
@@ -24,7 +28,7 @@
 			<p>{message.text}</p>
 		</div>
 		<div class="message-side">
-			<TextToSpeechButton text={message.text} {ttsPlayer} />
+			<TextToSpeechButton text={ttsText} {ttsPlayer} />
 		</div>
 	{:else}
 		<div class="message-side">
@@ -32,7 +36,7 @@
 				<img src={botAvatarImage} alt={t('alt.chatbotIcon', $language)} />
 			</div>
 			{#if message.final}
-				<TextToSpeechButton text={message.text} {ttsPlayer} />
+				<TextToSpeechButton text={ttsText} {ttsPlayer} />
 			{/if}
 		</div>
 		<div class="message-text">
