@@ -12,6 +12,14 @@
 
 	export let demand: BackendProductDemand;
 	export let ttsPlayer: TextToSpeechPlayer;
+
+	let demandText : string = "";
+
+	$ : demandText = demand ? `Nous avons ${demand.quantity} ${demand.product?.sales_unit || ''} 
+		de ${demand.product?.name}, en provenance de ${demand.partner?.name || ''}, 
+		disponible au prix de ${demand.product.price} CFA le ${demand.product?.sales_unit || 'unité'}.` : '';
+
+
 </script>
 
 <div class="product-demand shadow">
@@ -24,7 +32,8 @@
 			<span class="date">{format(demand.updatedAt)}</span>
 		</div>
 		<div>
-			<TextToSpeechButton {ttsPlayer} text={demand.product.name} />
+			<TextToSpeechButton {ttsPlayer} text={demandText} />
+			<p>{demandText}</p>
 		</div>
 	</div>
 	<div class="product">
@@ -33,11 +42,11 @@
 		</div>
 		<div class="offer">
 			<div class="offer-product">
-				<p>{demand.quantity} {demand.product.salesUnit}</p>
+				<p>{demand.quantity} {demand.product.sales_unit}</p>
 				<img src={handProductIcon} alt={t('product.demand-hand-product', $language)} />
 			</div>
 			<div class="offer-payment">
-				<p>{demand.product.price} CFA / {demand.product.salesUnit}</p>
+				<p>{demand.product.price} CFA / {demand.product.sales_unit}</p>
 				<img src={handMoneyIcon} alt={t('product.demand-hand-money', $language)} />
 			</div>
 		</div>

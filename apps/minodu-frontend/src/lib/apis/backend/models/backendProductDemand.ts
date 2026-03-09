@@ -9,7 +9,7 @@ export interface BackendProduct {
 	id: number;
 	name: string;
 	description: string;
-	salesUnit: string;
+	sales_unit: string;
 	image: string;
 	price: number;
 }
