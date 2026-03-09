@@ -334,6 +334,10 @@ const translations: TranslationStrings = {
 	'alt.floatingButton': {
 		fr: 'Bouton flottant',
 		kb: 'needs-translation'
+	},
+	'alt.closeDialog': {
+		fr: 'Fermer le dialogue',
+		kb: 'needs-translation'
 	}
 };
 
