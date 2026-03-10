@@ -37,8 +37,9 @@ RUN mkdir -p /usr/share/nginx/html/backoffice
 # Copy frontend build
 COPY --from=frontend-builder /app/build /usr/share/nginx/html/frontend
 
-# Copy captive portal probe file
+# Copy captive portal files
 COPY ./resources/captive/hotspot-detect.html /usr/share/nginx/html/frontend/hotspot-detect.html
+COPY ./resources/captive/captive.html /usr/share/nginx/html/frontend/captive.html
 
 # Copy backoffice build  
 COPY --from=backoffice-builder /app/dist/minodu-backoffice/browser /usr/share/nginx/html/backoffice
