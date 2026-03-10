@@ -1,12 +1,36 @@
 <!DOCTYPE html>
 <html>
     <head>
-    <title>Minodu App</title>
+        <meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <title>Minodu Captive Portal</title>
+        <style>
+            body {
+                font-size: 120%;
+                background-color: #EDCA82;
+            }
+
+            .center {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                text-align: center;
+            }
+
+            .center img {
+                width: 80px;
+                height: 80px;
+                display: inline;
+            }
+        </style>
     </head>
     <body>
-        <div style="text-align: center;">
+        <div class="center">
+            <img src="minodu-logo.png">
             <p>Open Minodu App in Browser:</p>
-            <a href="http://minodupi.local">http://minodupi.local</a>
+            <a href="http://minodupi.local" target="_blank">http://minodupi.local</a>
         </div>
     </body>
 </html>
