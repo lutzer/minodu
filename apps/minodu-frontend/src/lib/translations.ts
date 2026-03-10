@@ -159,6 +159,18 @@ const translations: TranslationStrings = {
 		fr: 'Erreur lors de la création du message',
 		kb: 'needs-translation'
 	},
+	'forum.takePhoto': {
+		fr: 'Prendre une photo',
+		kb: 'needs-translation'
+	},
+	'forum.galleryPhoto': {
+		fr: 'Galerie de photos',
+		kb: 'needs-translation'
+	},
+	'forum.recordAudio': {
+		fr: 'Enregistrer l\'audio',
+		kb: 'needs-translation'
+	},
 
 	// Agriculture
 	'agriculture.loadingText': {
