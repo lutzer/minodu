@@ -21,6 +21,7 @@
 </script>
 
 <svelte:head>
+	<title>Minodu</title>
 	<link rel="icon" href={favIcon} />
 </svelte:head>
 

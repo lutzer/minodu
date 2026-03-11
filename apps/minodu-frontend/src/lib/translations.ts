@@ -168,7 +168,7 @@ const translations: TranslationStrings = {
 		kb: 'needs-translation'
 	},
 	'forum.recordAudio': {
-		fr: 'Enregistrer l\'audio',
+		fr: "Enregistrer l'audio",
 		kb: 'needs-translation'
 	},
 

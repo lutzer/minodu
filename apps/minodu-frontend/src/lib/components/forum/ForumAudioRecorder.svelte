@@ -53,7 +53,7 @@
 		/>
 		<div class="select-button">
 			<button onclick={() => fileInput.click()}>
-				<img src={micIcon} alt={t('forum.recordAudio', $language)}/>
+				<img src={micIcon} alt={t('forum.recordAudio', $language)} />
 				<span>{t('forum.recordAudio', $language)}</span>
 			</button>
 		</div>
@@ -89,7 +89,7 @@
 	}
 
 	.select-button img {
-		width:40px;
+		width: 40px;
 		height: 40px;
 		object-fit: contain;
 	}

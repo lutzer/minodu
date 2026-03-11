@@ -53,13 +53,13 @@
 		/>
 		<div class="select-button">
 			<button class="shadow" onclick={() => cameraInput.click()}>
-				<img src={cameraIcon} alt={t('forum.takePhoto', $language)}/>
+				<img src={cameraIcon} alt={t('forum.takePhoto', $language)} />
 				<span>{t('forum.takePhoto', $language)}</span>
 			</button>
 		</div>
 		<div class="select-button">
 			<button class="shadow" onclick={() => galleryInput.click()}>
-				<img src={galleryIcon} alt={t('forum.galleryPhoto', $language)}/>
+				<img src={galleryIcon} alt={t('forum.galleryPhoto', $language)} />
 				<span>{t('forum.galleryPhoto', $language)}</span>
 			</button>
 		</div>
@@ -97,7 +97,7 @@
 	}
 
 	.select-button img {
-		width:60px;
+		width: 60px;
 		height: 60px;
 	}
 

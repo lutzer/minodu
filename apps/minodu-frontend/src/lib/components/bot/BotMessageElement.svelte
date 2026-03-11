@@ -14,7 +14,7 @@
 	export let ttsPlayer: TextToSpeechPlayer;
 	export let onCancelResponse: () => void;
 
-	let ttsText : string = '';
+	let ttsText: string = '';
 
 	$: isError = message.type == BotMessageType.BOT && message.text.trimStart().startsWith('[ERROR:');
 

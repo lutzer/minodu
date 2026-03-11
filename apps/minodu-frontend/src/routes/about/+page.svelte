@@ -4,6 +4,6 @@
 </script>
 
 <div>
-    <HomePage/>
-    <AboutPage/>
+	<HomePage />
+	<AboutPage />
 </div>
