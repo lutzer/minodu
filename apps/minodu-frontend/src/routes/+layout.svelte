@@ -1,5 +1,4 @@
 <script lang="ts">
-	import favicon from '$lib/assets/favicon.svg';
 	import FooterMenuButton from '$lib/components/common/FooterMenuButton.svelte';
 
 	import agricultureIcon from '$lib/assets/agriculture-icon.png';
@@ -14,13 +13,15 @@
 	import marketIconDisabled from '$lib/assets/market-icon-disabled.png';
 
 	import Toast from '$lib/components/common/Toast.svelte';
+
+	import favIcon from '$lib/assets/favicon.ico';
 	import '../global.css';
 
 	let { children } = $props();
 </script>
 
 <svelte:head>
-	<link rel="icon" href={favicon} />
+	<link rel="icon" href={favIcon} />
 </svelte:head>
 
 <div class="app-container">
