@@ -59,15 +59,19 @@ class RagRequest(BaseModel):
 
 
 @app.post("/rag/ask")
-async def rag_ask(request: RagRequest):
+async def rag_ask(http_request: Request, request: RagRequest):
     metrics = StreamMetrics()
     rag_logger.info(json.dumps({"event": "request", **request.model_dump()}, default=str))
     rag = RAG(language=request.language)
 
-    def generate_stream():
+    async def generate_stream():
         data = RAG.RagRequestData(request.question, request.conversation, request.source_id)
         try:
             for chunk in rag.ask_streaming(data):
+                
+                if await http_request.is_disconnected():
+                    break   # stop streaming immediately
+
                 metrics.record(chunk)
                 yield chunk
         except Exception as e:
