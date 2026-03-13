@@ -46,7 +46,7 @@
 					<AudioPlayer audioSource={message.audio[$language]} />
 				</div>
 			{/if}
-			{#if message.text.length == 0}
+			{#if message.text.length == 0 && !message.final}
 				<div class="spinner">
 					<LoadingSpinner fullscreen={false} />
 				</div>

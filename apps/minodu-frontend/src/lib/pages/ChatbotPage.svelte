@@ -131,6 +131,7 @@
 		let currentMessage = messages.length > 0 ? messages.slice(-1)[0] : undefined;
 		if (currentMessage) {
 			currentMessage.final = true;
+			messages = messages;
 		}
 	}
 
