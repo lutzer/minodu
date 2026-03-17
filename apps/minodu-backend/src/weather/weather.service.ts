@@ -47,7 +47,9 @@ export class WeatherService {
           luminosity: weather.luminosity,
           ambient_luminosity: weather.ambient,
           carbon_monoxide: weather.co,
-          nitrogen_dioxide: weather.no2
+          nitrogen_dioxide: weather.no2,
+          wind_spd: weather.wind_speed,
+          wind_dir: weather.wind_direction
         };
 
         const description = await this.interpretWeather(weatherData);
