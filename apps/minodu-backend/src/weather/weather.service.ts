@@ -39,25 +39,6 @@ export class WeatherService {
         time: syncWeatherDto.time ?? new Date().toISOString(),
       });
 
-      try {
-        const weatherData = {
-          temperature: weather.temperature,
-          humidity: weather.humidity,
-          pressure: weather.pressure,
-          luminosity: weather.luminosity,
-          ambient_luminosity: weather.ambient,
-          carbon_monoxide: weather.co,
-          nitrogen_dioxide: weather.no2
-        };
-
-        const description = await this.interpretWeather(weatherData);
-        if (description) {
-          weather.description = description;
-        }
-      } catch (aiError) {
-        this.loggerService.error(`AI Interpretation failed: ${aiError.message}`, WeatherService.name);
-      }
-
       const savedWeather = await this.weatherRepository.save(weather);
       this.loggerService.log(`Weather data synchronized (ID: ${savedWeather.id})`);
       
@@ -104,8 +85,7 @@ export class WeatherService {
         { header: 'wind_spd', key: 'wind_spd', width: 15 },
         { header: 'uv', key: 'uv', width: 15 },
         { header: 'battery', key: 'battery', width: 15 },
-        { header: 'time', key: 'time', width: 20 },
-        { header: 'description', key: 'description', width: 50 },
+        { header: 'time', key: 'time', width: 20 }
       ];
 
       // Appliquer les colonnes à la feuille Excel
@@ -135,7 +115,6 @@ export class WeatherService {
             uv: weather.indice_uv,
             battery: weather.battery,
             time: weather.time,
-            description: weather.description,
           };
           i++;
           return row;
@@ -184,11 +163,36 @@ export class WeatherService {
 
   async findCurrent() {
     try {
-      const latest = await this.weatherRepository.find({order:{createdAt:'DESC'}, take:1});
+      const latest = await this.weatherRepository.findOne({
+        order:{
+          createdAt:'DESC'
+        }
+      });
   
       if (!latest) {
         this.loggerService.error('No weather data found', WeatherService.name);
         throw new NotFoundException('Aucune donnée météo trouvée !');
+      }
+
+      try {
+        const weatherData = {
+          temperature: latest.temperature,
+          humidity: latest.humidity,
+          pressure: latest.pressure,
+          luminosity: latest.luminosity,
+          ambient_luminosity: latest.ambient,
+          carbon_monoxide: latest.co,
+          nitrogen_dioxide: latest.no2
+        };
+
+        const description = await this.interpretWeather(weatherData);
+        if (description) {
+          latest.description = description;
+          await this.weatherRepository.save(latest);
+        }
+
+      } catch (aiError) {
+        this.loggerService.error(`AI Interpretation failed: ${aiError.message}`, WeatherService.name);
       }
 
       return latest;
