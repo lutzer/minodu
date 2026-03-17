@@ -131,15 +131,4 @@ export class SyncWeatherDto {
   @IsNumber()
   @IsOptional()
   battery?: number;
-
-  @ApiProperty({
-    type: String,
-    description: 'time of the measurement',
-    required: false,
-    example: 12
-  })
-  @IsString()
-  @IsOptional()
-  time?: string;
-
 }

@@ -163,6 +163,7 @@ export class WeatherService {
   async findCurrent() {
     try {
       const latest = await this.weatherRepository.findOne({
+        where:{},
         order:{
           createdAt:'DESC'
         }
