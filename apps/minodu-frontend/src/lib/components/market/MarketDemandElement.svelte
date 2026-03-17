@@ -13,13 +13,13 @@
 	export let demand: BackendProductDemand;
 	export let ttsPlayer: TextToSpeechPlayer;
 
-	let demandText : string = "";
+	let demandText: string = '';
 
-	$ : demandText = demand ? `Nous avons ${demand.quantity} ${demand.product?.sales_unit || ''} 
+	$: demandText = demand
+		? `Nous avons ${demand.quantity} ${demand.product?.sales_unit || ''} 
 		de ${demand.product?.name}, en provenance de ${demand.partner?.name || ''}, 
-		disponible au prix de ${demand.product.price} CFA le ${demand.product?.sales_unit || 'unité'}.` : '';
-
-
+		disponible au prix de ${demand.product.price} CFA le ${demand.product?.sales_unit || 'unité'}.`
+		: '';
 </script>
 
 <div class="product-demand shadow">

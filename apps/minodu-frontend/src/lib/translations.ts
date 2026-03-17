@@ -11,329 +11,341 @@ const translations: TranslationStrings = {
 	// Navigation
 	'nav.home': {
 		fr: 'Accueil',
-		kb: 'needs-translation'
+		kb: 'kpaaŋ daa mʋʋ'
 	},
 	'nav.forum': {
 		fr: 'Forum',
-		kb: 'needs-translation'
+		kb: ' tɔm kɩkpɛŋdʋ lone'
 	},
 	'nav.weather': {
 		fr: 'Météo',
-		kb: 'needs-translation'
+		kb: 'ɛjaɖɛ́ alɩwatʋ lɔ́ŋsɩŋɖɛ́'
 	},
 	'nav.agriculture': {
 		fr: 'Agriculture',
-		kb: 'needs-translation'
+		kb: 'haɖaʋ tɔm lone'
 	},
 	'nav.market': {
 		fr: 'Marché',
-		kb: 'needs-translation'
+		kb: 'kɩyakʋ lone'
 	},
 
 	// Chatbot
 	'chatbot.title': {
 		fr: 'Chatbot',
-		kb: 'needs-translation'
-	},
-	'chatbot.forPost': {
-		fr: 'Chatbot pour id',
-		kb: 'needs-translation'
+		kb: 'tɔm coziyu'
 	},
 	'chatbot.question': {
 		fr: 'Question',
-		kb: 'needs-translation'
+		kb: 'Tɔmbɔsʋʋ'
 	},
 	'chatbot.answer': {
 		fr: 'Réponse',
-		kb: 'needs-translation'
+		kb: 'Tɔm cozuu'
 	},
 	'chatbot.noMessages': {
 		fr: "Il n'y a pas encore de messages dans cette conversation",
-		kb: 'needs-translation'
+		kb: 'Tɔm natɩyʋ fɛɩ ñɩnɛ'
 	},
 	'chatbot.you': {
 		fr: 'Vous',
-		kb: 'needs-translation'
+		kb: 'Mɩ'
 	},
 	'chatbot.botName': {
 		fr: 'Minodu Bot',
-		kb: 'needs-translation'
+		kb: 'Minodu taŋ'
 	},
 	'chatbot.cancelButton': {
 		fr: 'Annuler la réponse',
-		kb: 'needs-translation'
+		kb: 'Tɔm sɩsʋʋ'
 	},
 
 	// Actions
 	'action.record': {
 		fr: 'Enregistrer',
-		kb: 'needs-translation'
+		kb: 'Tɔm sɩʋ'
 	},
 	'action.stop': {
 		fr: 'Arrêter',
-		kb: 'needs-translation'
+		kb: 'Sɩsʋʋ'
 	},
 	'action.cancel': {
 		fr: 'Annuler',
-		kb: 'needs-translation'
+		kb: 'Tɔm sɩsʋʋ'
 	},
 	'action.send': {
 		fr: 'Envoyer',
-		kb: 'needs-translation'
+		kb: 'Yekɩnaʋ'
 	},
 	'action.submit': {
 		fr: 'Soumettre',
-		kb: 'needs-translation'
+		kb: 'Yekɩnaʋ'
 	},
 	'action.clearChat': {
 		fr: 'Effacer le chat',
-		kb: 'needs-translation'
+		kb: 'Tɔm hɩsʋʋ'
 	},
 	'action.ok': {
 		fr: 'Ok',
-		kb: 'needs-translation'
+		kb: 'Pɩmaɣ'
 	},
 	'action.delete': {
 		fr: 'Supprimer',
-		kb: 'needs-translation'
+		kb: 'hɩsʋʋ'
 	},
 
 	// Forum
 	'forum.loadingText': {
-		fr: 'Chargement des messages...',
-		kb: 'needs-translation'
+		fr: 'Chargement des messages',
+		kb: 'Pɩɖɩɩna tɩsʋʋ'
 	},
 	'forum.noPosts': {
 		fr: 'Pas encore de messages. Cliquez sur le bouton ci-dessous pour commencer une conversation.',
-		kb: 'needs-translation'
+		kb: 'Tɔm natʋyʋ fɛɩ cɩnɛ. ɛ-ñɩʋ hayɩ piye yɔɔ nɛ ɛ-baazɩ yɔɔdʋʋ.'
 	},
 	'forum.processingFile': {
 		fr: 'Traitement du fichier',
-		kb: 'needs-translation'
+		kb: 'Tɔm takayaa ɖaanʋʋ'
 	},
 	'forum.errorProcessingFile': {
 		fr: 'Erreur lors du traitement du fichier',
-		kb: 'needs-translation'
+		kb: 'Tɔm takaya ɖaanʋʋ kizaɣ'
 	},
 	'forum.createAuthor': {
 		fr: 'Créer un auteur',
-		kb: 'needs-translation'
+		kb: 'Lɩzɩ bɩʋ tʋ́'
 	},
 	'forum.name': {
 		fr: 'Nom',
-		kb: 'needs-translation'
+		kb: 'Hɩɖɛ'
 	},
 	'forum.avatar': {
 		fr: 'Avatar',
-		kb: 'needs-translation'
+		kb: 'Ãjaʋ'
 	},
 	'forum.yourName': {
 		fr: 'Votre nom',
-		kb: 'needs-translation'
+		kb: 'Na- Hɩɖɛ'
 	},
 	'forum.deleteAuthor': {
 		fr: 'Supprimer le profil ?',
-		kb: 'needs-translation'
+		kb: 'Bɩʋ tʋ tɔm hɩsʋʋ'
 	},
 	'forum.transcription': {
 		fr: 'Transcription',
-		kb: 'needs-translation'
+		kb: 'Tɔm maʋ'
 	},
 	'forum.deletePost': {
 		fr: 'Supprimer le message',
-		kb: 'needs-translation'
+		kb: 'Tɔm hɩsʋʋ'
 	},
 	'forum.errorFileTooLarge': {
 		fr: 'Le fichier est trop volumineux (max 5 Mo)',
-		kb: 'needs-translation'
+		kb: 'Tɔm takayaa kɩlɩ yʋŋ  (pɩtaaɖɛ Mo wa kagbaŋzɩ yɔɔ)'
 	},
 	'forum.errorFileUpload': {
 		fr: "Erreur lors de l'envoi du fichier",
-		kb: 'needs-translation'
+		kb: 'Tɔm takayaa tɩɩnaʋ katɩ kaɖɛ'
 	},
 	'forum.errorTextTooLong': {
 		fr: 'Le texte est trop long (max 5000 caractères)',
-		kb: 'needs-translation'
+		kb: 'Tɔm kɩmatʋ kɩlɩ ɖaalʋʋ (pɩtaaɖɛ tɔmbe kotokɩŋ kagbaŋzɩ yɔɔ) '
 	},
 	'forum.errorCreatePost': {
 		fr: 'Erreur lors de la création du message',
+		kb: 'Tɔm lɩzʋʋ katɩ kaɖɛ'
+	},
+	'forum.takePhoto': {
+		fr: 'Prendre une photo',
+		kb: 'needs-translation'
+	},
+	'forum.galleryPhoto': {
+		fr: 'Galerie de photos',
+		kb: 'needs-translation'
+	},
+	'forum.recordAudio': {
+		fr: "Enregistrer l'audio",
 		kb: 'needs-translation'
 	},
 
 	// Agriculture
 	'agriculture.loadingText': {
-		fr: 'Chargement des articles...',
-		kb: 'needs-translation'
+		fr: 'Chargement en cours',
+		kb: 'Pɩɖɩɩna tɩsʋʋ'
 	},
 	'agriculture.noPosts': {
 		fr: 'Pas de messages dans la catégorie sélectionnée. Veuillez sélectionner une autre catégorie.',
-		kb: 'needs-translation'
+		kb: 'Tɔm natʋyʋ fɛɩ cɩnɛ, medeŋdi mɩ se ɛlɛzɩ lone lɛɛɖɛ.'
 	},
 
 	// Market
 	'market.loadingText': {
 		fr: 'Chargement du marché...',
-		kb: 'needs-translation'
+		kb: 'Pɩɖɩɩna tɩsʋʋ Kɩyakʋ tɔm'
 	},
 	'market.noDemands': {
 		fr: 'Pas de demandes de produits disponibles.',
+		kb: 'Nɔyʋ tɔbɔsɩ kɩyakʋ woŋdu'
+	},
+	'market.contact': {
+		fr: 'Personne à contacter',
 		kb: 'needs-translation'
 	},
 	'market.phone-icon': {
 		fr: "Appelez l'administrateur.",
-		kb: 'needs-translation'
+		kb: 'ɛ-yaa ñʋʋ tʋ'
 	},
 	'product.demand-image': {
 		fr: 'Image du produit demandé',
-		kb: 'needs-translation'
+		kb: 'Woŋdu tɛ kɛlɛm-kɛlɛm'
 	},
 	'product.demand-hand-product': {
 		fr: 'Quantité demandée',
-		kb: 'needs-translation'
+		kb: 'Me-yekɩ mɛŋdɛ pɔzɩtʋ'
 	},
 	'product.demand-hand-money': {
 		fr: 'Prix proposé',
-		kb: 'needs-translation'
+		kb: 'Liidɩye ɛzɩmaɣ pa-ɖʋwɑ'
 	},
 
 	// Weather
 	'weather.loadingText': {
 		fr: 'Chargement de la météo...',
-		kb: 'needs-translation'
+		kb: 'ɛjaɖɛ́ alɩwatʋ lɔ́ŋsɩŋɖɛ́ ɖɩna tɩsʋʋ'
 	},
 	'weather.cloud': {
 		fr: 'Nuage avec précipitations',
-		kb: 'needs-translation'
+		kb: 'Mɩŋtʋ nɛ tɛʋ'
 	},
 	'weather.pressureArrow': {
 		fr: 'Indicateur de pression',
-		kb: 'needs-translation'
+		kb: 'Helim ɖoŋ wɩlɩyʋ'
 	},
 	'weather.bird': {
 		fr: 'Oiseau météo',
-		kb: 'needs-translation'
+		kb: 'ɛjaɖɛ́ alɩwatʋ lɔ́ŋsɩŋɖɛ́ sɩmaɣ'
 	},
 	'weather.thermometer': {
 		fr: 'Thermomètre',
-		kb: 'needs-translation'
+		kb: 'Tɔnʋʋ soŋʋʋ kɩmazɩnaʋ'
 	},
 
 	// Accessibility / Alt texts
 	'alt.playPauseAudio': {
-		fr: "Bouton pour démarrer/mettre en pause l'audio",
-		kb: 'needs-translation'
+		fr: "mettre en pause l'audio",
+		kb: 'kɩyɔɔdʋtʋ ɖʋʋ'
 	},
 	'alt.audioProgress': {
 		fr: 'Progression audio',
-		kb: 'needs-translation'
+		kb: 'kɩyɔɔdʋtʋ ɖɛnaʋ'
 	},
 	'alt.speakPageInfo': {
-		fr: 'Bouton pour lire les informations de la page',
-		kb: 'needs-translation'
+		fr: 'Lire les informations de la page',
+		kb: 'takayaɣ taa tɔm kalʋʋ'
 	},
 	'alt.switchLanguage': {
-		fr: 'Bouton pour changer de langue',
-		kb: 'needs-translation'
+		fr: 'changer de langue',
+		kb: ' kʋnʋŋ lɛɛzʋ'
 	},
 	'alt.submitForumPost': {
-		fr: 'Soumettre le message du forum',
-		kb: 'needs-translation'
+		fr: 'Soumettre le message',
+		kb: 'tɔm yekɩnaʋ'
 	},
 	'alt.deleteForumPost': {
-		fr: 'Supprimer le message du forum',
-		kb: 'needs-translation'
+		fr: 'Supprimer le message',
+		kb: 'tɔm hɩsʋʋ'
 	},
 	'alt.chatbotIcon': {
 		fr: 'Icône du chatbot',
-		kb: 'needs-translation'
+		kb: 'tɔjʋzɩyʋ ãjaʋ́'
 	},
 	'alt.avatarOfUser': {
 		fr: "Avatar de l'utilisateur",
-		kb: 'needs-translation'
+		kb: 'laɖʋ ãjaʋ́'
 	},
 	'alt.avatarImage': {
 		fr: "Image d'un avatar",
-		kb: 'needs-translation'
+		kb: 'nɔyʋ tɛ kɛlɛm-kɛlɛm'
 	},
 	'alt.imageFor': {
 		fr: 'Image pour',
-		kb: 'needs-translation'
+		kb: 'kɛlɛm-kɛlɛm ŋkʋ'
 	},
 	'alt.noDescription': {
 		fr: 'Pas de description',
-		kb: 'needs-translation'
+		kb: 'kɩkɛɖɩtʋ fɛɩ'
 	},
 	'alt.tilesShowingApps': {
 		fr: '4 tuiles minodu montrant différentes applications',
-		kb: 'needs-translation'
+		kb: 'Minodu tɔm ŋtʋ tɩ-wɩlʋʋ lona ŋdɩ-ŋdɩ yɔ'
 	},
 	'alt.rainyCloud': {
 		fr: 'Un nuage pluvieux dans le ciel',
-		kb: 'needs-translation'
+		kb: 'tɛʋ dɛ mɩŋdʋʋ ɛsɔdaa'
 	},
 	'alt.speechBubble': {
 		fr: 'Deux personnes et une bulle de dialogue',
-		kb: 'needs-translation'
+		kb: 'ɛyaa naalɛ wɛɛ pɔèyɔɔdʋʋ'
 	},
 	'alt.backForumPost': {
 		fr: 'retour',
-		kb: 'needs-translation'
+		kb: 'kɩdʋʋ'
 	},
 	'alt.createForumPost': {
 		fr: 'Créer un nouveau message',
-		kb: 'needs-translation'
+		kb: 'ma tɔm kɩfatʋ'
 	},
 	'alt.iconAudioPost': {
 		fr: 'Icône pour les messages audio',
-		kb: 'needs-translation'
+		kb: 'tɔm kɩyɔɔdɩtʋ tɛ ãjaʋ́'
 	},
 	'alt.iconImagePost': {
 		fr: 'Icône pour les messages photo',
-		kb: 'needs-translation'
+		kb: 'kɛm-kɛlɛm tɔm tɛ ãjaʋ́'
 	},
 	'alt.iconTextPost': {
 		fr: 'Icône pour les messages texte',
-		kb: 'needs-translation'
+		kb: 'tɔm kɩmamatʋ tɛ ãjaʋ́'
 	},
 	'alt.clearChatIcon': {
 		fr: 'Icône pour effacer la conversation',
-		kb: 'needs-translation'
+		kb: 'tɔm cozuu tɛ ãjaʋ́'
 	},
 	'alt.expand': {
 		fr: 'Développer',
-		kb: 'needs-translation'
+		kb: 'tɔm huu'
 	},
 	'alt.collapse': {
 		fr: 'Réduire',
-		kb: 'needs-translation'
+		kb: 'pasɩʋ'
 	},
 	'alt.categoryIcon': {
 		fr: 'Icône de catégorie pour',
-		kb: 'needs-translation'
+		kb: 'nabʋyʋ tɛ ãjaʋ́'
 	},
 	'alt.cancelResponse': {
 		fr: 'Annuler la réponse du chatbot',
-		kb: 'needs-translation'
+		kb: 'tɔm cozɩyʋ tɔm hɩsʋʋ'
 	},
 	'alt.compassNeedle': {
 		fr: 'Aiguille de boussole',
-		kb: 'needs-translation'
+		kb: 'taŋgayɩ wei ɛ-wɩlɩm nɩmɔʋ yɔ́'
 	},
 	'alt.soilImage': {
 		fr: 'Image du sol',
-		kb: 'needs-translation'
+		kb: 'tɛtʋ tɛ ãjaʋ́'
 	},
 	'alt.windTree': {
 		fr: 'Arbre au vent',
-		kb: 'needs-translation'
+		kb: 'heelim taa tɩʋ'
 	},
 	'alt.pressureLine': {
 		fr: 'Ligne de pression',
-		kb: 'needs-translation'
+		kb: 'heelim ɖoŋ tɛ loga'
 	},
 	'alt.floatingButton': {
 		fr: 'Bouton flottant',
-		kb: 'needs-translation'
+		kb: 'kɩñɩɩʋ mɛlɛ-mɛlɛ'
 	},
 	'alt.closeDialog': {
 		fr: 'Fermer le dialogue',

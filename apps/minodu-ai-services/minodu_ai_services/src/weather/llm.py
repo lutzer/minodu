@@ -28,6 +28,8 @@ class WeatherLLM:
         ambient_luminosity: float
         carbon_monoxide: float
         nitrogen_dioxide: float
+        wind_dir: float
+        wind_spd: float
 
     def __init__(self, language : LanguageEnum):
 
@@ -62,7 +64,7 @@ class WeatherLLM:
         # Simple chaine
         if language == LanguageEnum.en:
             self.template = textwrap.dedent("""
-                Act as a meteorological expert advising farmers in Kara, northern Togo.
+                You are a meteorological expert advising farmers in Kara, northern Togo.
                 Analyze the data below, taking the current season ({season}) into account.
 
                 **Station Data:**
@@ -72,33 +74,41 @@ class WeatherLLM:
                 - Luminosity: {luminosity} lux
                 - Carbon Monoxide (CO): {carbon_monoxide}
                 - Nitrogen Dioxide (NO2): {nitrogen_dioxide}
+                - Wind Direction: {wind_dir}
+                - Wind Speed: {wind_spd}
 
                 **Response Instructions:**
-                1. Summarize in ONE SINGLE paragraph in simple, natural English.
-                2. Describe current conditions, rain risks, air quality (if relevant), and impact on crops.
-                3. **Do not quote any raw numbers** from the data.
-                4. Limit your response to **100 words maximum**.
-                5. Tailor your analysis to the current season ({season}).
+                - Use very simple language, dont use any expert terms.
+                - Describe current conditions, rain risks, air quality (if relevant), and impact on crops.
+                - Do not quote any raw numbers from the data.
+                - Tailor your analysis to the current season ({season}).
+                - Limit your response to 150 words maximum in a single paragraph.
+                                            
+                Write your response now.
                 """)
         elif language == LanguageEnum.fr:
             self.template = textwrap.dedent("""
-                Agis en tant qu'expert météorologue conseillant des agriculteurs à Kara, au nord du Togo.
-                Analyse les données ci-dessous en tenant compte de la saison actuelle ({season}).
+                Vous êtes un expert en météorologie chargé de conseiller les agriculteurs de Kara, dans le nord du Togo.
+                Analysez les données ci-dessous en tenant compte de la saison en cours ({season}).
 
                 **Données de la station :**
-                - Température : {temperature}°C
-                - Humidité relative : {humidity}%
+                - Température : {temperature} °C
+                - Humidité relative : {humidity} %
                 - Pression atmosphérique : {pressure} hPa
                 - Luminosité : {luminosity} lux
                 - Monoxyde de carbone (CO) : {carbon_monoxide}
-                - Dioxyde d'azote (NO2) : {nitrogen_dioxide}
+                - Dioxyde d'azote (NO₂) : {nitrogen_dioxide}
+                - Direction du vent : {wind_dir}
+                - Vitesse du vent : {wind_spd}
 
-                **Consignes de réponse :**
-                1. Résume en UN SEUL paragraphe en français simple et naturel.
-                2. Décris les conditions actuelles, les risques de pluie, la qualité de l'air (si pertinent), et l'impact sur les cultures.
-                3. **Ne cite aucun chiffre** des données brutes.
-                4. Limite ta réponse à **100 mots maximum**.
-                5. Adapte ton analyse à la saison ({season}).           
+                **Instructions pour la réponse :**
+                - Utilisez un langage très simple, n'utilisez aucun terme technique.
+                - Décrivez les conditions actuelles, les risques de pluie, la qualité de l'air (le cas échéant) et l'impact sur les cultures.
+                - Ne citez aucun chiffre brut tiré des données.
+                - Adaptez votre analyse à la saison en cours ({season}).
+                - Limitez votre réponse à 150 mots maximum en un seul paragraphe.
+                                            
+                Rédigez votre réponse maintenant.        
             """)
         
         self.prompt = ChatPromptTemplate.from_template(self.template)

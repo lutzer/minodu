@@ -45,7 +45,7 @@
 				class="contact-container content-width"
 				style="background-image: url({contactBackground}"
 			>
-				<h1>Contact</h1>
+				<h1>{t('market.contact', $language)}</h1>
 				<h2>{contact?.fullname}</h2>
 				<button onclick={onPhoneButtonClicked} class="button call-button shadow">
 					<img src={phoneIcon} alt={t('market.phone-icon', $language)} />

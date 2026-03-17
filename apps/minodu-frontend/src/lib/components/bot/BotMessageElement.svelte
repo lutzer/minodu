@@ -14,7 +14,7 @@
 	export let ttsPlayer: TextToSpeechPlayer;
 	export let onCancelResponse: () => void;
 
-	let ttsText : string = '';
+	let ttsText: string = '';
 
 	$: isError = message.type == BotMessageType.BOT && message.text.trimStart().startsWith('[ERROR:');
 
@@ -46,7 +46,7 @@
 					<AudioPlayer audioSource={message.audio[$language]} />
 				</div>
 			{/if}
-			{#if message.text.length == 0}
+			{#if message.text.length == 0 && !message.final}
 				<div class="spinner">
 					<LoadingSpinner fullscreen={false} />
 				</div>

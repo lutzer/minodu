@@ -2,6 +2,10 @@
 	import type { Optional } from '$lib/types';
 	import AudioPlayer from '../common/AudioPlayer.svelte';
 
+	import micIcon from '$lib/assets/microphone-icon-dark.png';
+	import { language } from '$lib/stores';
+	import { t } from '$lib/translations';
+
 	export let blob: Optional<Blob>;
 
 	let fileInput: HTMLInputElement;
@@ -48,7 +52,10 @@
 			style="display: none;"
 		/>
 		<div class="select-button">
-			<button onclick={() => fileInput.click()}>Record Audio</button>
+			<button onclick={() => fileInput.click()}>
+				<img src={micIcon} alt={t('forum.recordAudio', $language)} />
+				<span>{t('forum.recordAudio', $language)}</span>
+			</button>
 		</div>
 	{/if}
 </div>
@@ -74,6 +81,17 @@
 		background-color: #eeeeee;
 		text-align: center;
 		--box-shadow-color: #cccccc;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		gap: var(--small-padding);
+	}
+
+	.select-button img {
+		width: 40px;
+		height: 40px;
+		object-fit: contain;
 	}
 
 	.audio-preview {

@@ -1,9 +1,7 @@
 <script lang="ts">
-	import HomePage from "$lib/pages/HomePage.svelte";
-
-	
+	import HomePage from '$lib/pages/HomePage.svelte';
 </script>
 
 <div>
-	<HomePage/>
+	<HomePage />
 </div>

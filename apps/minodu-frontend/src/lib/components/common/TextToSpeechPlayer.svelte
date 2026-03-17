@@ -42,72 +42,100 @@
 
 		player.addEventListener('ended', onMediaEnded);
 
-		let mediaSource = new MediaSource();
-		let mediaSourceBuffer: SourceBuffer;
-		let audioQueue: ArrayBuffer[] = [];
+		const useMediaSource =
+			typeof MediaSource !== 'undefined' && MediaSource.isTypeSupported('audio/mpeg');
 
-		player.src = URL.createObjectURL(mediaSource);
-		player.play();
+		if (useMediaSource) {
+			let mediaSource = new MediaSource();
+			let mediaSourceBuffer: SourceBuffer;
+			let audioQueue: ArrayBuffer[] = [];
 
-		mediaSource.addEventListener('error', (e) => {
-			console.error('MediaSource error:', e);
-		});
+			player.src = URL.createObjectURL(mediaSource);
+			player.play();
 
-		mediaSource.addEventListener('sourceopen', handleSourceOpened);
+			mediaSource.addEventListener('error', (e) => {
+				console.error('MediaSource error:', e);
+			});
 
-		function handleSourceOpened() {
-			if (player.paused) return;
-			mediaSourceBuffer = mediaSource.addSourceBuffer('audio/mpeg');
+			mediaSource.addEventListener('sourceopen', handleSourceOpened);
 
-			mediaSourceBuffer.addEventListener('updateend', () => {
+			function handleSourceOpened() {
+				if (player.paused) return;
+				mediaSourceBuffer = mediaSource.addSourceBuffer('audio/mpeg');
+
+				mediaSourceBuffer.addEventListener('updateend', () => {
+					processQueue();
+				});
+
+				mediaSourceBuffer.addEventListener('error', (e) => {
+					console.error('SourceBuffer error:', e);
+				});
+
 				processQueue();
-			});
-
-			mediaSourceBuffer.addEventListener('error', (e) => {
-				console.error('SourceBuffer error:', e);
-			});
-
-			processQueue();
-		}
-
-		function processQueue() {
-			if (!mediaSourceBuffer || mediaSourceBuffer.updating) return;
-
-			if (audioQueue.length > 0) {
-				mediaSourceBuffer.appendBuffer(audioQueue.shift()!);
 			}
-		}
 
-		function cleanup() {
-			reader?.cancel();
+			function processQueue() {
+				if (!mediaSourceBuffer || mediaSourceBuffer.updating) return;
 
-			player.removeEventListener('ended', onMediaEnded);
-			player.pause();
-
-			mediaSource.removeEventListener('sourceopen', handleSourceOpened);
-
-			if (mediaSource.readyState === 'open') {
-				mediaSourceBuffer?.abort();
-				if (mediaSourceBuffer) {
-					mediaSource.removeSourceBuffer(mediaSourceBuffer);
+				if (audioQueue.length > 0) {
+					mediaSourceBuffer.appendBuffer(audioQueue.shift()!);
 				}
-				mediaSource.endOfStream();
 			}
 
-			player.removeAttribute('src');
-			URL.revokeObjectURL(player.src);
-		}
+			function cleanup() {
+				reader?.cancel();
 
-		cleanupQueue.push({ cleanup: cleanup });
+				player.removeEventListener('ended', onMediaEnded);
+				player.pause();
 
-		while (true) {
-			const { done, value } = await reader.read();
-			if (done) {
-				if (mediaSource.readyState === 'open') mediaSource.endOfStream();
-				break;
+				mediaSource.removeEventListener('sourceopen', handleSourceOpened);
+
+				if (mediaSource.readyState === 'open') {
+					mediaSourceBuffer?.abort();
+					if (mediaSourceBuffer) {
+						mediaSource.removeSourceBuffer(mediaSourceBuffer);
+					}
+					mediaSource.endOfStream();
+				}
+
+				player.removeAttribute('src');
+				URL.revokeObjectURL(player.src);
 			}
-			audioQueue.push(value.buffer);
-			processQueue();
+
+			cleanupQueue.push({ cleanup: cleanup });
+
+			while (true) {
+				const { done, value } = await reader.read();
+				if (done) {
+					if (mediaSource.readyState === 'open') mediaSource.endOfStream();
+					break;
+				}
+				audioQueue.push(value.buffer);
+				processQueue();
+			}
+		} else {
+			// Blob fallback for Firefox / Safari (no audio/mpeg MSE support)
+			const chunks: ArrayBuffer[] = [];
+			while (true) {
+				const { done, value } = await reader.read();
+				if (done) break;
+				chunks.push(value.buffer);
+			}
+			if (!speaking) return;
+			const blob = new Blob(chunks, { type: 'audio/mpeg' });
+			const blobUrl = URL.createObjectURL(blob);
+			player.src = blobUrl;
+			player.play();
+
+			cleanupQueue.push({
+				cleanup: () => {
+					reader?.cancel();
+					player.removeEventListener('ended', onMediaEnded);
+					player.pause();
+					URL.revokeObjectURL(blobUrl);
+					player.removeAttribute('src');
+				}
+			});
 		}
 	}
 

@@ -128,12 +128,12 @@
 
 	.tree-link {
 		position: absolute;
-		top:30%;
-		bottom:45%;
+		top: 30%;
+		bottom: 45%;
 		max-width: calc(var(--max-page-width) * 0.3);
 		min-width: 150px;
-		width:30%;
-		left:50%;
+		width: 30%;
+		left: 50%;
 		transform: translateX(-50%);
 	}
 

@@ -1,6 +1,11 @@
 <script lang="ts">
 	import type { Optional } from '$lib/types';
 
+	import cameraIcon from '$lib/assets/camera-icon-dark.png';
+	import galleryIcon from '$lib/assets/gallery-icon.png';
+	import { language } from '$lib/stores';
+	import { t } from '$lib/translations';
+
 	export let image: Optional<File> = undefined;
 
 	$: {
@@ -47,10 +52,16 @@
 			style="display: none;"
 		/>
 		<div class="select-button">
-			<button class="shadow" onclick={() => galleryInput.click()}>Pic Photo from Gallery</button>
+			<button class="shadow" onclick={() => cameraInput.click()}>
+				<img src={cameraIcon} alt={t('forum.takePhoto', $language)} />
+				<span>{t('forum.takePhoto', $language)}</span>
+			</button>
 		</div>
 		<div class="select-button">
-			<button class="shadow" onclick={() => cameraInput.click()}>Take Photo</button>
+			<button class="shadow" onclick={() => galleryInput.click()}>
+				<img src={galleryIcon} alt={t('forum.galleryPhoto', $language)} />
+				<span>{t('forum.galleryPhoto', $language)}</span>
+			</button>
 		</div>
 	{:else}
 		<div class="preview">
@@ -78,6 +89,16 @@
 		background-color: #eeeeee;
 		text-align: center;
 		--box-shadow-color: #cccccc;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		gap: var(--small-padding);
+	}
+
+	.select-button img {
+		width: 60px;
+		height: 60px;
 	}
 
 	.preview {

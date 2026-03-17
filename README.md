@@ -81,27 +81,18 @@ or run all three steps with
 
 ## Deployment on raspberry pi
 
-* install base image rasp pi os 64 bit lite
-* create `.env` file in root folder and set password, rootpassword and secret key:
-```
-MYSQL_USER=minodu_user
-MYSQL_PASSWORD=<password>
-MYSQL_ROOT_PASSWORD=<rootpassword>
-DB_NAME=minodu
-JWT_SECRET_KEY=secret
-FORUM_ADMIN_PASSWORD=<some_password>
-ADMIN_PASSWORD=<admin_password>
-ADMIN_PHONE=<90000000>
-ENVIRONMENT=production
-```
+### Prerequisites
+
 * setup ollama
 ```
 # install ollama
 curl -fsSL https://ollama.com/install.sh | sh
 ollama pull llama3.2:1b && ollama pull nomic-embed-text && ollama pull all-minilm:l6-v2
 ```
+
 * edit and enable ollama service
 ```
+# edit startup service file
 sudo systemctl edit ollama.service
 
 # Add these lines:
@@ -115,10 +106,8 @@ sudo systemctl enable ollama
 * install other dependencies
 ```
 # install docker
-sudo apt update
-sudo apt upgrade
 curl -sSL https://get.docker.com | sh
-sudo usermod -aG docker $USER
+sudo usermod -aG docker pi
 sudo systemctl enable docker
 
 # install git-lfs and get lfs files
@@ -139,6 +128,21 @@ eval "$(pyenv init - bash)"
 pyenv install 3.12.11
 ```
 
+### Run App
+
+* create `.env` file in root folder and set password, rootpassword and secret key:
+```
+MYSQL_USER=minodu_user
+MYSQL_PASSWORD=<password>
+MYSQL_ROOT_PASSWORD=<rootpassword>
+DB_NAME=minodu
+JWT_SECRET_KEY=secret
+FORUM_ADMIN_PASSWORD=<some_password>
+ADMIN_PASSWORD=<admin_password>
+ADMIN_PHONE=<90000000>
+ENVIRONMENT=production
+```
+
 * install docker containers
 ```
 # run this inside minodu repo folder
@@ -149,10 +153,7 @@ npm install
 sudo npm run docker:start
 
 # once the database is running, sync online database to local one and update embeddings
-cd tools/sync && poetry install
+(cd tools/sync && poetry install)
 npm run sync:database && npm run sync:rag
 ```
 
-## TODO
-
-* create install script containing these instructions + network and access point setup

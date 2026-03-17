@@ -32,7 +32,7 @@
 		width: 12px;
 		height: 12px;
 		border-radius: 50%;
-		background: #4a9068;
+		background: #00000059;
 		animation: dotPulse 1.3s ease-in-out infinite;
 	}
 	.pulsing-dots span:nth-child(2) {

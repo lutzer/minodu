@@ -15,7 +15,8 @@ class DocumentStoreException(Exception):
     pass
 
 
-CHUNK_SIZE = 500
+CHUNK_SIZE = 256
+CHUNK_OVERLAP = 40
 
 
 class DocumentStore:
@@ -26,7 +27,7 @@ class DocumentStore:
         self.language = language
         self.text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=CHUNK_SIZE,
-            chunk_overlap=int(CHUNK_SIZE * 0.1)
+            chunk_overlap=CHUNK_OVERLAP
         )
 
     def add_text_documents(self, texts, metadatas=None, summary: Optional[str] = None):

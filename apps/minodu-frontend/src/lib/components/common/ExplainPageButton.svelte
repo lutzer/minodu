@@ -5,7 +5,7 @@
 	import languageFrButton from '$lib/assets/language-fr-button.png';
 	import { language } from '$lib/stores';
 	import { t } from '$lib/translations';
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 
 	export let audioKb: string;
 	export let audioFr: string;
@@ -14,13 +14,19 @@
 	let isPlaying: boolean = false;
 	let mounted: boolean = false;
 
+	let audioSrc : string | undefined = undefined;
+
 	function languageButtonClicked() {
 		language.set($language == 'kb' ? 'fr' : 'kb');
 		audio?.pause();
 		isPlaying = false;
 	}
 
-	function explainPageButtonClicked() {
+	async function explainPageButtonClicked() {
+		audioSrc = $language == 'kb' ? audioKb : audioFr
+
+		await tick();
+		
 		if (!isPlaying) {
 			audio.currentTime = 0;
 			audio.play();
@@ -59,8 +65,9 @@
 			</button>
 			<audio
 				bind:this={audio}
-				src={$language == 'kb' ? audioKb : audioFr}
+				src={audioSrc}
 				onended={handleAudioEnded}
+				preload="none"
 			>
 			</audio>
 		{/if}

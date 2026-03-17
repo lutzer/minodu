@@ -71,15 +71,15 @@
 		return val == null ? 'NaN' : Math.round(val);
 	}
 
-	function getCloudIcon(airPressure: number) : string {
+	function getCloudIcon(airPressure: number): string {
 		if (airPressure < 1000) {
-			return cloudRain
-		} else if (airPressure < 1010 ) {
-			return cloudCovered
+			return cloudRain;
+		} else if (airPressure < 1010) {
+			return cloudCovered;
 		} else if (airPressure < 1015) {
-			return cloudSunny
+			return cloudSunny;
 		} else {
-			return cloudSun
+			return cloudSun;
 		}
 	}
 

@@ -35,8 +35,7 @@ export class WeatherService {
         wind_direction: syncWeatherDto.wind_dir,
         wind_speed: syncWeatherDto.wind_spd,
         indice_uv: syncWeatherDto.uv,
-        battery: syncWeatherDto.battery,
-        time: syncWeatherDto.time ?? new Date().toISOString(),
+        battery: syncWeatherDto.battery
       });
 
       const savedWeather = await this.weatherRepository.save(weather);
@@ -114,7 +113,7 @@ export class WeatherService {
             wind_spd: weather.wind_speed,
             uv: weather.indice_uv,
             battery: weather.battery,
-            time: weather.time,
+            time: weather.createdAt,
           };
           i++;
           return row;
@@ -182,7 +181,9 @@ export class WeatherService {
           luminosity: latest.luminosity,
           ambient_luminosity: latest.ambient,
           carbon_monoxide: latest.co,
-          nitrogen_dioxide: latest.no2
+          nitrogen_dioxide: latest.no2,
+          wind_spd: latest.wind_speed,
+          wind_dir: latest.wind_direction
         };
 
         const description = await this.interpretWeather(weatherData);

@@ -22,7 +22,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 logging.getLogger("chromadb").setLevel(logging.ERROR)
 logging.getLogger("chromadb.telemetry").setLevel(logging.CRITICAL)
 
-NUMBER_OF_RETRIEVED_CHUNKS = 3
+NUMBER_OF_RETRIEVED_CHUNKS = 8
 MAX_HISTORY_EXCHANGES = 5  # Limit conversation history for faster inference
 
 

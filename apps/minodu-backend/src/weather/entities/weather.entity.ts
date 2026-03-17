@@ -45,9 +45,6 @@ export class Weather extends BaseEntity {
   @Column({ type: 'float', nullable: true })
   battery: number;
 
-  @Column({ nullable: true })
-  time: string;
-
   @Column({ type: 'text', nullable: true })
   description: string;
 
