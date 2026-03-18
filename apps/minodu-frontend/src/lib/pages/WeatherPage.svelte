@@ -53,7 +53,7 @@
 
 	$: loading = weather === undefined;
 	$: cloud = weather?.pressure != null && getCloudIcon(weather.pressure);
-	$: wind = weather?.wind_speed && getWindIcon(weather.wind_speed);
+	$: wind = weather?.wind_speed != null && getWindIcon(weather.wind_speed);
 	$: soil = weather?.humidity != null && getHumidityIcon(weather.humidity);
 
 	$: pressure = weather?.pressure != null && getPressureLevel(weather.pressure);
