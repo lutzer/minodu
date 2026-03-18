@@ -49,7 +49,7 @@ export class BackendApi {
 		return response.json();
 	}
 
-	public static async getWeatherCurrent(): Promise<BackendWeather[]> {
+	public static async getWeatherCurrent(): Promise<BackendWeather> {
 		const response = await fetch(`${BackendApi.API_PREFIX}/weather/current`);
 		if (!response.ok) {
 			throw new HttpError({ code: response.status, message: await response.text() });

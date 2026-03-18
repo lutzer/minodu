@@ -42,14 +42,13 @@
 	import speakWeatherButton from '$lib/assets/weather-speak-button.png';
 	import speakWeatherButtonPressed from '$lib/assets/weather-speak-button-pressed.png';
 
-	let weather: BackendWeather;
+	let weather: BackendWeather | undefined;
 
 	let ttsPlayer: TextToSpeechPlayer;
 	let ttsSpeaking: boolean = false;
 
 	onMount(async () => {
-		const data = await BackendApi.getWeatherCurrent();
-		if (data.length > 0) weather = data[0];
+		weather = await BackendApi.getWeatherCurrent();
 	});
 
 	$: loading = weather === undefined;
@@ -62,7 +61,7 @@
 
 	function toggleSpeakWeather() {
 		if (ttsSpeaking) ttsPlayer.stop();
-		else if (typeof weather.description === 'string') {
+		else if (weather && typeof weather.description === 'string') {
 			ttsPlayer.speak(weather.description);
 		}
 	}
