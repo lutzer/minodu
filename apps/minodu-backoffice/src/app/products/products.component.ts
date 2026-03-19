@@ -72,7 +72,7 @@ export class ProductsComponent implements OnInit {
       },
       error: err => {
         this.loading = false;
-        this.errorMessage = err.error.message;
+        this.errorMessage = 'Une erreur est survenue lors du chargement des produits. Veuillez réessayer.';
         // console.log(err.error)
         this.authService.logout();
       }
@@ -85,7 +85,7 @@ export class ProductsComponent implements OnInit {
         this.categories = data;
       },
       error: err => {
-        this.errorMessage = err.error.message;
+        this.errorMessage = 'Une erreur est survenue lors du chargement des catégories. Veuillez réessayer.';
         // console.log(err.error)
       }
     });
@@ -117,7 +117,7 @@ export class ProductsComponent implements OnInit {
           error: err => {
             // console.log(err.error)
             this.isSubmitting = false;
-            this.errorMessage = err.error.message;
+            this.errorMessage = 'Une erreur s\'est produite lors de la modification du produit. Veuillez vérifier et réessayer.';
           }
         });
       } else {
@@ -134,7 +134,7 @@ export class ProductsComponent implements OnInit {
           error: err => {
             // console.log(err.error)
             this.isSubmitting = false;
-            this.errorMessage = err.error.message;
+            this.errorMessage = 'Une erreur s\'est produite lors de l\'ajout du produit. Veuillez vérifier et réessayer.';
           }
         });
       }
@@ -172,7 +172,7 @@ export class ProductsComponent implements OnInit {
         },
         error: err => {
           this.isDeleting = false;
-          this.errorMessage = err.error.message;
+          this.errorMessage = 'Une erreur s\'est produite lors de la suppression. Veuillez réessayer.';
           // console.log(err.error);
         }
       });
@@ -183,15 +183,20 @@ export class ProductsComponent implements OnInit {
     if (event.target.files && event.target.files.length > 0) {
       this.image = event.target.files[0];
 
-       if (this.image && this.image.type.split('/')[0] !== 'image') {
-      this.addProductForm.get('image')!.setValue('');
-      this.addProductForm.get('image')!.setErrors({ 'invalidFileType': true });
-      }else{
-      const reader = new FileReader();
+      // Vérifier que c'est bien PNG ou JPG/JPEG
+      if (this.image) {
+        const validImageTypes = ['image/png', 'image/jpeg'];
+        if (!validImageTypes.includes(this.image.type)) {
+          this.addProductForm.get('image')!.setValue('');
+          this.addProductForm.get('image')!.setErrors({ 'invalidFileType': true });
+          return;
+        }
+
+        const reader = new FileReader();
         reader.onload = () => {
           this.currentImageUrl = reader.result as string;
         };
-        reader.readAsDataURL(this.image!!);
+        reader.readAsDataURL(this.image);
       }
     }
   }

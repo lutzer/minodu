@@ -81,7 +81,7 @@ export class PostsComponent implements OnInit {
       },
       error: err => {
         this.loading = false;
-        this.errorMessage = err.error?.message || 'Erreur lors du chargement des publications';
+        this.errorMessage = 'Une erreur est survenue lors du chargement des publications. Veuillez réessayer.';
         if (err.status === 401) this.authService.logout();
       }
     });
@@ -138,28 +138,30 @@ export class PostsComponent implements OnInit {
   onFileChange(event: any, type: 'image' | 'attachment' | 'attachmentKb' | 'attachmentPdf') {
       if (event.target.files && event.target.files.length > 0) {
         const file = event.target.files[0];
-        this.imageFile = file;
-        this.imageFile = event.target.files[0];
 
-        if (this.imageFile && this.imageFile.type.split('/')[0] !== 'image') {
-        this.form.get('image')!.setValue('');
-        this.form.get('image')!.setErrors({ 'invalidFileType': true });
-        }else{
-        const reader = new FileReader();
-        reader.onload = (e: any) => {
-          this.currentImageUrl = e.target.result;
-        };
-        reader.readAsDataURL(file);
+        if (type === 'image') {
+          // Vérifier que c'est bien PNG ou JPG/JPEG
+          const validImageTypes = ['image/png', 'image/jpeg'];
+          if (!validImageTypes.includes(file.type)) {
+            this.form.get('image')!.setValue('');
+            this.form.get('image')!.setErrors({ 'invalidFileType': true });
+            return;
+          }
+          
+          this.imageFile = file;
+          const reader = new FileReader();
           reader.onload = () => {
             this.currentImageUrl = reader.result as string;
           };
-          reader.readAsDataURL(this.imageFile!!);
+          reader.readAsDataURL(file);
+        } else if (type === 'attachment') {
+          this.attachmentFile = file;
+        } else if (type === 'attachmentKb') {
+          this.attachmentKbFile = file;
+        } else if (type === 'attachmentPdf') {
+          this.attachmentPdfFile = file;
+        }
       }
-
-      if (type === 'attachment') this.attachmentFile = file;
-      if (type === 'attachmentKb') this.attachmentKbFile = file;
-      if (type === 'attachmentPdf') this.attachmentPdfFile = file;
-    }
   }
 
   removeImage() {
@@ -238,13 +240,17 @@ export class PostsComponent implements OnInit {
         undefined                // resources
       ).subscribe({
         next: _ => {
-          this.successMessage = 'Publication modifiée avec succès';
-          this.loadAll();
-          this.closeModal();
+          this.successMessage = 'Publication modifiée avec succès !';
           this.isSubmitting = false;
+          setTimeout(() => {
+            this.closeModal('modal-report');
+            this.resetForm();
+            this.loadAll();
+            this.successMessage = '';
+          }, 2000);
         },
         error: err => {
-          this.errorMessage = err.error?.message || 'Erreur lors de la modification';
+          this.errorMessage = 'Une erreur s\'est produite lors de la modification de la publication. Veuillez vérifier les informations et réessayer.';
           this.isSubmitting = false;
         }
       });
@@ -262,23 +268,18 @@ export class PostsComponent implements OnInit {
         undefined                // resources
       ).subscribe({
         next: _ => {
-        this.successMessage = this.selectedPost ? 
-            'Publication modifiée avec succès' : 
-            'Publication ajoutée avec succès';
-
-        this.loadAll();
-        this.isSubmitting = false;
-
-        // Laisser le message visible 1s avant de fermer le modal
-        setTimeout(() => {
-          this.closeModal();
-          // Effacer le message après fermeture si tu veux
-          this.successMessage = '';
-        }, 2000);
-      },
+          this.successMessage = 'Publication ajoutée avec succès !';
+          this.isSubmitting = false;
+          setTimeout(() => {
+            this.closeModal('modal-report');
+            this.resetForm();
+            this.loadAll();
+            this.successMessage = '';
+          }, 2000);
+        },
 
         error: err => {
-          this.errorMessage = err.error?.message || 'Erreur lors de l\'ajout';
+          this.errorMessage = 'Une erreur s\'est produite lors de l\'ajout de la publication. Veuillez vérifier les informations et réessayer.';
           this.isSubmitting = false;
         }
       });
@@ -296,25 +297,26 @@ export class PostsComponent implements OnInit {
     this.isDeleting = true;
     this.postService.deletePost(this.deleteId).subscribe({
       next: _ => {
-        this.successMessage = 'Publication supprimée avec succès';
+        this.successMessage = 'Publication supprimée avec succès !';
         this.loadAll();
-        this.closeModal('delete');
+        this.closeModal('modal-delete');
+        this.deleteId = null;
         this.isDeleting = false;
       },
       error: err => {
-        this.errorMessage = err.error?.message || 'Erreur lors de la suppression';
+        this.errorMessage = 'Une erreur s\'est produite lors de la suppression. Veuillez réessayer.';
         this.isDeleting = false;
       }
     });
   }
 
-  closeModal(type: 'delete' | 'form' = 'form') {
-    if (type === 'form') {
-      (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-report')).hide();
-      this.resetForm();
-    } else {
-      (window as any).bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-delete')).hide();
-      this.deleteId = null;
+  closeModal(modalId: string): void {
+    const modalElement = document.getElementById(modalId);
+    if (modalElement) {
+      const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
+      if (modal) {
+        modal.hide();
+      }
     }
   }
 

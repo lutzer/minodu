@@ -56,7 +56,7 @@ export class PostTagsComponent implements OnInit {
       },
       error: err => {
         this.loading = false;
-        this.errorMessage = err.error?.message || 'Erreur lors du chargement des tags';
+        this.errorMessage = 'Une erreur est survenue lors du chargement des tags. Veuillez réessayer.';
         if (err.status === 401) this.authService.logout();
       }
     });
@@ -95,12 +95,21 @@ export class PostTagsComponent implements OnInit {
   }
 
   onFileChange(event: any) {
-    const file = event.target.files[0];
-    this.imageFile = file;
-    if (file) {
+    if (event.target.files && event.target.files.length > 0) {
+      const file = event.target.files[0];
+
+      // Vérifier que c'est bien PNG ou JPG/JPEG
+      const validImageTypes = ['image/png', 'image/jpeg'];
+      if (!validImageTypes.includes(file.type)) {
+        this.form.get('image')!.setValue('');
+        this.form.get('image')!.setErrors({ 'invalidFileType': true });
+        return;
+      }
+
+      this.imageFile = file;
       const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.currentImageUrl = e.target.result;
+      reader.onload = () => {
+        this.currentImageUrl = reader.result as string;
       };
       reader.readAsDataURL(file);
     }
@@ -124,26 +133,34 @@ export class PostTagsComponent implements OnInit {
     if (this.selectedTag) {
       this.tagsService.updateTag(this.selectedTag.id, name, this.imageFile).subscribe({
         next: _ => {
-          this.successMessage = 'Tag modifié avec succès';
+          this.successMessage = 'Tag modifié avec succès !';
           this.loadTags();
-          this.closeModal();
           this.isSubmitting = false;
+          setTimeout(() => {
+            this.closeModal('modal-tag');
+            this.resetForm();
+            this.successMessage = '';
+          }, 2000);
         },
         error: err => {
-          this.errorMessage = err.error?.message || 'Erreur lors de la modification';
+          this.errorMessage = 'Une erreur s\'est produite lors de la modification du tag. Veuillez vérifier et réessayer.';
           this.isSubmitting = false;
         }
       });
     } else {
       this.tagsService.addTag(name, this.imageFile).subscribe({
         next: _ => {
-          this.successMessage = 'Tag ajouté avec succès';
+          this.successMessage = 'Tag ajouté avec succès !';
           this.loadTags();
-          this.closeModal();
           this.isSubmitting = false;
+          setTimeout(() => {
+            this.closeModal('modal-tag');
+            this.resetForm();
+            this.successMessage = '';
+          }, 2000);
         },
         error: err => {
-          this.errorMessage = err.error?.message || 'Erreur lors de l\'ajout';
+          this.errorMessage = 'Une erreur s\'est produite lors de l\'ajout du tag. Veuillez vérifier et réessayer.';
           this.isSubmitting = false;
         }
       });
@@ -160,31 +177,26 @@ export class PostTagsComponent implements OnInit {
     this.isDeleting = true;
     this.tagsService.deleteTag(this.deleteId).subscribe({
       next: _ => {
-        this.successMessage = 'Tag supprimé avec succès';
+        this.successMessage = 'Tag supprimé avec succès !';
         this.loadTags();
-        this.closeModal('delete');
+        this.closeModal('modal-delete-tag');
+        this.deleteId = null;
         this.isDeleting = false;
       },
       error: err => {
-        this.errorMessage = err.error?.message || 'Erreur lors de la suppression';
+        this.errorMessage = 'Une erreur s\'est produite lors de la suppression. Veuillez réessayer.';
         this.isDeleting = false;
       }
     });
   }
 
-  closeModal(type: 'delete' | 'form' = 'form') {
-    if (type === 'form') {
-      const modal = document.getElementById('modal-tag');
-      if (modal && (window as any).bootstrap) {
-        (window as any).bootstrap.Modal.getOrCreateInstance(modal).hide();
+  closeModal(modalId: string): void {
+    const modalElement = document.getElementById(modalId);
+    if (modalElement) {
+      const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
+      if (modal) {
+        modal.hide();
       }
-      this.resetForm();
-    } else {
-      const modal = document.getElementById('modal-delete-tag');
-      if (modal && (window as any).bootstrap) {
-        (window as any).bootstrap.Modal.getOrCreateInstance(modal).hide();
-      }
-      this.deleteId = null;
     }
   }
 
