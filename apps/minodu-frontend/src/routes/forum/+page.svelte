@@ -1,12 +1,14 @@
 <script>
 	import ExplainPageButton from '$lib/components/common/ExplainPageButton.svelte';
 	import ForumPage from '$lib/pages/ForumPage.svelte';
+
+	import explainPageFr from '$lib/assets/audio/s3_forum_fr.mp3'
+	import explainPageKb from '$lib/assets/audio/s3_forum_kb.mp3';
 </script>
 
 <div>
 	<ForumPage />
 	<ExplainPageButton
-		audioFr="https://audio-samples.github.io/samples/mp3/blizzard_unconditional/sample-0.mp3"
-		audioKb="https://audio-samples.github.io/samples/mp3/blizzard_unconditional/sample-1.mp3"
-	/>
+		audioFr={explainPageFr}
+		audioKb={explainPageKb}/>
 </div>

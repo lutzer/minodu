@@ -6,6 +6,10 @@
 	import ExplainPageButton from '$lib/components/common/ExplainPageButton.svelte';
 	import { language } from '$lib/stores';
 	import { t } from '$lib/translations';
+
+	import explainPageFr from '$lib/assets/audio/s1_accueil_fr.mp3';
+	import explainPageKb from '$lib/assets/audio/s1_accueil_kb.mp3';
+
 </script>
 
 <div class="content-width">
@@ -39,8 +43,8 @@
 		<a href="/about"></a>
 	</div>
 	<ExplainPageButton
-		audioFr="https://audio-samples.github.io/samples/mp3/blizzard_unconditional/sample-0.mp3"
-		audioKb="https://audio-samples.github.io/samples/mp3/blizzard_unconditional/sample-1.mp3"
+		audioFr={explainPageFr}
+		audioKb={explainPageKb}
 	/>
 </div>
 

@@ -1,12 +1,16 @@
 <script>
 	import ExplainPageButton from '$lib/components/common/ExplainPageButton.svelte';
 	import MarketPage from '$lib/pages/MarketPage.svelte';
+
+
+	import explainPageFr from '$lib/assets/audio/s6_marche_fr.mp3';
+	import explainPageKb from '$lib/assets/audio/s6_marche_kb.mp3';
 </script>
 
 <div>
 	<MarketPage />
 	<ExplainPageButton
-		audioFr="https://audio-samples.github.io/samples/mp3/blizzard_unconditional/sample-0.mp3"
-		audioKb="https://audio-samples.github.io/samples/mp3/blizzard_unconditional/sample-1.mp3"
+		audioFr={explainPageFr}
+		audioKb={explainPageKb}
 	/>
 </div>

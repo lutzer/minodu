@@ -16,6 +16,10 @@
 	import { goto } from '$app/navigation';
 	import { language } from '$lib/stores';
 	import { t } from '$lib/translations';
+	import ExplainPageButton from '$lib/components/common/ExplainPageButton.svelte';
+
+	import explainPageFr from '$lib/assets/audio/s4_chatbot_fr.mp3';
+	import explainPageKb from '$lib/assets/audio/s4_chatbot_kb.mp3';
 
 	export let post: Optional<BackendPost> = undefined;
 	export let saveChat: boolean;
@@ -183,6 +187,9 @@
 			</div>
 			<BotInputElement onMessageSubmitted={submitMessage} enabled={!generating} />
 		</div>
+		<ExplainPageButton
+			audioFr={explainPageFr}
+			audioKb={explainPageKb}/>
 	{/if}
 	<TextToSpeechPlayer bind:this={ttsPlayer} />
 </div>
