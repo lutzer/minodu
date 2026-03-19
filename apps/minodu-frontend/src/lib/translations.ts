@@ -157,15 +157,15 @@ const translations: TranslationStrings = {
 	},
 	'forum.takePhoto': {
 		fr: 'Prendre une photo',
-		kb: 'needs-translation'
+		kb: 'kɛlɛm-kɛlɛm kpaaʋ'
 	},
 	'forum.galleryPhoto': {
 		fr: 'Galerie de photos',
-		kb: 'needs-translation'
+		kb: 'kɛlɛm-kɛlɛm naa kpowu'
 	},
 	'forum.recordAudio': {
 		fr: "Enregistrer l'audio",
-		kb: 'needs-translation'
+		kb: 'tɔm kiwelezitu kpaaʋ'
 	},
 
 	// Agriculture
@@ -189,7 +189,7 @@ const translations: TranslationStrings = {
 	},
 	'market.contact': {
 		fr: 'Personne à contacter',
-		kb: 'needs-translation'
+		kb: 'wei ɛbɩzʋʋ eyekina yɔ́/ wei ɛbɩzʋʋ ɛ-yaa yɔ́'
 	},
 	'market.phone-icon': {
 		fr: "Appelez l'administrateur.",
@@ -349,7 +349,7 @@ const translations: TranslationStrings = {
 	},
 	'alt.closeDialog': {
 		fr: 'Fermer le dialogue',
-		kb: 'needs-translation'
+		kb: 'kɛdaɣ ɖɩɩʋ'
 	}
 };
 
