@@ -112,7 +112,7 @@ export class PostController {
         }),
         fileFilter: BaseConfig.fileFilter,
         limits: {
-          fileSize: 5 * 1024 * 1024, // Limit to 5 MB
+          fileSize: 10 * 1024 * 1024, // Limit to 10 MB
         }
       },
     ),
