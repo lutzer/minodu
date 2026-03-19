@@ -33,6 +33,18 @@
 
       <div class="page-body">
       <div class="container-xl">
+      
+      <!-- Messages de chargement/erreur au niveau de la page -->
+      <div class="row mb-3" *ngIf="!isSubmitting && errorMessage">
+        <div class="col-12">
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 8v4" /><path d="M12 16v.01" /></svg>
+            <div>{{errorMessage}}</div>
+            <a class="btn-close" data-bs-dismiss="alert" aria-label="close" (click)="errorMessage = ''"></a>
+          </div>
+        </div>
+      </div>
+      
       <div class="row row-deck row-cards">
       <div class="col-12">
           <div class="card">            
@@ -95,10 +107,6 @@
     </div>
 </div>
 
-<!-- Feedback utilisateur -->
-<div *ngIf="successMessage" class="alert alert-success mt-2">{{successMessage}}</div>
-<div *ngIf="errorMessage" class="alert alert-danger mt-2">{{errorMessage}}</div>
-
 <!-- Modale formulaire (ajout/édition) -->
 <div class="modal fade" id="modal-category" tabindex="-1" aria-labelledby="modalCategoryLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -106,9 +114,20 @@
       <form [formGroup]="form" (ngSubmit)="submitForm()">
         <div class="modal-header">
           <h5 class="modal-title" id="modalCategoryLabel">{{modalTitle}}</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="closeModal()"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="closeModal('modal-category')"></button>
         </div>
         <div class="modal-body">
+          <!-- Feedback utilisateur -->
+          <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+            <!-- <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M5 12l5 5l10 -10" /></svg> -->
+            <div>{{successMessage}}</div>
+            <a class="btn-close" data-bs-dismiss="alert" aria-label="close" (click)="successMessage = ''"></a>
+          </div>
+          <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <!-- <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 8v4" /><path d="M12 16v.01" /></svg> -->
+            <div>{{errorMessage}}</div>
+            <a class="btn-close" data-bs-dismiss="alert" aria-label="close" (click)="errorMessage = ''"></a>
+          </div>
           <div class="mb-3">
             <label for="categoryName" class="form-label">Nom de la catégorie</label>
             <input id="categoryName" type="text" class="form-control" formControlName="name" [class.is-invalid]="form.get('name')?.invalid && form.get('name')?.touched">
@@ -142,8 +161,8 @@
               
               <!-- File input toujours visible -->
               <div *ngIf="!currentImageUrl">
-                <input [id]="fileInputId" formControlName="image" type="file" class="form-control mb-3" accept="image/*" (change)="onFileChange($event)">
-                <small class="form-text text-muted d-block mt-2">Formats acceptés: JPG, PNG</small>
+                <input [id]="fileInputId" formControlName="image" type="file" class="form-control mb-3" accept=".png,.jpg,.jpeg" (change)="onFileChange($event)">
+                <small class="form-text text-muted d-block mt-2">Formats acceptés: PNG, JPG/JPEG</small>
                 <div *ngIf="form.get('image')?.invalid" class="mt-10 text-danger">
                                   <p *ngIf="form.get('image')?.errors?.['required'] && isSubmitting">
                                       * L'image du produit est requise.
@@ -156,8 +175,9 @@
             </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeModal()">Annuler</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="closeModal('modal-category')">Annuler</button>
           <button type="submit" class="btn btn-primary" [disabled]="form.invalid || isSubmitting">
+            <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
             {{selectedCategory ? 'Modifier' : 'Ajouter'}}
           </button>
         </div>

@@ -66,7 +66,7 @@ export class PostDetailsComponent implements OnInit {
         },
         error: err => {
           this.loading = false;
-          this.errorMessage = err.error.message;
+          this.errorMessage = 'Une erreur est survenue lors du chargement de la publication. Veuillez réessayer.';
           this.authService.logout();
         }
       });
@@ -121,31 +121,32 @@ export class PostDetailsComponent implements OnInit {
   }
 
   onFileChange(event: any, type: string) {
-    const file = event.target.files && event.target.files[0];
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
-      this.imageFile = file;
-      this.imageFile = event.target.files[0];
 
-       if (this.imageFile && this.imageFile.type.split('/')[0] !== 'image') {
-      this.form.get('image')!.setValue('');
-      this.form.get('image')!.setErrors({ 'invalidFileType': true });
-      }else{
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.currentImageUrl = e.target.result;
-      };
-      reader.readAsDataURL(file);
+      if (type === 'image') {
+        // Vérifier que c'est bien PNG ou JPG/JPEG
+        const validImageTypes = ['image/png', 'image/jpeg'];
+        if (!validImageTypes.includes(file.type)) {
+          this.form.get('image')!.setValue('');
+          this.form.get('image')!.setErrors({ 'invalidFileType': true });
+          return;
+        }
+
+        this.imageFile = file;
+        const reader = new FileReader();
         reader.onload = () => {
           this.currentImageUrl = reader.result as string;
         };
-        reader.readAsDataURL(this.imageFile!!);
+        reader.readAsDataURL(file);
+      } else if (type === 'attachment') {
+        this.attachmentFile = file;
+      } else if (type === 'attachmentKb') {
+        this.attachmentKbFile = file;
+      } else if (type === 'attachmentPdf') {
+        this.attachmentPdfFile = file;
       }
     }
-
-    if (type === 'attachment') this.attachmentFile = file;
-    if (type === 'attachmentKb') this.attachmentKbFile = file;
-    if (type === 'attachmentPdf') this.attachmentPdfFile = file;
   }
 
   submitForm() {
@@ -181,7 +182,7 @@ export class PostDetailsComponent implements OnInit {
       '' // resources, à adapter si besoin
     ).subscribe({
       next: () => {
-        this.formSuccess = 'Publication modifiée avec succès.';
+        this.formSuccess = 'Publication modifiée avec succès !';
         this.isSubmitting = false;
         setTimeout(() => {
           this.closeModal();
@@ -190,7 +191,7 @@ export class PostDetailsComponent implements OnInit {
         }, 1200);
       },
       error: err => {
-        this.formError = err?.error?.message || 'Erreur lors de la modification.';
+        this.formError = 'Une erreur s\'est produite lors de la modification de la publication. Veuillez vérifier les informations et réessayer.';
         this.isSubmitting = false;
       }
     });

@@ -61,7 +61,7 @@ export class ProductCategoriesComponent implements OnInit {
       },
       error: err => {
         this.loading = false;
-        this.errorMessage = err.error.message;
+        this.errorMessage = 'Une erreur est survenue lors du chargement des catégories. Veuillez réessayer.';
         this.authService.logout();
       }
     });
@@ -82,22 +82,21 @@ export class ProductCategoriesComponent implements OnInit {
 
     if (!file) return;
 
-    // Vérification du type MIME
-    if (!file.type.startsWith('image/')) {
+    // Vérifier que c'est bien PNG ou JPG/JPEG
+    const validImageTypes = ['image/png', 'image/jpeg'];
+    if (!validImageTypes.includes(file.type)) {
       this.image = null;
       this.addCategoryForm.get('image')!.setValue('');
       this.addCategoryForm.get('image')!.setErrors({ invalidFileType: true });
       return;
     }
 
-    // ✅ FIX : on stocke le File correctement
     this.image = file;
 
     // Prévisualisation
     const reader = new FileReader();
     reader.onload = () => {
       this.currentImageUrl = reader.result as string;
-      // L'image est valide : on vide les erreurs et on met une valeur
       this.addCategoryForm.get('image')!.setValue(file.name);
       this.addCategoryForm.get('image')!.setErrors(null);
     };
@@ -142,7 +141,7 @@ export class ProductCategoriesComponent implements OnInit {
           },
           error: err => {
             this.isSubmitting = false;
-            this.errorMessage = err.error.message;
+            this.errorMessage = 'Une erreur s\'est produite lors de la modification de la catégorie. Veuillez vérifier et réessayer.';
           }
         });
       } else {
@@ -157,7 +156,7 @@ export class ProductCategoriesComponent implements OnInit {
           },
           error: err => {
             this.isSubmitting = false;
-            this.errorMessage = err.error.message;
+            this.errorMessage = 'Une erreur s\'est produite lors de l\'ajout de la catégorie. Veuillez vérifier et réessayer.';
           }
         });
       }
@@ -233,7 +232,7 @@ export class ProductCategoriesComponent implements OnInit {
         },
         error: err => {
           this.isDeleting = false;
-          this.errorMessage = err.error.message;
+          this.errorMessage = 'Une erreur s\'est produite lors de la suppression. Veuillez réessayer.';
         }
       });
     }

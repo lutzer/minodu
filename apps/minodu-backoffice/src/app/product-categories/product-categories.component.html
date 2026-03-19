@@ -15,9 +15,20 @@
     </div>
   </div>
     <div class="container-xl">
-
       <div class="page-body">
       <div class="container-xl">
+      
+      <!-- Messages de chargement/erreur au niveau de la page -->
+      <div class="row mb-3" *ngIf="!isFormSubmitted && errorMessage">
+        <div class="col-12">
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon alert-icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /><path d="M12 8v4" /><path d="M12 16v.01" /></svg>
+            <div>{{errorMessage}}</div>
+            <a class="btn-close" data-bs-dismiss="alert" aria-label="close" (click)="errorMessage = ''"></a>
+          </div>
+        </div>
+      </div>
+      
       <div class="row row-deck row-cards">
       <div class="col-12">
           <div class="card">            
@@ -103,8 +114,8 @@
             
             <!-- File input toujours visible -->
              <div *ngIf="!currentImageUrl">
-              <input [id]="fileInputId" formControlName="image" type="file" class="form-control mb-3" accept="image/*" (change)="onFileChange($event)">
-              <small class="form-text text-muted d-block mt-2">Formats acceptés: JPG, PNG</small>
+              <input [id]="fileInputId" formControlName="image" type="file" class="form-control mb-3" accept=".png,.jpg,.jpeg" (change)="onFileChange($event)">
+              <small class="form-text text-muted d-block mt-2">Formats acceptés: PNG, JPG/JPEG</small>
               <div *ngIf="addCategoryForm.get('image')?.invalid" class="mt-10 text-danger">
                                 <p *ngIf="addCategoryForm.get('image')?.errors?.['required'] && isFormSubmitted">
                                     * L'image de la catégorie est requise.

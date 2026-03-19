@@ -56,24 +56,21 @@ export class PostCategoriesComponent implements OnInit {
       },
       error: err => {
         this.loading = false;
-        this.errorMessage = err.error?.message || 'Erreur lors du chargement des catégories';
+        this.errorMessage = 'Une erreur est survenue lors du chargement des catégories. Veuillez réessayer.';
         if (err.status === 401) this.authService.logout();
       }
     });
   }
 
-   updateImageValidation(): void {
+  updateImageValidation(): void {
     const imageControl = this.form.get('image');
     if (!this.currentImageUrl) {
-      // If no image URL, image is required
       imageControl?.setValidators([Validators.required]);
     } else {
-      // If image URL exists, image is optional
       imageControl?.clearValidators();
     }
     imageControl?.updateValueAndValidity();
   }
-
 
   openAddModal() {
     this.resetForm();
@@ -98,66 +95,66 @@ export class PostCategoriesComponent implements OnInit {
   onFileChange(event: any) {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
-      this.imageFile = file;
-      this.imageFile = event.target.files[0];
 
-       if (this.imageFile && this.imageFile.type.split('/')[0] !== 'image') {
-      this.form.get('image')!.setValue('');
-      this.form.get('image')!.setErrors({ 'invalidFileType': true });
-      }else{
+      const validImageTypes = ['image/png', 'image/jpeg'];
+      if (!validImageTypes.includes(file.type)) {
+        this.form.get('image')!.setValue('');
+        this.form.get('image')!.setErrors({ 'invalidFileType': true });
+        return;
+      }
+
+      this.imageFile = file;
       const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.currentImageUrl = e.target.result;
+      reader.onload = () => {
+        this.currentImageUrl = reader.result as string;
       };
       reader.readAsDataURL(file);
-        reader.onload = () => {
-          this.currentImageUrl = reader.result as string;
-        };
-        reader.readAsDataURL(this.imageFile!!);
-      }
     }
   }
 
   removeImage() {
-    this.currentImageUrl= null; 
-    this.imageFile= undefined; 
-    
-    // Réinitialiser le FormControl pour obliger l'utilisateur à uploader un nouveau fichier
+    this.currentImageUrl = null;
+    this.imageFile = undefined;
     this.form.controls['image'].setValue(null);
     this.form.controls['image'].markAsTouched();
     this.updateImageValidation();
   }
-
-
 
   submitForm() {
     if (this.form.invalid) return;
     this.isSubmitting = true;
     const name = this.form.value.name;
     const nameKb = this.form.value.nameKb;
+
     if (this.selectedCategory) {
       this.postCategoriesService.updatePostCategory(this.selectedCategory.id, name, nameKb, this.imageFile).subscribe({
         next: _ => {
-          this.successMessage = 'Catégorie modifiée avec succès';
-          this.loadCategories();
-          this.closeModal();
+          this.successMessage = 'Catégorie modifiée avec succès !';
           this.isSubmitting = false;
+          setTimeout(() => {
+            this.closeModal('modal-category');
+            this.resetForm();
+            this.loadCategories();
+          }, 2000);
         },
         error: err => {
-          this.errorMessage = err.error?.message || 'Erreur lors de la modification';
+          this.errorMessage = 'Une erreur s\'est produite lors de la modification de la catégorie. Veuillez vérifier et réessayer.';
           this.isSubmitting = false;
         }
       });
     } else {
       this.postCategoriesService.addPostCategory(name, nameKb, this.imageFile).subscribe({
         next: _ => {
-          this.successMessage = 'Catégorie ajoutée avec succès';
-          this.loadCategories();
-          this.closeModal();
+          this.successMessage = 'Catégorie ajoutée avec succès !';
           this.isSubmitting = false;
+          setTimeout(() => {
+            this.closeModal('modal-category');
+            this.resetForm();
+            this.loadCategories();
+          }, 2000);
         },
         error: err => {
-          this.errorMessage = err.error?.message || 'Erreur lors de l\'ajout';
+          this.errorMessage = 'Une erreur s\'est produite lors de l\'ajout de la catégorie. Veuillez vérifier et réessayer.';
           this.isSubmitting = false;
         }
       });
@@ -174,35 +171,26 @@ export class PostCategoriesComponent implements OnInit {
     this.isDeleting = true;
     this.postCategoriesService.deletePostCategory(this.deleteId).subscribe({
       next: _ => {
-        this.successMessage = 'Catégorie supprimée avec succès';
+        this.successMessage = 'Catégorie supprimée avec succès !';
         this.loadCategories();
-        this.closeModal('delete');
+        this.closeModal('modal-delete-category');
+        this.deleteId = null;
         this.isDeleting = false;
       },
       error: err => {
-        this.errorMessage = err.error?.message || 'Erreur lors de la suppression';
+        this.errorMessage = 'Une erreur s\'est produite lors de la suppression. Veuillez réessayer.';
         this.isDeleting = false;
       }
     });
   }
 
-  closeModal(type: 'delete' | 'form' = 'form') {
-    const modalId = type === 'form' ? 'modal-category' : 'modal-delete-category';
-    const modal = document.getElementById(modalId);
-    if (modal) {
-      modal.classList.remove('show');
-      modal.setAttribute('aria-hidden', 'true');
-      modal.style.display = 'none';
-      document.body.classList.remove('modal-open');
-      document.body.style.removeProperty('overflow');
-      document.body.style.removeProperty('padding-right');
-      const backdrop = document.querySelector('.modal-backdrop');
-      if (backdrop) backdrop.remove();
-    }
-    if (type === 'form') {
-      this.resetForm();
-    } else {
-      this.deleteId = null;
+  closeModal(modalId: string): void {
+    const modalElement = document.getElementById(modalId);
+    if (modalElement) {
+      const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
+      if (modal) {
+        modal.hide();
+      }
     }
   }
 
