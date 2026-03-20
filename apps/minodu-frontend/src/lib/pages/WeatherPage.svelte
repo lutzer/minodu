@@ -54,10 +54,10 @@
 	$: loading = weather === undefined;
 	$: cloud = weather?.pressure != null && getCloudIcon(weather.pressure);
 	$: wind = weather?.wind_speed != null && getWindIcon(weather.wind_speed);
-	$: soil = weather?.humidity != null && getHumidityIcon(weather.humidity);
+	$: soil = weather?.humidity1 != null && getHumidityIcon(weather.humidity1);
 
 	$: pressure = weather?.pressure != null && getPressureLevel(weather.pressure);
-	$: thermometer = weather?.temperature != null && getTemperatureIcon(weather.temperature);
+	$: thermometer = weather?.temperature1 != null && getTemperatureIcon(weather.temperature1);
 
 	function toggleSpeakWeather() {
 		if (ttsSpeaking) ttsPlayer.stop();
