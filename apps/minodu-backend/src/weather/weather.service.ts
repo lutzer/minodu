@@ -184,12 +184,13 @@ export class WeatherService {
           carbon_monoxide: latest.co,
           nitrogen_dioxide: latest.no2,
           wind_spd: latest.wind_speed,
-          wind_dir: latest.wind_direction
+          wind_dir: latest.wind_direction,
+          description: latest.description
         };
 
-        const description = await this.interpretWeather(weatherData);
-        if (description) {
-          latest.description = description;
+        if(!latest.description) {
+          const description = await this.interpretWeather(weatherData);
+          latest.description =(description!=null) ? description : latest.description;
           await this.weatherRepository.save(latest);
         }
 
