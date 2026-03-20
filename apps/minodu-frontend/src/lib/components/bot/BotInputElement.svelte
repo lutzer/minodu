@@ -71,7 +71,7 @@
 				<div class="input-textarea {!expanded && 'minimized'}">
 					<textarea id="text" bind:value={text} maxlength={1000} onclick={() => (expanded = true)}
 					></textarea>
-					<div class="record-button">
+					<!-- <div class="record-button">
 						<input
 							bind:this={fileInput}
 							type="file"
@@ -83,7 +83,7 @@
 						<button class="button shadow" onclick={() => fileInput.click()} disabled={transcribing}>
 							<img src={micButton} />
 						</button>
-					</div>
+					</div> -->
 				</div>
 			</div>
 			<div class="input-button-group">
