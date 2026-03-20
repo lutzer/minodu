@@ -189,7 +189,7 @@ const translations: TranslationStrings = {
 	},
 	'market.contact': {
 		fr: 'Personne à contacter',
-		kb: 'wei ɛbɩzʋʋ eyekina yɔ́/ wei ɛbɩzʋʋ ɛ-yaa yɔ́'
+		kb: 'wei ɛbɩzʋʋ eyekina yɔ́'
 	},
 	'market.phone-icon': {
 		fr: "Appelez l'administrateur.",
