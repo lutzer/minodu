@@ -98,6 +98,7 @@ sudo systemctl edit ollama.service
 # Add these lines:
 [Service]
 Environment="OLLAMA_HOST=0.0.0.0:11434"
+CPUAffinity=0 1 2
 
 # then enable service
 sudo systemctl enable ollama
