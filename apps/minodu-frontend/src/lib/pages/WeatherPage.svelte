@@ -153,7 +153,7 @@
 					{#if soil}
 						<div class="soil">
 							<img src={soil} alt={t('alt.soilImage', $language)} />
-							<span class="label">{format(weather.humidity)}%</span>
+							<span class="label">{format(weather.humidity1)}%</span>
 						</div>
 					{/if}
 					{#if wind}
@@ -181,7 +181,7 @@
 					{#if thermometer}
 						<div class="thermometer">
 							<img src={thermometer} alt={t('weather.thermometer', $language)} />
-							<span class="label">{format(weather.temperature)} °C</span>
+							<span class="label">{format(weather.temperature1)} °C</span>
 						</div>
 					{/if}
 				</div>
