@@ -52,7 +52,7 @@
 	});
 
 	$: loading = weather === undefined;
-	$: cloud = weather?.pressure != null && getCloudIcon(weather.pressure);
+	$: cloud = weather?.pressure != null && weather?.humidity1 != null && getCloudIcon(weather.pressure, weather.humidity1);
 	$: wind = weather?.wind_speed != null && getWindIcon(weather.wind_speed);
 	$: soil = weather?.humidity1 != null && getHumidityIcon(weather.humidity1);
 
@@ -70,15 +70,35 @@
 		return val == null ? 'NaN' : Math.round(val);
 	}
 
-	function getCloudIcon(airPressure: number): string {
-		if (airPressure < 1000) {
-			return cloudRain;
-		} else if (airPressure < 1010) {
-			return cloudCovered;
-		} else if (airPressure < 1015) {
-			return cloudSunny;
-		} else {
+	function calcRainLikelihood(RH: number, P: number) : number {
+		// Dew point depression (T cancels out)
+		const D = (100 - RH) / 5;
+
+		// Lifting Condensation Level in meters
+		const LCL = Math.max(0, 125 * D);
+
+		// Pressure deviation from standard (1013.25 hPa)
+		const Pfactor = (1013.25 - P) / 10;
+
+		// Score: 70% driven by humidity, 30% by pressure
+		let score = ((RH - 50) / 50) * 70 + Pfactor * 3;
+		score = Math.min(100, Math.max(0, score));
+
+		return score;
+	}
+
+	function getCloudIcon(airPressure: number, humidity: number): string {
+
+		const score = calcRainLikelihood(humidity, airPressure);
+
+		if (score < 30) {
 			return cloudSun;
+		} else if (score < 55) {
+			return cloudCovered;
+		} else if (score < 75) {
+			return cloudCovered
+		} else {
+			return cloudRain;
 		}
 	}
 
