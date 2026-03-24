@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Not, Repository } from 'typeorm';
 import { Weather } from './entities/weather.entity';
 import { SyncWeatherDto } from './dto/sync-weather.dto';
 import { Workbook } from 'exceljs';
@@ -22,26 +22,60 @@ export class WeatherService {
     if (!syncWeatherDto) return;
 
     try {
-      const weather = this.weatherRepository.create({
-        temperature: syncWeatherDto.temp,
-        temperature1: syncWeatherDto.temp1,
-        humidity: syncWeatherDto.hum,
-        humidity1: syncWeatherDto.hum1,
-        pressure: syncWeatherDto.press,
-        luminosity: syncWeatherDto.lux,
-        ambient: syncWeatherDto.ambient,
-        co: syncWeatherDto.CO,
-        no2: syncWeatherDto.NO2,
-        wind_direction: syncWeatherDto.wind_dir,
-        wind_speed: syncWeatherDto.wind_spd,
-        indice_uv: syncWeatherDto.uv,
-        battery: syncWeatherDto.battery
-      });
+      var weather = this.weatherRepository.create({
+          temperature: syncWeatherDto.temp,
+          temperature1: syncWeatherDto.temp1,
+          humidity: syncWeatherDto.hum,
+          humidity1: syncWeatherDto.hum1,
+          pressure: syncWeatherDto.press,
+          luminosity: syncWeatherDto.lux,
+          ambient: syncWeatherDto.ambient,
+          co: syncWeatherDto.CO,
+          no2: syncWeatherDto.NO2,
+          wind_direction: syncWeatherDto.wind_dir,
+          wind_speed: syncWeatherDto.wind_spd,
+          indice_uv: syncWeatherDto.uv,
+          battery: syncWeatherDto.battery
+        });
 
-      const savedWeather = await this.weatherRepository.save(weather);
-      this.loggerService.log(`Weather data synchronized (ID: ${savedWeather.id})`);
-      
-      return savedWeather;
+
+      const latestInterpretedData = await this.findLatestWeatherInterpretation();
+      const thresholdMinutes = 30; // 30 minutes threshold to trigger new interpretation
+      var diffMinutes = thresholdMinutes;
+
+      if (latestInterpretedData) {
+        const now = new Date();
+        const lastInterpretationDate = new Date(latestInterpretedData.date);
+        const diffMs = now.getTime() - lastInterpretationDate.getTime();
+        diffMinutes = diffMs / (1000 * 60);
+      }
+
+      if((diffMinutes > thresholdMinutes) || (latestInterpretedData === null) ) {
+            const weatherAiData = {
+              temperature: weather.temperature,
+              humidity: weather.humidity,
+              pressure: weather.pressure,
+              luminosity: weather.luminosity,
+              ambient_luminosity: weather.ambient,
+              carbon_monoxide: weather.co,
+              nitrogen_dioxide: weather.no2,
+              wind_spd: weather.wind_speed,
+              wind_dir: weather.wind_direction
+            };
+            
+            await this.interpretWeather(weatherAiData).then(async description => {
+              if(description) {
+                weather.description = description;
+                this.loggerService.log(`Weather data interpreted (ID: ${weather.id})`);
+              }
+            })
+        }else{
+          weather.description = (latestInterpretedData)?latestInterpretedData.description: null; // Use the last interpretation as default description
+        }
+
+      weather = await weather.save();
+      this.loggerService.log(`Weather data synchronized (ID: ${weather.id})`);
+      return weather;
 
     } catch (error) {
       this.loggerService.error(`Sync failed: ${error.message}`, WeatherService.name);
@@ -58,7 +92,7 @@ export class WeatherService {
       });
       return response.data;
     } catch (error) {
-      this.loggerService.error(error.response?.data || error.message, WeatherService.name)
+      this.loggerService.error(`Error occurred while interpreting weather data: ${error.message}`, WeatherService.name);
       throw error;
     }
   }
@@ -173,35 +207,25 @@ export class WeatherService {
         this.loggerService.error('No weather data found', WeatherService.name);
         throw new NotFoundException('Aucune donnée météo trouvée !');
       }
-
-      try {
-        const weatherData = {
-          temperature: latest.temperature,
-          humidity: latest.humidity,
-          pressure: latest.pressure,
-          luminosity: latest.luminosity,
-          ambient_luminosity: latest.ambient,
-          carbon_monoxide: latest.co,
-          nitrogen_dioxide: latest.no2,
-          wind_spd: latest.wind_speed,
-          wind_dir: latest.wind_direction,
-          description: latest.description
-        };
-
-        if(!latest.description) {
-          const description = await this.interpretWeather(weatherData);
-          latest.description =(description!=null) ? description : latest.description;
-          await this.weatherRepository.save(latest);
-        }
-
-      } catch (aiError) {
-        this.loggerService.error(`AI Interpretation failed: ${aiError.message}`, WeatherService.name);
-      }
-
       return latest;
     } catch (error) {
       this.loggerService.error(`Error occurred while fetching current weather data: ${error.message}`, WeatherService.name);
       throw error;
+    }
+  }
+
+  async findLatestWeatherInterpretation() {
+    try {
+      const latest = await this.weatherRepository.findOne({
+        where:{description: Not(IsNull())},
+        order:{
+          createdAt:'DESC'
+        }
+      });
+      return (latest) ? {description: latest.description, date: latest.createdAt} : null;
+    } catch (error) {
+      this.loggerService.error(`Error occurred while fetching current weather data: ${error.message}`, WeatherService.name);
+      return null;
     }
   }
 
