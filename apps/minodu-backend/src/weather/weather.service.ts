@@ -40,7 +40,7 @@ export class WeatherService {
 
 
       const latestInterpretedData = await this.findLatestWeatherInterpretation();
-      const thresholdMinutes = 30; // 30 minutes threshold to trigger new interpretation
+      const thresholdMinutes = 1; // 30 minutes threshold to trigger new interpretation
       var diffMinutes = thresholdMinutes;
 
       if (latestInterpretedData) {
@@ -63,9 +63,10 @@ export class WeatherService {
               wind_dir: weather.wind_direction
             };
             
-            await this.interpretWeather(weatherAiData).then(async description => {
+            this.interpretWeather(weatherAiData).then(async description => {
               if(description) {
                 weather.description = description;
+                await weather.save();
                 this.loggerService.log(`Weather data interpreted (ID: ${weather.id})`);
               }
             })
