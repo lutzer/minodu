@@ -4,6 +4,7 @@
   "license": "MIT",
   "scripts": {
     "postinstall": "poetry install --directory tools/sync --no-root",
+    "docker:up" : "docker compose up -d",
     "docker:start": "mkdir -p ./data/mysql && mkdir -p ./data/logs && mkdir -p ./data/minodu-backend && chmod 755 ./data/minodu-backend && docker compose up -d --build",
     "docker:stop": "docker compose down",
     "docker:logs": "docker compose logs -f",
@@ -11,9 +12,11 @@
     "docker:status": "docker compose ps",
     "docker:stats": "docker compose stats",
     "sync": "rm -f ./tools/sync/download.zip && npm run sync:update_backup && npm run sync:database && npm run sync:rag",
-    "sync:update_backup": "curl -X GET http://minodu.chickenkiller.com:3000/backup/create",
-    "sync:database": "npx dotenv -- sh -c 'poetry --directory tools/sync run python sync_database.py http://minodu.chickenkiller.com:3000/files/minodu_backend_backup.zip --destination=../../data/minodu-backend --user=$MYSQL_USER --password=$MYSQL_PASSWORD'",
-    "sync:rag": "poetry --directory tools/sync run python sync_rag.py http://localhost/api/backend/v1/posts/ minodu-minodu-ai-services-1"
+    "sync:update_backup": "curl -X GET http://137.184.46.216:3000/backup/create",
+    "sync:update_database": "npx dotenv -- sh -c 'poetry --directory tools/sync run python sync_database.py http://137.184.46.216:3000/files/minodu_backend_backup.zip --destination=../../data/minodu-backend --user=$MYSQL_USER --password=$MYSQL_PASSWORD'",
+    "sync:database": "npx dotenv -- sh -c 'poetry --directory tools/sync run python sync_database.py https://github.com/lutzer/minodu-installer/releases/download/dataset-v3/minodu_dataset.zip --destination=../../data/minodu-backend --user=$MYSQL_USER --password=$MYSQL_PASSWORD'",
+    "sync:rag": "poetry --directory tools/sync run python sync_rag.py http://localhost/api/backend/v1/posts/ minodu-minodu-ai-services-1",
+    "info:rag": "docker exec minodu-minodu-ai-services-1 python cli.py --list-docs"
   },
   "private": true,
   "devDependencies": {

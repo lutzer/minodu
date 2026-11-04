@@ -163,6 +163,14 @@ const translations: TranslationStrings = {
 		fr: 'Galerie de photos',
 		kb: 'kɛlɛm-kɛlɛm naa kpowu'
 	},
+	'forum.pickerUnavailableTitle': {
+		fr: 'Sélecteur de fichier indisponible',
+		kb: 'Sélecteur de fichier indisponible'
+	},
+	'forum.pickerUnavailableBody': {
+		fr: "Sélection de fichier impossible ici. Ouvrez http://minodupi.local dans Chrome, Firefox ou Safari.",
+		kb: "Sélection de fichier impossible ici. Ouvrez http://minodupi.local dans Chrome, Firefox ou Safari."
+	},
 	'forum.recordAudio': {
 		fr: "Enregistrer l'audio",
 		kb: 'tɔm kiwelezitu kpaaʋ'
